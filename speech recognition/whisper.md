@@ -84,3 +84,50 @@ https://github.com/openai/whisper?tab=readme-ov-file
 ## 결론
 - 보통 동시 발화가 없고 한 언어로 발화하는 오디오에 대해서는 위의 이슈가 나타나지 않음
 - 계속해서 업데이트 되며 일부 이슈들은 해결이 되었을 수도 있음 (24.04)
+
+
+## Fine-tuning
+### Log-Mel Spectrogram
+- 사람의 발화를 녹음한 데이터
+- 매질인 공기 분자가 흔들리며 형성되는 공기압의 진폭이 파형을 띄게 되어 그래프가 그려짐
+- 이 waveform을 이용해서 컴퓨터가 인간의 언어를 인식할 수 있게 해야함
+- 음성 데이터는 연속형 데이터지만 컴퓨터는 0,1만 인식
+- 일정한 시간 간격으로 아날로그 신호의 값을 샘플링하고, 그 샘플링된 값을 이진 코드로 표현하는 방식으로 이루어짐
+- 2 Steps : Sampling & Quantization
+
+### Feature Extraction : Spectrum
+- 대부분의 아날로그 신호나 waveform은 매우 복잡한 구조를 가짐
+  - 이는 다양한 주파수 성분이 혼합되어 있음을 의미
+- 디지털 변화 과정에서는 이러한 복잡한 주파수 성분들을 완벽하게 표현하기 어려움
+
+### 학습 파라미터
+- 모델을 자신의 데이터의 특성에 맞게 학습하기 위해 필요
+  - 아래와 같이 STFT를 적용할때 parameter들이 존재
+- win_length : 음성을 작은 조각으로 자를 대 작은 조각의 크기
+  - 일반적으로 25ms을 기본으로 함
+  - 16000Hz 음성에서는 400(16000/40)에 해당
+- n_fft : FT가 적용될 크기
+  - win_length 보다 크거나 같아야 함
+  - 클시 자동으로 0으로 패딩
+- hop_length : 자르는 간격
+  - 일반적으로 10ms
+  - 16000Hz 음성에서는 160
+ 
+### 데이터 전처리 - Text Normalization, Filtering
+- 학습 데이터셋에 Text Normalization(TN)을 거치지 않고 raw text를 예측하도록 최소한의 전처리 진행
+- TN : TTS전 필수적인 전처리 단계
+  - ex) $123 -> 백이십삼달러
+- ITN : 텍스트 가독성 향상을 위해 ASR 모델 출력을 다시 서면 형식으로 변환하는 과정
+  - ex) 백이십삼달러 -> $123
+- Filtering : 학습에 안좋은 영향을 주는 데이터 제거
+
+### Evaluation Metrics
+- WER(Word Error Rate) : 예측 결과와 정답 간의 모든 단어들을 비교
+- CER(Character Error Rate) : 문자열(한 글자)과 정답 문자열(한 글자) 사이의 문자 오류 비율을 나타내는 지표
+- ?ER = (I+D+S)/N
+  - I (Inertion) : 단어가 잘못 삽입된 개수
+  - D (Deletion) : 단어가 잘못 삭제된 개수
+  - S (Substition) : 잘못 교체된 단어의 개수
+
+### 데이터셋
+- AIHub -> 극한 소음 음성인식 데이터 존재
