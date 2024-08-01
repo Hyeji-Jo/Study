@@ -21,12 +21,12 @@
   -  **Transformer(2017)** 가 나오기 전까지 state-of-the-art로 사용
   -  Sequence -> 일반적으로 하나의 문장을 의미(문장 = 각각의 단어(token)들로 이루어짐)
   -  **context vector는 크기가 고정됨**
-     <img width="1072" alt="image" src="https://github.com/user-attachments/assets/34cd1446-d79e-4b36-9849-d490ada5d727">
+     <img alt="image" src="https://github.com/user-attachments/assets/34cd1446-d79e-4b36-9849-d490ada5d727">
 
 - 2021년 기준으로 최신 고성능 모델들은 Transformer 아키텍처를 기반으로 함
   - GPT : Transformer의 디코더(Decoder) 아키텍처 활용
   - BERT : Transformer의 인코더(Encoder) 아키텍처 활용
-  <img width="1132" alt="image" src="https://github.com/user-attachments/assets/11faec3f-ed01-4149-98d2-7a0e2f89cbaa">
+  <img alt="image" src="https://github.com/user-attachments/assets/11faec3f-ed01-4149-98d2-7a0e2f89cbaa">
 
 
  
