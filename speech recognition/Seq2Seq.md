@@ -95,5 +95,43 @@
 - 실제 학습 및 테스트 과정에서 **입력 문장의 순서를 거꾸로 했을 때 더 높은 정확도**를 보임
   - 출력 문장의 순서는 바꾸지 않음 
 
-  
+## Seq2Seq 구현 shape
+- Encoder
+  - Input = src = [src length, batch size]
+  - embedded = [src length, batch size, embedding dim]
+  - outputs = [src length, batch size, hidden dim * n directions]
+  - hidden = [n layers * n directions, batch size, hidden dim]
+  - cell = [n layers * n directions, batch size, hidden dim]
+  - outputs are always from the top hidden layer
 
+- Seq2Seq
+  - Encoder 결과
+    - src = [src length, batch size]
+    - trg = [trg length, batch size]
+  - hidden = [n layers * n directions, batch size, hidden dim]
+  - cell = [n layers * n directions, batch size, hidden dim]
+  - first input to the decoder is the <sos> tokens
+  - output = [batch size, output dim]
+  - hidden = [n layers, batch size, hidden dim]
+  - cell = [n layers, batch size, hidden dim]
+  - input = [batch size]
+  
+- Decoder
+  - Seq2Seq 결과
+    - input = [batch size]
+    - hidden = [n layers * n directions, batch size, hidden dim]
+    - cell = [n layers * n directions, batch size, hidden dim]
+    - n directions in the decoder will both always be 1, therefore:
+    - hidden = [n layers, batch size, hidden dim]
+    - context = [n layers, batch size, hidden dim]
+  
+  - input = input.unsqueeze(0) 후 input = [1, batch size]
+  - embedded = [1, batch size, embedding dim]
+  - output = [seq length, batch size, hidden dim * n directions]
+  - hidden = [n layers * n directions, batch size, hidden dim]
+  - cell = [n layers * n directions, batch size, hidden dim]
+  - seq length and n directions will always be 1 in this decoder, therefore:
+  - output = [1, batch size, hidden dim]
+  - hidden = [n layers, batch size, hidden dim]
+  - cell = [n layers, batch size, hidden dim]
+  - prediction = [batch size, output dim]
