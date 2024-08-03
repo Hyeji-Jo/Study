@@ -21,6 +21,7 @@
 
 # 닷-프로덕트 어텐션(Dot-Product Attention)  
 <img width="591" alt="image" src="https://github.com/user-attachments/assets/a06aba2f-6197-4b08-8145-cca1df965615">  
+  
 - 디코더의 세번째 LSTM 셀에서 출력 단어를 예측할 때, 어텐션 메커니즘을 사용하는 모습  
   - 디코더의 세번째 LSTM 셀은 출력 단어를 예측하기 위해서 인코더의 모든 입력 단어들의 정보를 다시 한번 참고  
 - 인코더에 softmax 함수 존재  
@@ -30,6 +31,7 @@
 
 ## 1) 어텐션 스코어(Attention Score) 계산  
 <img width="628" alt="image" src="https://github.com/user-attachments/assets/19bde94b-3c74-49c3-860e-5532237bd872">    
+  
 - 조건  
   - 인코더의 시점(time step)을 각각 1, 2, ... N  
   - 인코더의 은닉 상태(hidden state)를 각각 $$ h_1, h_2, ... , h_n $$  
