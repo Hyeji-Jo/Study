@@ -32,7 +32,7 @@
 <img width="628" alt="image" src="https://github.com/user-attachments/assets/19bde94b-3c74-49c3-860e-5532237bd872">    
 - 조건  
   - 인코더의 시점(time step)을 각각 1, 2, ... N  
-  - 인코더의 은닉 상태(hidden state)를 각각 $$h_1, h_2, ... , h_n$$  
+  - 인코더의 은닉 상태(hidden state)를 각각 $$ h_1, h_2, ... , h_n $$  
   - 디코더의 현재 시점(time step) t에서의 디코더의 은닉 상태(hidden state)를 s<sub>t</sub>  
   - 인코더의 은닉 상태와 디코더의 은닉 상태의 차원이 같다고 가정  
   
@@ -47,6 +47,7 @@
   - 해당 스코어 값을 구하기 위해 **s_t를 전치(transpose)** 하고 각 **은닉 상태와 내적(dot product) 실시**  
   - 모든 어텐션 스코어 값은 **스칼라**  
 <img width="352" alt="image" src="https://github.com/user-attachments/assets/5e38a554-faf1-468a-84be-1730fab010e4">  
+
 - s_t와 인코더의 모든 은닉 상태의 **어텐션 스코어의 모음값을 $$e^t$$**로 정의  
 
 ## 2) 소프트맥스(softmax) 함수를 통해 어텐션 분포(Attention Distribution) 구하기  
