@@ -20,7 +20,7 @@
   - V = Values : 모든 시점의 인코더 셀의 은닉 상태들
 
 # 닷-프로덕트 어텐션(Dot-Product Attention)
-<img width="591" alt="image" src="https://github.com/user-attachments/assets/a06aba2f-6197-4b08-8145-cca1df965615">
+<img width="591" alt="image" src="https://github.com/user-attachments/assets/a06aba2f-6197-4b08-8145-cca1df965615">  
 - 디코더의 세번째 LSTM 셀에서 출력 단어를 예측할 때, 어텐션 메커니즘을 사용하는 모습
   - 디코더의 세번째 LSTM 셀은 출력 단어를 예측하기 위해서 인코더의 모든 입력 단어들의 정보를 다시 한번 참고
 - 인코더에 softmax 함수 존재
@@ -29,33 +29,33 @@
   - 각 입력 단어가 디코더에 도움이 되는 정도를 수치화해 이를 하나의 정보로 담아서 디코더로 전송 -> 초록색 삼각형
 
 ## 1) 어텐션 스코어(Attention Score) 계산
-<img width="628" alt="image" src="https://github.com/user-attachments/assets/19bde94b-3c74-49c3-860e-5532237bd872">
+<img width="628" alt="image" src="https://github.com/user-attachments/assets/19bde94b-3c74-49c3-860e-5532237bd872">  
 - 조건
   - 인코더의 시점(time step)을 각각 1, 2, ... N
-  - 인코더의 은닉 상태(hidden state)를 각각 h_1, h_2, ... , h_n
-  - 디코더의 현재 시점(time step) t에서의 디코더의 은닉 상태(hidden state)를 s_t
+  - 인코더의 은닉 상태(hidden state)를 각각 $$h_1, h_2, ... , h_n$$
+  - 디코더의 현재 시점(time step) t에서의 디코더의 은닉 상태(hidden state)를 $$s_t$$
   - 인코더의 은닉 상태와 디코더의 은닉 상태의 차원이 같다고 가정
   
 - 시점 t에서 **출력 단어를 예측하기 위해서 디코더의 셀은 두 개의 입력값을 필요로 함**
   - 이전 시점인 **t-1의 은닉 상태**
   - 이전 시점 **t-1에 나온 출력 단어**
 - 출력 단어 예측에 **어텐션 값(Attention Value)** 도 추가로 필요로 함
-  - t번째 단어를 예측하기 위한 어텐션 값 = **a_t**
+  - t번째 단어를 예측하기 위한 어텐션 값 = **$$a_t$$**
 
 - **어텐션 스코어(Attention Score)**
-  - 현재 디코더의 **시점 t에서 단어를 예측하기 위해**, **인코더의 모든 은닉 상태** 각각이 **디코더의 현 시점의 은닉 상태 s_t와 얼마나 유사한지** 판단하는 스코어값
+  - 현재 디코더의 **시점 t에서 단어를 예측하기 위해**, **인코더의 모든 은닉 상태** 각각이 **디코더의 현 시점의 은닉 상태 $$s_t$$와 얼마나 유사한지** 판단하는 스코어값
   - 해당 스코어 값을 구하기 위해 **s_t를 전치(transpose)** 하고 각 **은닉 상태와 내적(dot product) 실시**
   - 모든 어텐션 스코어 값은 **스칼라**
 <img width="352" alt="image" src="https://github.com/user-attachments/assets/5e38a554-faf1-468a-84be-1730fab010e4">
-- s_t와 인코더의 모든 은닉 상태의 **어텐션 스코어의 모음값을 e^t**로 정의
+- s_t와 인코더의 모든 은닉 상태의 **어텐션 스코어의 모음값을 $$e^t$$**로 정의
 
 ## 2) 소프트맥스(softmax) 함수를 통해 어텐션 분포(Attention Distribution) 구하기
 <img width="660" alt="image" src="https://github.com/user-attachments/assets/ae850d4a-2305-47cb-b3fd-bd356b90c50d">
 
-- **e^t에 소프트맥스 함수를 적용하여, 모든 값을 합하면 1이 되는 확률 분포 = 어텐션 분포(Attention Distribution)**
+- **$$e^t$$ 에 소프트맥스 함수를 적용하여, 모든 값을 합하면 1이 되는 확률 분포 = 어텐션 분포(Attention Distribution)**
 - **각각의 값 = 어텐션 가중치(Attention Weight)**
 - 어텐션 가중치가 클수록 직사각형의 크기가 큼
-- 디코더의 시점 t에서의 어텐션 가중치의 모음값인 어텐션 분포를 $$\alpha^t$$이라고 할 때
+- 디코더의 시점 t에서의 어텐션 가중치의 모음값인 어텐션 분포를 $$\alpha^t$$ 이라고 할 때
   - $$\alpha^t = softmax(e^t)$$
 
 
