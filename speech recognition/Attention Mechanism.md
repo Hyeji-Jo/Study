@@ -64,25 +64,23 @@
 ## 3) 각 인코더의 어텐션 가중치와 은닉 상태를 가중합하여 어텐션 값(Attention Value) 구하기
 <img width="609" alt="image" src="https://github.com/user-attachments/assets/206c25c6-9444-4db7-97d1-3cf2209e5c2e">  
   
-- 어텐션의 최종 결과값을 얻기 위해 각 **인코더의 은닉 상태와 가중치값들을 곱하고, 최종적으로 모두 더함**
+- 어텐션의 최종 결과값을 얻기 위해 각 **인코더의 은닉 상태와 가중치값들을 곱하고, 최종적으로 모두 더함**  
 - 즉, 가중합(Weighted Sum) 진행  
-$$
-a_t = \sum_{i=1}^{N} \alpha_{i}^{t} h_{i}
-$$
-- 이러한 어텐션 값(=$$a_t$$)은 종종 **인코더의 문맥을 포함하고 있다고 하여 컨텍스트 벡터(context vector)라고도 불림**
-  - seq2seq에서 인코더의 마지막 은닉 상태를 컨텍스트 벡터라고 부르는 것과 대조됨
+$$a_t = \sum_{i=1}^{N} \alpha_{i}^{t} h_{i}$$  
+- 이러한 어텐션 값(= $$a_t$$ )은 종종 **인코더의 문맥을 포함하고 있다고 하여 컨텍스트 벡터(context vector)라고도 불림**  
+  - seq2seq에서 인코더의 마지막 은닉 상태를 컨텍스트 벡터라고 부르는 것과 대조됨  
 
 ## 4) 어텐션 값과 디코더의 t 시점의 은닉 상태 연결(Concatenate)
 <img width="688" alt="image" src="https://github.com/user-attachments/assets/c36dc955-7206-4eed-ba8c-14e68f3d805d">  
   
-- $$a_t$$와 $$s_t$$를 결합하여 하나의 벡터로 만드는 작업을 수행 -> $$v_t$$
-- 해당 $$v_t$$를 \(\hat{y}\) 예측 연산의 입력으로 사용하므로서 인코더로부터 얻은 정보를 활용하여 \(\hat{y}\)을 더 잘 예측할 수 있게 됨
+- $$a_t$$와 $$s_t$$를 결합하여 하나의 벡터로 만드는 작업을 수행 -> $$v_t$$  
+- 해당 $$v_t$$를 $$\hat{y}$$ 예측 연산의 입력으로 사용하므로서 인코더로부터 얻은 정보를 활용하여 $$\hat{y}$$을 더 잘 예측할 수 있게 됨  
 
 ## 5) 출력층 연산의 입력이 되는 $$\tilde{s}t$$를 계산
-<img width="492" alt="image" src="https://github.com/user-attachments/assets/d9ce036d-46ec-4078-9af8-6a37cdc8a016">
-
-- $$v_t$$를 가중치 행렬과 곱한 후에 하이퍼볼릭탄젠트 함수를 지나도록 하여 출력층 연산을 위한 새로운 벡터인 $$\tilde{s}t$$ 도출
-- 어텐션 매커니즘에서 출력층의 입력 = $$\tilde{s}t$$
+<img width="492" alt="image" src="https://github.com/user-attachments/assets/d9ce036d-46ec-4078-9af8-6a37cdc8a016">  
+  
+- $$v_t$$를 가중치 행렬과 곱한 후에 하이퍼볼릭탄젠트 함수를 지나도록 하여 출력층 연산을 위한 새로운 벡터인 $$\tilde{s}t$$ 도출  
+- 어텐션 매커니즘에서 출력층의 입력 = $$\tilde{s}t$$  
 
 
 
