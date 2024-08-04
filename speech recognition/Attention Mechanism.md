@@ -84,7 +84,7 @@ $$a_t = \sum_{i=1}^{N} \alpha_{i}^{t} h_{i}$$
 
 ## 6) $$\tilde{s}t$$ 를 출력층의 입력으로 사용  
 - 출력층의 입력으로 사용하여 예측 벡터 도출  
-  $$ \hat{y_t} = \text{Softmax}(W_y \tilde{s_t} + b_y) $$  
+  $$\hat{y_t} = \text{Softmax}(W_y \tilde{s_t} + b_y)$$  
   
 
 
