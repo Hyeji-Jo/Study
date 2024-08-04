@@ -109,23 +109,25 @@
   <img width="667" alt="image" src="https://github.com/user-attachments/assets/85d9eb12-7d07-4564-b616-ec764b9a8d1d">
 
 
-
-
-
-  
-
 - **3가지 종류의 Attention 존재**  
-  - Encoder Self-Attention  
-    - 입력 데이터의 각 부분이 서로 어떻게 관련되어 있는지 파악  
-    - 모델이 문장이나 음성 데이터의 맥락을 이해하는 데 중요한 역할   
-  - Masked Decoder Self-Attention  
+  <img width="700" alt="image" src="https://github.com/user-attachments/assets/938a69f7-fa71-464d-969e-d409fdeb1fc1">  
+
+  - Self-Attention  
+    - **입력 문장에서 각 단어가 다른 어떤 단어와 연광성이 높은지** 계산
+    - 모델이 문장이나 음성 데이터의 맥락을 이해하는 데 중요한 역할
+    - 인코더와 디코더 모두에서 사용
   - Encoder-Decoder Attention  
 - 입력 문장을 토큰화해 사전을 만들고 토큰을 정수에 매핑시켜 임베딩 층을 통과하면 모델이 학습하기 위한 토큰들의 임베딩 값이 만들어 짐  
   - 트랜스포머는 단어를 표현하는 임베딩 벡터와 모델 내 입출력 값이 모두 같은 512 차원  
 - 첫 번째 인코딩 츨에서는 **입력된 문장의 토큰들끼리 유사도 계산**  
   - 512차원을 n개 head로 나눠서 학습함 (= **Multi-head Attention**)  
  
-  
+## 5) Positional Encoding
+- 주기 함수를 활용한 공식을 사용
+  <img width="723" alt="image" src="https://github.com/user-attachments/assets/cf923a3f-0e84-4970-9b3a-fc828478bed8">  
+  <img width="711" alt="image" src="https://github.com/user-attachments/assets/a6844e9c-f586-4a08-b033-9ca38c21394f">  
+
+
 
 
 
