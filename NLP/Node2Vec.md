@@ -27,7 +27,6 @@
 - **Node2Vec**
   - 그래프의 노드를 벡터 공간에 임베딩하는 것을 목표
   - 그래프의 구조적 정보를 반영한 벡터 표현을 생성하여, 이후 머신러닝 모델에서 사용
-    
 -  **NetworkX**  
   - 그래프 데이터를 생성, 처리, 분석 및 시각화하는 데 사용  
   - 임베딩보다는 그래프 자체의 다양한 분석 기능에 중점  
@@ -35,6 +34,6 @@
   - **그래프의 전반적인 구조 분석에는 탁월**하지만, **벡터화를 통한 유사도 측정에는 Node2Vec만큼 효율적이지 않을 수 있음**  
 
     
-<img width="795" alt="image" src="https://github.com/user-attachments/assets/532b4960-d157-482e-8bda-24b62c49e8e3">
+  <img width="795" alt="image" src="https://github.com/user-attachments/assets/532b4960-d157-482e-8bda-24b62c49e8e3">
   
   
