@@ -2,6 +2,10 @@
 - 그래프의 구조적 특성을 반영하면서 노드를 고차원 공간에서 저차원 벡터로 변환
 - Node2Vec는 특히 네트워크 분석, 추천 시스템, 소셜 네트워크 분석 등의 분야에서 유용
 
+# Graph Representation Learning
+<img width="986" alt="image" src="https://github.com/user-attachments/assets/c6a12b04-3535-4fc4-8a4c-8b095f0b4a43">
+
+
 # Word2Vec vs Node2Vec
 - 모두 임베딩 기법으로, 데이터의 고차원 표현을 저차원 벡터로 변환하는 방법
 - **Word2Vec**
@@ -21,6 +25,9 @@
       - 일종의 경로 생성 방식
       - **DFS(깊이 우선 탐색)**:**구조적 유사성**(Structural Equivalence)을 반영 -> 가능한 깊이까지 들어가기 때문에
       - **BFS(너비 우선 탐색)**:노드 간의 **지역적 연결**(Community Similarity)을 반영 -> 주변에 인접한 요소들을 먼저 방문하기 때문에
+      - 확률로 표현되기 때문에 두 노드의 경로가 짧은 경우는 물론이고 경로가 긴 경우에도 이웃 정보를 잡아낼 수 있음
+    - 네거티브 샘플링
+      - 이웃 노드 간의 확률은 높아지고, 이웃하지 않은 노드 간 확률은 낮아지도록 최적화 
   - BFS(너비 우선 탐색)와 DFS(깊이 우선 탐색)를 혼합하여 랜덤 워크를 진행
 
 # Node2Vec vs NetworkX
