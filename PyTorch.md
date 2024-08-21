@@ -30,7 +30,43 @@
 - 텐서는 스칼라, 벡터, 행렬을 일반화한 개념으로 임의의 차원을 가지는 다차원 배열(multi - dimensional array)
 - 스칼라, 벡터, 행렬은 각각 0, 1, 2차원 텐서의 개념으로 볼 수 있음
 - 딥러닝과 머신러닝 분야에서는 고차원의 텐서를 데이터로 다루기 떄문에 중요한 데이터 구조
-- Tensor 생성은 list나 ndarray를 사용 가능
+
+```py
+# numpy - ndarray
+import numpy as np
+n_array = np.arange(10).reshape(2,5)
+print(n_array)
+# [[0 1 2 3 4]
+#  [5 6 7 8 9]]
+print('ndim :', n_array.ndim, ' shape:', n_array.shape) # n_dim : 2  shape: (2, 5)
+
+# pytorch - tensor
+import torch
+t_array = torch.FloatTensor(n_array)
+print(t_array)
+# tensor([[0., 1., 2., 3., 4.],
+#         [5., 6., 7., 8., 9.]])
+print('ndim :', t_array.ndim, ' shape:', t_array.shape) # ndim : 2  shape: torch.Size([2, 5])
+```
+
+- Array to Tensor
+  - Tensor 생성은 list나 ndarray를 사용 가능
+  ```py
+  # data to tensor
+  data = [[3,5], [10,5]]
+  x_data = torch.tensor(data)
+  x_data
+
+  # ndarray to tensor
+  nd_array_ex = np.array(data)
+  tensor_array = torch.from_numpy(nd_array_ex)
+  tensor_array
+
+  # 결과물 동일
+  # tensor([[ 3,  5],
+  #        [10,  5]])
+  ```
+- Tensor가 가질수 있는 data 타입은 numpy와 동일
 
 
 ## 5) Squeeze vs Unsqueeze
