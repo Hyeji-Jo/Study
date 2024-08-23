@@ -75,6 +75,10 @@ print('ndim :', t_array.ndim, ' shape:', t_array.shape) # ndim : 2  shape: torch
   - 행렬의 크기가 동일해야 함
 - 해당 함수를 통해 행렬의 '차원'을 하나 더 높이거나 줄일 수 있음
 - ex) [1,2,3,4] 와 같은 행렬을 [[1,2,3,4]] 또는 [[1],[2],[3],[4]] 와 같이 변환 할 수 있음
+- **view** : reshape과 동일하게 tensor의 shape을 변환
+- **squeeze** : 차원의 개수가 1인 차원을 삭제(압축)
+- **unsqueeze** : 차원의 개수가 1인 차원을 추가
+
 
 ## 6) Broadcasting
 - torch를 통해 행렬을 연산할때, 두 행렬의 크기가 달라도 계산이 되는 경우 종종 존재
@@ -87,7 +91,8 @@ print('ndim :', t_array.ndim, ' shape:', t_array.shape) # ndim : 2  shape: torch
 
 ## 7) Matrix multiplication
 - Broadcasting을 수행할 때, 행렬의 곱은?
-- tensor에는 행렬 곱을 위한 mm, matmul 두가지의 메서드가 존재
+- **내적**을 계산할때만 **dot** 사용
+- tensor에는 **행렬 곱**을 위한 **mm**, matmul 두가지의 메서드가 존재
   - mm 메서드의 경우 Broadcasting을 지원하지 않음
   - matmul 메서드의 경우 지원
  
@@ -99,3 +104,22 @@ print('ndim :', t_array.ndim, ' shape:', t_array.shape) # ndim : 2  shape: torch
 - PyTorch의 핵심 기능인 자동 미분
 - 어떤 tensor에 대한 연산 정보들을 기억했다가 자동으로 미분해주는 기능
   - Tensor 객체의 requires_grad 인자를 True로 만들어 주면 됨 
+
+# 2. PyTorch 모델의 구성 요소
+
+## 1) torch.nn.Module 
+- 딥러닝 모델은 복잡한 구조로 되어있는 것처럼 보이지만, 몇 개의 코어 블록의 반복
+- torch의 nn.Module은 모든 layer의 Base Class
+- Input, Output, Forward, Backward 정의
+- 학습의 대상이 되는 parameter(tensor) 정의
+
+### nn.Parameter
+- Tensor 객체의 상속 객체
+- **nn.Module 내에 attribute**가 될 때는 **required_grad = True**로 지정되어 학습 대상이 되는 Tensor
+- 우리가 직접 지정할 일은 잘 없음
+  - 대부분의 layer에는 weights 값들이 지정되어 있음
+ 
+### Backward
+- Layer에 있는 Parameter들의 미분을 수행
+- Forward의 결과값 (model의 output=예측치)과 실제값간의 차이(loss)에 대해 미분을 수행
+- 해당 값으로 Parameter 업데이트
