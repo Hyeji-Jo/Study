@@ -119,7 +119,117 @@ print('ndim :', t_array.ndim, ' shape:', t_array.shape) # ndim : 2  shape: torch
 - 우리가 직접 지정할 일은 잘 없음
   - 대부분의 layer에는 weights 값들이 지정되어 있음
  
-### Backward
+## 2) Backward
 - Layer에 있는 Parameter들의 미분을 수행
 - Forward의 결과값 (model의 output=예측치)과 실제값간의 차이(loss)에 대해 미분을 수행
 - 해당 값으로 Parameter 업데이트
+- 실제 backward는 Module 단계에서 직접 지정가능
+- Module에서 backward와 optimizer 오버라이딩
+  - 사용자가 직접 미분 수식을 써야하는 부담
+  - 쓸일은 없으나 순서는 이해할 필요 있음
+- 순서
+  - (Forward 과정을 통해 얻어진) Model의 출력값(Output)과 정답값(Label)의 차이를 Loss Function을 통해 계산
+  - Backward는 Loss 값을 활용해 미분을 수행
+  - back-propagation을 통해 Parameter(weight)를 update
+
+### Loss function
+- 입력값(input)에 대한 Model의 출력값(Output)과 정답값(Label)의 차이를 비교해 나타내는 함수
+  - **MSE**(Mean Squared Error) Loss
+    - **회귀**문제에서 많이 쓰이는 함수
+    - 출력값(Output)과 정답값(Label)의 차이의 제곱에 대해 측정
+  - **CE**(Cross Entropy) Loss
+    - **분류**문제에서 많이 쓰이는 함수
+
+## 3) PyTorch Dataset 이론
+<img width="741" alt="image" src="https://github.com/user-attachments/assets/6008fcbe-1b14-4532-8ab9-551e43157e25">
+
+### Dataset 클래스
+- 데이터 입력 형태를 정의하는 클래스
+- 데이터를 입력하는 방식의 표준화
+- Image, Text, Audio 등에 따라 다른 입력정의
+```py
+import torch
+from torch.utils.data import Dataset
+class CustomDataset(Dataset):
+
+  # 초기 데이터 생성 방법을 지정
+  def __init__(self, text, labels):
+    self.labels = labels
+    self.data = text
+
+  # 데이터의 전체 길이 return
+  def __len__(self):
+    return len(self.labels)
+
+  # index 값을 주었을 때 반환되는 데이터의 형태 (X, y)
+  def __getitem__(self, idx):
+    label = self.labels[idx]
+    text = self.data[idx]
+    sample = {"Text": text, "Class": label}
+    return sample
+```
+- **유의점**
+  - 데이터 형태에 따라 각 함수를 다르게 정의
+  - 모든 것을 데이터 생성 시점에 처리할 필요는 없음
+    - image의 Tensor 변화는 학습에 필요한 시점에 변환
+  - 데이터 셋에 대한 표준화된 처리방법 제공 필요
+     - 후속 연구자 또는 동료에게는 빛과 같은 존재
+  - 최근에는 HuggingFace등 표준화된 라이브러리 사용    
+
+### DataLoader 클래스
+- Data의 Batch를 생성해주는 클래스
+- 학습직전(GPU feed전) 데이터의 변환을 책임
+- Tensor로 변환 + Batch 처리가 메인 업무
+- 병렬적인 데이터 전처리 코드의 고민 필요
+```py
+text = ['Happy', 'Amazing', 'Sad', 'Unhappy', 'Claim']
+labels = ['Positive', 'Positive', 'Negative', 'Negative', 'Negative']
+MyDataset = CustomDataset(text, labels)
+
+from torch.utils.data import DataLoader
+MyDataLoader = DataLoader(MyDataset, batch_size=2, shuffle=True)
+next(iter(MyDataLoader))
+```
+- **파라미터**
+  - **sampler**
+    - index를 컨트롤하는 방법
+    - SequentialSampler : 항상 같은 순서
+    - RandomSampler : 랜덤, replacemetn 여부 선택 가능, 개수 선택 가능
+    - SubsetRandomSampler : 랜덤 리스트, 위와 두 조건 불가능
+    - WeigthRandomSampler : 가중치에 따른 확률
+    - BatchSampler : batch단위로 sampling 가능
+    - DistributedSampler : 분산처리 (torch.nn.parallel.DistributedDataParallel과 함께 사용)
+  - **collate_fn**
+    - map-style 데이터셋에서 sample list를 batch 단위로 바꾸기 위해 필요한 기능
+    - zero-padding이나 Variable Size 데이터 등 데이터 사이즈를 맞추기 위해 많이 사용 
+
+
+# 3. PyTorch 모델 관리하기
+
+## 1) 모델 저장하기
+- **model.save()**
+  - 학습의 결과를 저장하기 위한 함수
+  - 모델 형태(architecture)와 파라미터를 저장
+  - 모델 학습 중간 과정의 저장을 통해 최선의 결과모델을 선택
+  - 만들어진 모델을 외부 연구자와 공유하여 학습 재연성 향상
+
+## 2) 모델 체크포인트 만들기
+- 학습의 중간 결과를 저장하여 최선의 결과를 선택
+- earlystopping 기법 사용시 이전 학습의 결과물을 저장
+- loss와 metric 값을 지속적으로 확인 저장
+- 일반적으로 epoch, loss, metric을 함께 저장하여 확인
+- colab에서 지속적인 학습을 위해 필요
+
+## 3) 모델 학습 시켜보기
+- **Transfer learning**
+  - 다른 데이터셋으로 만든 모델을 현재 데이터에 적용
+  - 일반적으로 대용량 데이터셋으로 만들어진 모델의 성능 높음
+  - 현재의 DL에서는 가장 일반적인 학습 기법
+  - backbone architecture가 잘 학습된 모델에서 일부분만 변경하여 학습 수행
+- **Freezing**
+  <img width="573" alt="image" src="https://github.com/user-attachments/assets/8b5dbbe8-65ee-4a41-97d7-8c88eec23e0f">
+
+  - pretrained model을 활용시 모델의 일부분을 frozen 시킴
+  - 모델의 **학습 파라미터들을 update 하지 않고 얼려둔 상태**
+  - 이를 통해 필요한 만큼의 파라미터를 효율적으로 update하여 연산속도를 올리고 빠른 결과를 내는 것이 목적
+  - Auto Grad의 **requires_grad=False**가 되면 freezing 하는 것
