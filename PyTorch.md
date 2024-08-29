@@ -258,3 +258,125 @@ next(iter(MyDataLoader))
   - 각각의 인스턴스들은 "클래스"로부터 공통적인 속성들을 부여받고 인스턴스마다의 특징을 생성 시점에 반영하도록 프로그래밍
 
 ## 2) Monitoring tools for PyTorch
+
+
+### Logging
+- 학습이 진행되면서 주요하다고 생각되는 지표들이나 학습의 상태 등 관련된 정보들을 기록하는 것
+- **Tensorboard**
+  - TensorFlow의 프로젝트로 만들어진 시각화 도구
+  - 학습 그래프, Metric, 학습 결과의 시각화를 지원
+  - PyTorch도 연결하여 사용가능
+  - 여러 값 저장 가능
+    - scalar : metric 등 상수 값의 연속(epoch)을 표시
+    - graph : 모델의 computational graph 표시
+    - histogram : weight 등 값의 분포를 표현
+    - image : 예측 값과 실제 값을 비교 표시
+    - mesh : 3d 형태의 데이터를 표현하는 도구
+  ```py
+  # Tensorboard 기록을 위한 directory 생성
+  import os
+  logs_base_dir = 'logs'
+  os.makedirs(logs_base_dir, exist_ok=True)
+  
+  # 기록 생성 객체 SummaryWriter 생성
+  from torch.utils.tensorboard import SummaryWriter
+  import numpy as np
+  
+  writer = SummaryWriter(logs_base_dir)
+  for n_iter in range(100):
+    # add_scalar : scalar 값을 기록
+    # Loss/train : loss category에 train 값
+    # n_iter : x 축의 값
+    writer.add_scalar('Loss/train', np.random.random(), n_iter)
+    writer.add_scalar('Loss/test', np.random.random(), n_iter)
+    writer.add_scalar('Accuracy/train', np.random.random(), n_iter)
+    writer.add_scalar('Accuracy/test', np.random.random(), n_iter)
+  
+  # 값 기록(disk에 쓰기)
+  writer.flush()
+  
+  # tensorboard 수행
+  %load_ext tensorboard
+  # 파일 위치 지정
+  %tensorboard --logdir {logs_base_dir}
+  ```
+- **Weight & Biases**
+  - 머신러닝 실험을 원활하게 지원하기 위한 상용 도구
+  - 협업, code versioning, 실험 결과 기록 등의 기능을 제공하는 시각화 툴
+  - MLOps의 대표적인 툴으로 확대되고 있음
+  ```py
+  !pip install wandb -q
+
+  config = {'epochs':EPOCHS, 'batch_size':BATCH_SIZE, 'learning_rate':LEARNING_RATE}
+  wandb.init(project='my-test-project', config=config)
+  # config 설정
+  # wandb.config.batch_size = BATCH_SIZE
+  # wandb.config.learning_rate = LEARNING_RATE
+  
+  for e in range(1, EPOCHS+1):
+    epoch_loss = 0
+    epoch_acc = 0
+    for X_batch, y_batch in train_dataset:
+      X_batch, y_batch = X_batch.to(device), y_batch.to(device).type(torch.cuda.FloatTensor)
+      # ...
+      optimizer.step()
+  
+      # ...
+  
+      wandb.log({'accuracy':train_acc, 'loss':train_loss})
+  ```
+
+## 3) Hyperparameter Tuning
+- 모델 스스로 학습하지 않는 값은 사람이 지정
+  - learning rate, 모델의 크기, optimizer 등
+- 마지막 0.01을 쥐어짜야 할 때 도전해볼만!
+- 가장 기본적인 방법
+  - Grid Search
+  - Random search
+  - 최근에는 베이지안 기반 기법들이 주도
+
+### Ray
+- 머신러닝/딥러닝을 할 때 분산 처리를 효과적으로 처리할 수 있도록 도와주는 라이브러리
+- Ray tune을 통해 Hyperparameter tuning을 위한 다양한 모듈을 제공
+- multi-node multi processing 지원 모듈
+- ML/DL의 병렬 처리를 위해 개발된 모듈
+
+## 4) PyTorch Troubleshooting
+- OOM 문제가 해결하기 어려운 이유  
+ - 어디서, 왜 발생했는지 알기 어려움
+ - Error backtracking이 이상한데로 감
+ - 메모리의 이전상황의 파악이 어려움
+ 
+### OOM(Out Of Memory)
+- GPU의 메모리 이상으로 할당하면서 발생하는 오류
+- 모델의 사이즈를 줄이지 않으면서 OOM 오류를 해결하는 방법 존재
+  - Batch size를 줄이는 방법
+  - 훈련과정에서 낭비되는 memory를 줄이는 방법
+    - torch.cuda.empty_cache()를 통해서 사용되지 않는 cache 정리
+    - trainning loop에서 불필요한 변수를 적절히 del 명령어를 통해 삭제
+
+- GPUUtil 사용하기
+  - nvidia-smi 처럼 GPU의 상태를 보여주는 모듈
+  - Colab은 환경에서 GPU 상태 보여주기 편함
+  - iter마다 메모리가 늘어나는지 확인!!
+  ```py
+  !pip install GPUtil
+
+  import GPUtil
+  GPUtil.showUtilization()
+  ```
+- torch.cuda.empty_cache() 사용하기
+  - 사용되지 않는 GPU상 cache 정리
+  - 가용 메모리 확보
+  - del과는 구분이 필요
+  - reset 대신 쓰기 좋은 함수
+- trainning loop에 tensor로 축적되는 변수 확인
+  - tensor로 처리된 변수는 GPU 상에 메모리 사용
+  - 해당 변수 loop안에 연산이 있을 때 GPU에 computational graph를 생성
+- del 명령어 적절히 사용
+  - 필요가 없어진 변수는 적절한 삭제가 필요함
+  - python의 메모리 배치 특성상 loop이 끝나도 메모리 차지함
+- 가능한 batch 사이즈 실험해보기
+- torch.no_grad() 사용하기
+  - Inference 시점에서는 torch.no_grad() 구문을 사용
+  - backward pass로 인해 쌓이는 메모리에서 자유로움    
