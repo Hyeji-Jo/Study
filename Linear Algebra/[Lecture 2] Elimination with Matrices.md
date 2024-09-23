@@ -18,3 +18,9 @@
 ![image](https://github.com/user-attachments/assets/22ecd1ae-72fa-4d04-9fd9-2442de9e81e5)
 
 
+## Permutation
+![image](https://github.com/user-attachments/assets/283dce4b-b57b-4d55-8808-e15ae9c011cf)
+
+
+## Inverses
+![image](https://github.com/user-attachments/assets/2e9cfb39-f4ab-46f8-ab1c-4455e9622c83)
