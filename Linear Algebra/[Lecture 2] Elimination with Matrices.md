@@ -1,8 +1,8 @@
 ## Elimination
 - The way every software solves equations
 - row를 제거하며, 식을 풀어나감
-- Success와 Failure로 나뉨'
-  <img src="https://github.com/user-attachments/assets/834c1889-2144-4568-9204-ba3464bfa8eb.png"  width="200" height="400"/>
+- Success와 Failure로 나뉨
+  ![image](https://github.com/user-attachments/assets/834c1889-2144-4568-9204-ba3464bfa8eb)
 
   ![image](https://github.com/user-attachments/assets/ca8f3d28-f277-462d-b1e0-014998572b99)
 
