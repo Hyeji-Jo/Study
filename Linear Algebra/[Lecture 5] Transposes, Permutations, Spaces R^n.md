@@ -1,4 +1,5 @@
 ## Permutations P  : execute row exchanges
+![image](https://github.com/user-attachments/assets/6d878b8a-6c97-4453-96a8-ee3520631ee0)
 
 
 - numerical accuracy 때문에 0에 가까운 pivot을 좋아하지 않는다
@@ -16,3 +17,23 @@
 - **해결 방법: 피벗팅(Pivoting)**
   - **부분 피벗팅(partial pivoting)** 이나 **완전 피벗팅(full pivoting)** 같은 기법을 사용
   - 각 단계에서 피벗으로 사용할 값이 0에 가깝지 않도록 행이나 열을 재배열하는 방법
+
+## Transposes
+![image](https://github.com/user-attachments/assets/7640dbab-b3ce-4f63-a4fc-a6ea35e2fc3d)
+
+
+## Vector Space
+> **같은 공간에 속한 벡터들은 서로가 서로의 선형결합에 의해 표현될 수 있어야 한다**
+- 벡터 공간 내에 존재하는 임의의 **벡터 v와 w**는 그 둘을 더해도 **(v+w)** 그 결과가 반드시 **같은 벡터 공간에 존재**해야 한다. 
+- 벡터 공간 내에 존재하는 임의의 벡터 **v**에 **임의의 상수 c를 곱해도 (cv)** 그 결과가 반드시 **같은 벡터 공간에 존재**해야 한다.
+- 벡터 공간 내에 존재하는 임의의 **벡터 v, w**와 **임의의 상수 c, d**에 대해 **모든 경우의 cv+dw 조합**(각 벡터에 임의의 상수를 곱한 뒤 더하는, 즉 **선형 결합(Linear Combination)**)결과가 반드시 **같은 벡터 공간에 존재**해야 한다.
+![image](https://github.com/user-attachments/assets/2aa1db25-7d67-4fc8-819e-dd3d6a8b9911)
+![image](https://github.com/user-attachments/assets/9f2f8e0b-0ff2-49ce-aa85-88d0e895972f)
+
+
+## Subspace of R^2 : a vector space inside R^2
+- 부분 공간 역시 벡터 공간이기 때문에 벡터 공간의 조건을 모두 만족해야함
+- R^2 부분 공간이 될 수 있는 목록
+  - all of R^2 : R^2 공간 전체는 그 자체로 자신의 부분 공간이다. (가장 큰 부분 공간)
+  - any line through zero vector [0 0]' : 영벡터를 지나는 직선 * 단, 이 직선이 1차원 공간을 의미하는 것은 아니다. R^2에 속한 직선이므로 두 개의 성분을 갖기 때문이다.
+  - zero vector [0 0]' : 영벡터는 부분 공간의 성질을 모두 만족한다. (가장 작은 부분 공간)
