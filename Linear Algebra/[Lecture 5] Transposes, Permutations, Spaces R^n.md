@@ -32,8 +32,18 @@
 
 
 ## Subspace of $$R^2$$  : a vector space inside $$R^2$$
+![image](https://github.com/user-attachments/assets/dd7dc217-7cea-4509-b040-411bb8f08e8a)
+
 - 부분 공간 역시 벡터 공간이기 때문에 벡터 공간의 조건을 모두 만족해야함
-- $$R^2$$ 부분 공간이 될 수 있는 목록
-  - all of $$R^2$$ : $$R^2$$ 공간 전체는 그 자체로 자신의 부분 공간이다. (가장 큰 부분 공간)
-  - any line through zero vector [0 0]' : 영벡터를 지나는 직선 * 단, 이 직선이 1차원 공간을 의미하는 것은 아니다. $$R^2$$에 속한 직선이므로 두 개의 성분을 갖기 때문이다.
-  - zero vector [0 0]' : 영벡터는 부분 공간의 성질을 모두 만족한다. (가장 작은 부분 공간)
+- **$$R^2$$** 부분 공간이 될 수 있는 목록
+  - all of **$$R^2$$**: $$R^2$$ 공간 전체는 그 자체로 자신의 부분 공간이다. (가장 큰 부분 공간)
+  - **any line through zero vector** [0 0]' : 영벡터를 지나는 직선 * 단, 이 직선이 1차원 공간을 의미하는 것은 아니다. $$R^2$$에 속한 직선이므로 두 개의 성분을 갖기 때문이다.
+  - **zero vector** [0 0]' : 영벡터는 부분 공간의 성질을 모두 만족한다. (가장 작은 부분 공간)
+- **3차원 공간 $$R^3$$** 부분 공간이 될 수 있는 목록
+  - all of **$$R^3$$**
+  - any **plane** through **zero vector** [0 0 0]'
+  - any **line** through **zero vector** [0 0 0]'
+  - **zero vector** [0 0 0]'
+
+## Column Space : C(A)
+![image](https://github.com/user-attachments/assets/2547ef29-9d6f-4787-ab05-d4ea6ec7455d)
