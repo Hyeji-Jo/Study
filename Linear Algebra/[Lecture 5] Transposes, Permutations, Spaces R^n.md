@@ -31,7 +31,7 @@
 ![image](https://github.com/user-attachments/assets/9f2f8e0b-0ff2-49ce-aa85-88d0e895972f)
 
 
-## Subspace of R^2 : a vector space inside R^2
+## Subspace of R<sup>2 : a vector space inside R^2
 - 부분 공간 역시 벡터 공간이기 때문에 벡터 공간의 조건을 모두 만족해야함
 - R^2 부분 공간이 될 수 있는 목록
   - all of R^2 : R^2 공간 전체는 그 자체로 자신의 부분 공간이다. (가장 큰 부분 공간)
