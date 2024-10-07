@@ -11,8 +11,8 @@
   - [Lecture 1] The Geometry of Linear Equations - 선형 방정식들의 기하학적인 접근 
   - [Lecture 2] Elimination with Matrices - 소거법 및 후방 대입법을 활용해 방정식 푸는 방법 학습
   - [Lecture 3] Multiplication and Inverse Matrices - 행렬의 곱셈 및 역행렬 도출 방법 학습
-  - [Lecture 4] Factorization into A = LU - 
-  - [Lecture 5] Transposes, Permutations, Spaces R^n - 
+  - [Lecture 4] Factorization into A = LU - LU 분해를 통해 복잡한 행렬 연산 간소화 방법 설명
+  - [Lecture 5] Transposes, Permutations, Spaces R^n - 대칭 행렬, Vector Space와 Sub Space의 정의 학습
   - [Lecture 6] Column Space and Nullspace - 
 
 
