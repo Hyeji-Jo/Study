@@ -13,7 +13,7 @@
   - [Lecture 3] Multiplication and Inverse Matrices - 행렬의 곱셈 및 역행렬 도출 방법 학습
   - [Lecture 4] Factorization into A = LU - LU 분해를 통해 복잡한 행렬 연산 간소화 방법 설명
   - [Lecture 5] Transposes, Permutations, Spaces R^n - 대칭 행렬, Vector Space와 Sub Space의 정의 학습
-  - [Lecture 6] Column Space and Nullspace - 
+  - [Lecture 6] Column Space and Nullspace - 선형 연립 방정식으로 구성된 sub space인 column space와 Ax=0를 만족시키는 solution x들이 이루는 sub space인 Nullspace 학습
 
 
 
