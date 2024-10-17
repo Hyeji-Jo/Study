@@ -14,74 +14,95 @@
 
 # 1. 과거 음성인식 시스템의 발전과 한계
 <img width="1019" alt="image" src="https://github.com/user-attachments/assets/63a14901-fa96-441d-82cb-78e10d7b2224">
-- 언어 모델(LM) : 단어간의 결합 확률에 관한 지식
-- 발음 사전 : 단어와 음소간의 관계에 대한 지식
-- 음향 모델(AM) : 음소와 소리의 관계에 대한 지식
+- 언어 모델(Language Model = LM)
+  - 단어간의 결합 확률에 관한 지식
+  - 단어 시퀀스의 확률을 모델링하여 문법적 일관성과 문맥을 고려
+  - 일반적으로 **n-그램 모델**을 사용하여 \( P(w_{1}, w_{2}, \dots, w_{n}) \) 형태로 표현
+- 발음 사전(Pronunciation Dictionary)
+  - 단어와 음소간의 관계에 대한 지식
+  - 단어를 음소의 시퀀스로 변환하여 음향 모델과 언어 모델을 연결하는 역할
+- 음향 모델(Acoustic Model= AM)
+  - 음소와 소리의 관계에 대한 지식
+  - 음성 신호와 음소(phoneme) 또는 음향 단위 간의 확률적 관계를 모델링
+  - 관측값은 일반적으로 **MFCC**나 **필터뱅크** 같은 음성 특징 벡터
   - HMM
   - GMM-HMM
   - DNN-HMM
 
-## HMM 기반 음성인식 (1980~2010년대 초반)
+## 1) HMM 기반 음성인식 (1980~2010년대 초반)
 ![image](https://github.com/user-attachments/assets/ba275934-bb00-4283-8134-52f57f4ba13c)
 ![image](https://github.com/user-attachments/assets/ab5e010e-5ead-4475-a97d-d5c4f205cf76)
 
-
 - **히든 마르코프 모델(HMM)** 은 음성을 통계적으로 분석하는 방식
 - 순차데이터를 확률적으로 모델링 하는 생성 모델
-  
-- **개념**
-  - observation(관측치) 뒤에 hidden(은닉)되어 있는 state(상태)를 추청하는 것
-  - 우리가 보유하고 있는 observation(데이터)는 true hidden state(실제 은닉 상태들)이 노이즈가 낀 형태로 실현된 것이라고 보는 것 **(= noisy channel)**
-  - ex. P(x=아이스크림 구매|q=더운 날씨)
-  - 음성 분야에서는 Time-homogeneous Markov Chain 사용
-    - 확률 분포가 시간과는 무관하다는 의미 
-    - 3 states & left-to-right transition
-    ![image](https://github.com/user-attachments/assets/4a259f9b-a70d-49ee-a44e-9f60316343df)
-
-  
-
-- **주요 구성 요소(Parameters)**
-  - **전이 확률(transition probability) A, 방출 확률(emission probablity) B, 초기 상태 분포(Initial State Distribution) π** 3가지 요소로 구성됨
-  - 모든 전이 확률의 합 = **1**, 방출 확률의 합 = **1**, 초기 상태 분포의 합 = **1**
-    - **전이 확률** : 숨겨진 상태(hidden state)에서 다른 상태로 이동할 확률을 의미 ex)"h" 다음에 "e"가 나올 확률을 의미
-    - **방출 확률** : 숨겨진 상태가 실제로 관찰되는 데이터를 생성할 확률 ex)"h"가 특정 주파수의 음성 신호를 방출할 확률
-    - **초기 상태 분포** : 첫 번째 숨겨진 상태가 무엇일지에 대한 확률 분포 ex) "h"-0.3, "s"-0.2, "a"-0.5
-
 - 특정 음소(phoneme)를 인식하고 그 음소들이 조합되어 단어와 문장이 형성
 - 이 방식에서는 음성인식 시스템이 **음향 모델(Acoustic Model), 발음 사전(Pronunciation Dictionary), 언어 모델(Language Model)의 세 가지 모듈로** 나뉘어 처리
-  
-- **문제점**
-  - 모듈마다 독립적으로 훈련되어야 하고, 음성 데이터를 텍스트로 변환하는 여러 단계를 거쳐야 했습니다.
-  - 이로 인해 시스템이 복잡하고 최적화가 어렵고, 새로운 언어나 방언에 대한 확장성이 떨어졌습니다.
-  - 모듈 간 상호작용 부족, 복잡한 최적화 과정, 높은 계산 비용.
 
 ### Markov model
 - 마르코프 모델은 state로 이루어진 Sequence를 상태 전이 확률 행렬로 표현하는 것
 - **Markov 가정** : 시간 **t에서 관측은 가장 최근 r개의 관측에만 의존**한다는 가정
-  - 한 상태에서 다른 상태로의 전이는 이전 상태의 긴 이력을 필요치 않다는 가정 
+  - 한 상태에서 다른 상태로의 전이는 이전 상태의 긴 이력을 필요치 않다는 가정
+  - \[P(S_{t} | S_{t-1}, S_{t-2}, \dots, S_{1}) = P(S_{t} | S_{t-1})\]
 - **Hidden Markov Model** : 관측이 불가능한 process를 관측이 가능한 다른 process로 추정하는 이중 확률처리 모델
-  - 관측이 가능한 Observable과 관측이 불가능한 Hidden state 구분하기 
+  - 관측이 가능한 Observable과 관측이 불가능한 Hidden state 구분하기
+  
+### 개념
+- observation(관측치) 뒤에 hidden(은닉)되어 있는 state(상태)를 추청하는 것
+- 우리가 보유하고 있는 observation(데이터)는 true hidden state(실제 은닉 상태들)이 노이즈가 낀 형태로 실현된 것이라고 보는 것 **(= noisy channel)**
+- ex. P(x=아이스크림 구매|q=더운 날씨)
+- 음성 인식에서는 **시간 동질 마르코프 연쇄(Time-homogeneous Markov Chain)** 를 사용
+  - 이는 확률 분포가 시간과 무관하다는 의미
+  - 3 states & left-to-right transition : **Left-to-right transition** 구조를 사용하며, 3개의 상태로 구성
+  ![image](https://github.com/user-attachments/assets/4a259f9b-a70d-49ee-a44e-9f60316343df)
+
+### 주요 구성 요소(Parameters)
+- **전이 확률(transition probability) A, 방출 확률(emission probablity) B, 초기 상태 분포(Initial State Distribution) π** 3가지 요소로 구성됨
+- 모든 전이 확률의 합 = **1**, 방출 확률의 합 = **1**, 초기 상태 분포의 합 = **1**
+  - **전이 확률** : 숨겨진 상태(hidden state)에서 다른 상태로 이동할 확률을 의미
+    - ex)"h" 다음에 "e"가 나올 확률을 의미
+    - \( A_{ij} = P(S_{t} = j | S_{t-1} = i) \)
+  - **방출 확률** : 숨겨진 상태가 실제로 관찰되는 데이터를 생성할 확률
+    - ex)"h"가 특정 주파수의 음성 신호를 방출할 확률
+    - \( B_{j}(o_{t}) = P(O_{t} = o_{t} | S_{t} = j) \)
+  - **초기 상태 분포** : 첫 번째 숨겨진 상태가 무엇일지에 대한 확률 분포
+    - ex) "h"-0.3, "s"-0.2, "a"-0.5
+    - \( \pi_{i} = P(S_{1} = i) \)
+
+
+### HMM 알고리즘
+- **Forward Algorithm**: 주어진 모델에서 관측된 시퀀스가 나올 확률을 계산
+- **Viterbi Algorithm**: 가장 가능성 있는 숨겨진 상태 시퀀스를 찾는 알고리즘, 실제 음소들이 발음된 시퀀스를 추정하는 데 사용
+- **Baum-Welch Algorithm**: 모델의 파라미터를 학습하는 데 사용되는 알고리즘으로, EM(Expectation-Maximization) 알고리즘의 한 형태
+
+
+### HMM의 한계
+- 모듈마다 독립적으로 훈련되어 복잡하고 최적화가 어렵습니다.
+- 새로운 언어나 방언에 대한 확장성이 떨어집니다.
+- 상태 지속 시간이 지수 분포를 따른다는 가정이 실제 음성에서는 맞지 않을 수 있습니다.
+- 발음 변이, 억양, 발화 속도 등의 다양한 음성 변형을 처리하기 어려운 점이 있습니다.
 
 
 
-## GMM-HMM 기반 ASR
+
+
+## 2) GMM-HMM 기반 ASR
 - **GMM(Gaussian Mixture Model)** 은 음성 데이터에서 음향 모델을 추출하는 과정에서 사용
 - 각 음소의 통계적 특성을 학습하여 음성 신호를 해석
 - 문제점
   - GMM-HMM 시스템은 고정된 수학적 가정을 사용해 특정 주파수 패턴을 기반으로 분석하기 때문에,
   - 실제로 다양한 음성 신호를 정확하게 처리하기에는 한계가 있었습니다. 특히 노이즈나 발음의 변동성에 취약했습니다. 
 
-## DNN-HMM 기반 ASR
+## 3) DNN-HMM 기반 ASR
 - 전통적인 HMM 구조에 **심층 신경망(DNN)** 을 결합하여 음성 신호에서 패턴을 더 잘 학습할 수 있도록 개선한 방식
 - 기존 GMM-HMM보다 성능이 뛰어나며 더 복잡한 음성 패턴을 학습
 - 문제점
   - 여전히 다단계 모듈 구조를 사용하기 때문에 최적화와 훈련이 복잡
 
-## End-to-End ASR
+## 4) End-to-End ASR
 
 
 
-## Hybrid ASR
+## 5) Hybrid ASR
 - 기존 HMM 기반 구조에 신경망을 결합한 하이브리드 시스템
 - HMM, CTC, DNN 등 여러 기법을 결합하여 성능을 높이려는 접근 방식으로, 전통적인 ASR과 End-to-end ASR의 장점을 결합
 
