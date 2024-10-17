@@ -125,6 +125,8 @@
 
 
 ## 2-1) Hybrid ASR - GMM-HMM 기반 ASR
+![image](https://github.com/user-attachments/assets/b3d157c1-cdf5-48e3-bb62-81f64fc9c882)
+
 - **GMM(Gaussian Mixture Model)** 은 음성 데이터에서 음향 모델을 추출하는 과정에서 사용
 - 각 음소의 통계적 특성을 학습하여 음성 신호를 해석
 
