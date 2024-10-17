@@ -5,9 +5,27 @@
 그래서 다른 모델들과의 차이는 무엇이고  
 그런거 등등  
 
+### Q&A
+- 음성에서의 sequence는 무엇을 의미하는가?
+- hmm, Gmm-HMM은 음향 모델내에 속하는 것인지?
+- 음소의 정의는?
+- 왜 HMM이 대세로 굳었는지? 어떻게 나오게 됬는지?
+
 
 # 1. 과거 음성인식 시스템의 발전과 한계
+<img width="1019" alt="image" src="https://github.com/user-attachments/assets/63a14901-fa96-441d-82cb-78e10d7b2224">
+- 언어 모델(LM) : 단어간의 결합 확률에 관한 지식
+- 발음 사전 : 단어와 음소간의 관계에 대한 지식
+- 음향 모델(AM) : 음소와 소리의 관계에 대한 지식
+  - HMM
+  - GMM-HMM
+  - DNN-HMM
+
 ## HMM 기반 음성인식 (1980~2010년대 초반)
+![image](https://github.com/user-attachments/assets/ba275934-bb00-4283-8134-52f57f4ba13c)
+![image](https://github.com/user-attachments/assets/ab5e010e-5ead-4475-a97d-d5c4f205cf76)
+
+
 - **히든 마르코프 모델(HMM)** 은 음성을 통계적으로 분석하는 방식
 - 순차데이터를 확률적으로 모델링 하는 생성 모델
   
@@ -15,6 +33,12 @@
   - observation(관측치) 뒤에 hidden(은닉)되어 있는 state(상태)를 추청하는 것
   - 우리가 보유하고 있는 observation(데이터)는 true hidden state(실제 은닉 상태들)이 노이즈가 낀 형태로 실현된 것이라고 보는 것 **(= noisy channel)**
   - ex. P(x=아이스크림 구매|q=더운 날씨)
+  - 음성 분야에서는 Time-homogeneous Markov Chain 사용
+    - 확률 분포가 시간과는 무관하다는 의미 
+    - 3 states & left-to-right transition
+    ![image](https://github.com/user-attachments/assets/4a259f9b-a70d-49ee-a44e-9f60316343df)
+
+  
 
 - **주요 구성 요소(Parameters)**
   - **전이 확률(transition probability) A, 방출 확률(emission probablity) B, 초기 상태 분포(Initial State Distribution) π** 3가지 요소로 구성됨
