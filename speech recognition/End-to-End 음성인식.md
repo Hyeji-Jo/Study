@@ -14,6 +14,7 @@
 
 # 1. 과거 음성인식 시스템의 발전과 한계
 <img width="1019" alt="image" src="https://github.com/user-attachments/assets/63a14901-fa96-441d-82cb-78e10d7b2224">
+
 - 언어 모델(Language Model = LM)
   - 단어간의 결합 확률에 관한 지식
   - 단어 시퀀스의 확률을 모델링하여 문법적 일관성과 문맥을 고려
