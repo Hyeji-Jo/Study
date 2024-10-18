@@ -126,7 +126,7 @@
 
 ### 1. GMM-HMM (Gaussian Mixture Model - Hidden Markov Model)
 - **특징**
-  - 음향 모델로 **GMM(가우시안 혼합 모델)**을 사용
+  - 음향 모델로 **GMM(가우시안 혼합 모델)** 을 사용
   - **각 음소**(음성의 기본 단위)를 가우시안 혼합 분포로 모델링하여 HMM의 각 상태에서의 방출 확률을 계산
   - HMM은 음소가 시간에 따라 어떻게 전이되는지를 모델링하며, GMM은 각 음소의 통계적 특성을 학습하여 관측된 음성 신호의 음향적 특성을 설명
   - **EM 알고리즘**을 사용하여 GMM의 파라미터(평균, 공분산 등)를 최적화
@@ -143,7 +143,7 @@
 
 ### 2. DNN-HMM (Deep Neural Network - Hidden Markov Model)
 - **특징**
-  - 음향 모델로 **DNN(심층 신경망)**을 사용
+  - 음향 모델로 **DNN(심층 신경망)** 을 사용
   - DNN은 **비선형적인 음성 신호의 패턴을 학습**하는 데 뛰어나며, HMM의 각 상태에서의 방출 확률을 더 정교하게 계산
   - 다층의 뉴런(neuron)을 통해 입력 데이터의 **복잡한 패턴**을 학습하고, 높은 차원의 음향 특징도 잘 처리
   - HMM은 여전히 음소 간의 **시간적 전이**를 모델링하는 데 사용
@@ -385,6 +385,8 @@
 ## 3) End-to-End ASR
 <img width="818" alt="image" src="https://github.com/user-attachments/assets/0092af4a-42e2-4bc2-86e5-98070c8b8542">
 
+![image](https://github.com/user-attachments/assets/dea3f1b8-350b-4bde-addb-1f1aa3e72363)
+
 ### 개념
 - **End-to-End ASR**는 음성 신호 입력을 텍스트 출력으로 직접 매핑하는 방식의 음성 인식 시스템
 - 전통적인 ASR 시스템에서 사용되는 **음향 모델, 언어 모델, 발음 사전** 등의 구성 요소를 통합하여 **단일 신경망 모델**로 구현
@@ -422,7 +424,7 @@
 
 
 # 2. End-to-End ASR 등장 배경(핵심 아이디어, 누가 어떻게 만들었는지)
-- 2010년대에 들어서면서 **심층 신경망(DNN)**이 음성인식에 도입되기 시작했지만, 여전히 GMM-HMM 구조와 결합된 형태였습니다.
+- 2010년대에 들어서면서 **심층 신경망(DNN)** 이 음성인식에 도입되기 시작했지만, 여전히 GMM-HMM 구조와 결합된 형태였습니다.
 - 하지만 더 나은 성능을 위해 단일 신경망으로 음성인식을 처리하는 End-to-end 접근법이 필요하게 되었습니다.
 - 음성 데이터를 바로 텍스트로 변환하는 하나의 신경망 모델을 사용해 여러 모듈을 통합하는 방식
 - 이 방식은 복잡한 중간 단계를 없애고, 음성에서 바로 텍스트로 변환하는 과정을 단순화
@@ -454,6 +456,9 @@
 
 
 # 3. End-to-End ASR의 종류(각 종류별 차이점)
+- "End-to-End Models for Speech Recognition: History and Methodology" (Survey, 2019)
+- "A Comprehensive Review of End-to-End Speech Recognition" (Survey, 2021)
+
 - CTC 기반 ASR
   - Connectionist Temporal Classification(CTC)을 사용하여 음성 입력과 텍스트 출력 사이의 관계를 직접 학습
   - 음성 길이가 다를 때 발생하는 문제를 해결하며, 중간 단계를 생략할 수 있습
@@ -464,7 +469,8 @@
   - 음성 데이터를 처리하기 위해 Self-Attention 메커니즘을 사용하는 최신 End-to-end ASR 모델
   - 실시간 음성 처리에 매우 적합하며, 대규모 음성 데이터에서 높은 성능을 발휘 
 
-## 1. CTC (Connectionist Temporal Classification) - 2012
+## 1. CTC (Connectionist Temporal Classification) - 2006
+-"Connectionist Temporal Classification: Labelling Unsegmented Sequence Data with Recurrent Neural Networks" (CTC, 2006)
 ### 특징
 - 입력과 출력 시퀀스의 길이가 다르거나 정렬되지 않은 경우에도 학습 가능
 - 음성 신호에서 음소 또는 문자 시퀀스를 직접 예측
@@ -487,7 +493,8 @@
 - 출력 레이어에 Softmax를 적용하여 각 타임스텝에서의 확률 분포를 생성
 
 
-## 2. RNN-T (Recurrent Neural Network Transducer) - 2016
+## 2. RNN-T (Recurrent Neural Network Transducer) - 2012
+- "Sequence Transduction with Recurrent Neural Networks" (RNN-T, 2012)
 ### 특징
 - 입력 시퀀스의 처리와 출력 시퀀스의 생성을 동시에 수행
 - 예측된 출력과 함께 입력을 처리하는 구조
@@ -510,6 +517,7 @@
 
 
 ## 3. LAS (Listen, Attend and Spell) - 2015
+- "Listen, Attend and Spell" (LAS, 2015)
 ### 특징
 - Attention 메커니즘을 활용하여 입력 시퀀스에서 필요한 정보에 집중
 - 주어진 정보를 바탕으로 음소 또는 문자를 생성하는 구조
@@ -532,7 +540,8 @@
 - Decoder: 인코딩된 정보를 기반으로 문자를 생성
 
 
-## 4. Hybrid CTC/LAS - 2019
+## 4. Hybrid CTC/LAS - 2017
+- "Hybrid CTC/Attention Architecture for End-to-End Speech Recognition" (2017)
 ### 특징
 - CTC와 LAS의 장점을 결합하여 음성 인식 성능을 극대화
 - 초기 예측을 CTC로 수행하고, 세밀한 예측을 LAS로 수행
