@@ -545,6 +545,9 @@
 
 ## 1. CTC (Connectionist Temporal Classification) - 2006
 -"Connectionist Temporal Classification: Labelling Unsegmented Sequence Data with Recurrent Neural Networks" (CTC, 2006)
+
+- https://zerojsh00.github.io/posts/Connectionist-Temporal-Classification/
+
 ### 특징
 - 입력과 출력 시퀀스의 길이가 다르거나 정렬되지 않은 경우에도 학습 가능
 - 음성 신호에서 음소 또는 문자 시퀀스를 직접 예측
