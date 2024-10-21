@@ -572,6 +572,59 @@
 
 ## 2. RNN-T (Recurrent Neural Network Transducer) - 2012
 - "Sequence Transduction with Recurrent Neural Networks" (RNN-T, 2012)
+
+## Introduction
+- 기존 RNN 모델의 한계를 극복하기 위해, 출력 시퀀스의 길이를 사전에 몰라도 입력 시퀀스를 자유롭게 변환할 수 있는 종단 간(end-to-end) 확률적 시퀀스 변환 시스템을 제안
+- Connectionist Temporal Classification (CTC)의 확장
+  - CTC는 RNN의 출력 레이어로, 입력 시퀀스의 길이가 출력 시퀀스보다 길거나 같을 때 모든 정렬을 고려할 수 있게 합니다.
+  - 하지만 CTC는 출력 간의 종속성을 모델링하지 못합니다.
+  - 이러한 CTC의 단점을 보완하여, 모든 길이의 출력 시퀀스를 다룰 수 있으며 입력과 출력, 출력 간의 종속성을 동시에 모델링
+- 이 변환기는 **체인 그래프 조건부 랜덤 필드(chain-graph CRF)**와 유사하지만, CRF가 출력 간 잠재적인 관계만 모델링하는 데 비해, RNN을 사용해 더 넓은 범위의 입력 정보를 추출하고 더 긴 종속성을 학습할 수 있다는 점에서 차별화
+
+### 2. Recurrent Neural Network Transducer
+- 입력과 출력 시퀀스의 정의
+  - $\( x = (x_1, x_2, ..., x_T) \)$: 길이 T의 입력 시퀀스. 입력 시퀀스는 임의의 길이를 가지며, 어떤 입력 공간 $\( X \)$에 속함.
+  - $\( y = (y_1, y_2, ..., y_U) \)$: 길이 U의 출력 시퀀스. 출력 시퀀스는 출력 공간 $\( Y \)$에 속함.
+  - 입력 벡터 $\( x_t \)$와 출력 벡터 $\( y_u \)$는 고정된 길이의 실수 벡터로 표현됨.
+  - 예를 들어, 음성 인식에서 $\( x_t \)$는 MFCC(Mel-frequency cepstral coefficients) 같은 음성 특징 벡터, $\( y_u \)$는 특정 음소를 나타내는 원-핫 벡터(one-hot vector).
+
+- RNN 변환기의 구조
+  1. **Transcription Network \( F \)**: 입력 시퀀스 $\( x \)$를 처리하여 **전사 벡터(transcription vectors) $\( f = (f_1, ..., f_T) \)$** 를 출력.
+    - **Transcription Network F**는 **양방향 RNN(bidirectional RNN)**
+    - 양방향 RNN을 사용하는 이유는 출력 벡터가 전체 입력 시퀀스에 의존하게 하기 위해
+    - RNN의 활성화 함수로는 전통적인 tanh나 시그모이드 대신 LSTM(Long Short-Term Memory) 구조를 사용
+    - Transcription Network는 Connectionist Temporal Classification (CTC) RNN과 유사하게 null 출력을 사용하여 입력-출력 정렬을 정의하는 구조
+      
+  2. **Prediction Network \( G \)**: 출력 시퀀스 $\( y \)$를 처리하여 **예측 벡터(prediction vectors) $\( g = (g_0, g_1, ..., g_U) \)$** 를 생성.
+     - 입력층, 출력층, 은닉층으로 구성된 **Recurrent Neural Network(RNN)**
+     - 입력은 **원-핫 벡터(one-hot vector)** 로 인코딩
+     - $\[h_u = H(W_{ih} ŷ_u + W_{hh} h_{u-1} + b_h)\]$
+     - H는 은닉층의 활성화 함수로, 전통적인 RNN에서는 주로 tanh 또는 시그모이드(sigmoid) 함수가 사용
+     - 전통적인 RNN에서 **장기 의존성(long-range dependency)**을 학습하는 데 어려움이 있었으나, 논문에서는 LSTM(Long Short-Term Memory) 아키텍처를 사용하여 이 문제를 해결
+     - 이전에 출력된 y 요소들을 기반으로 다음 출력을 예측하는 역할
+ 
+- 전체 입력과 출력 간의 정렬은 격자(lattice) 형태로 나타내며, 이 격자는 모든 가능한 입력-출력 정렬을 포함
+- Forward - 입력 시퀀스의 처음 부분에서 출력 시퀀스의 일부를 생성
+- Backward - 입력 시퀀스의 t에서부터 끝까지, 그리고 출력 시퀀스의 u에서부터 끝까지를 생성할 확률
+- 전체 출력 시퀀스에 대한 확률은 모든 top-left to bottom-right 경로를 따라 계산되며, 이를 통해 전체 확률을 합산
+- 모델의 학습은 각 출력에 대해 **Backpropagation Through Time(BPTT)** 기법을 사용해 **역전파(backpropagation)** 를 수행하여 가중치를 업데이트하는 방식으로 이루어집니다.
+- 주된 방법은 빔 서치(beam search) 알고리즘을 사용
+  - 테스트 단계에서는 빔 서치(beam search) 알고리즘을 사용하여 출력 시퀀스의 확률 분포를 탐색
+  - 트리 구조의 출력 시퀀스를 탐색하는 알고리즘으로, 여러 개의 출력 시퀀스를 동시에 고려하면서 가장 가능성이 높은 경로를 찾습니다.
+  - 이 과정에서 **빔 너비(beam width)**를 설정하여, 고려할 경로의 수를 제한함으로써 계산 복잡도를 줄일 수 있습니다.
+- 길이 정규화
+  - 더 긴 시퀀스가 짧은 시퀀스보다 과도하게 선택되는 것을 방지하기 위해 사용
+  - 확률을 계산할 때, 시퀀스의 길이에 따라 확률을 정규화하여, 짧은 시퀀스가 더 많이 선택되지 않도록 조정
+
+### 3. Experimental Results  
+- RNN Transducer의 성능을 Prediction Network 및 CTC와 비교하여 각 네트워크가 음소 인식 작업에서 어떻게 성능을 발휘하는지 측정
+- 성능은 **음소 오류율(phoneme error rate, PER)** 로 평가
+- **로그 손실(log-loss)** 도 추가적으로 기록되어 모델이 출력 확률을 얼마나 잘 예측하는지 평가
+
+### 4. Conclusions and Future Work
+- 음향 정보와 언어 정보를 통합하여 처리
+
+
 ### 특징
 - 입력 시퀀스의 처리와 출력 시퀀스의 생성을 동시에 수행
 - 예측된 출력과 함께 입력을 처리하는 구조
