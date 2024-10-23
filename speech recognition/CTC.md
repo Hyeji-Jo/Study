@@ -96,7 +96,8 @@
   - **Undirected Graph** : 아래 Nodes와 Edges 그림 처럼 방향성이 없는 그래프
     ![image](https://github.com/user-attachments/assets/16121b9c-3725-456e-be1d-b6bad3e024b9)
 
-    - 예시 : Markov Random Fields, Boltzmann Machine 
+    - 예시 : Markov Random Fields, Boltzmann Machine
+      
   - **Directed Graph** : 아래 오른쪽 그림처럼, 화살표가 존재하는 그래프
     ![image](https://github.com/user-attachments/assets/1c3370ab-a932-4f1e-913e-1be53c7451f2)
 
@@ -135,11 +136,14 @@
     - 하지만, "흡연 여부(C)"가 주어졌을 때, 나이와 질병 여부는 조건부 독립적
     - 흡연 여부를 알고 나면, 나이와 질병 간의 관계는 없어질 수 있기 때문 
 
-
 ### 🔎 Bayesian networks
 - Bayes 네트워크, 신뢰 네트워크 또는 의사결정 네트워크라고도 함
 - Conditional independence(조건부 독립성)
 - 변수 집합과 변수의 조건부 종속성을 나타내는 확률적 그래픽 모델
+- 결합확률 : p(a,b,c)=p(c|a,b)p(a,b)
+- 만약 $\(x_i\), \(i = 1, \ldots, n\)$ 가 이항(binary) 변수라면, $\(p(x_i | x_{i-1}, \ldots, x_1)\)은 \(2^{i-1}\)$개의 모수가 필요
+  - 결론적으로 조건부 확률에서 조건으로 주어지는 변수가 많아지면 모수가 **지수적으로 증가**
+  - 영향을 주는 변수만을 골라서 조건으로 준다면, 고려해야하는 경우 적어지므로 필요한 모수가 적어질 것
 - 예를 들어 베이지안 네트워크는 질병과 증상 간의 확률적 관계를 나타낼 수 있습니다
   - 증상이 주어지면 네트워크를 사용하여 다양한 질병의 존재 확률을 계산 
 ![image](https://github.com/user-attachments/assets/7b8c42fb-190d-4ea6-9c0e-fdfd087ea5b7)
@@ -152,6 +156,16 @@
     - R = Raining(true/false)
     - Rain이 True일 때, Grass Wet이 True일 확률은 높음
     - Sprinkler와 Rain은 서로 독립적이지 않으며, 둘 다 Grass Wet에 영향을 미침
-   - 잔디가 젖어 있을 때 비가 올 확률은?
-     - $\[\Pr(R = T \mid G = T) = \frac{\Pr(G = T, R = T)}{\Pr(G = T)} = \frac{\sum_{x \in \{T,F\}} \Pr(G = T, S = x, R = T)}{\sum_{x,y \in \{T,F\}} \Pr(G = T, S = x, R = y)}\]$
-     - 
+  - 잔디가 젖어 있을 때 비가 올 확률은?
+    - $\[\Pr(R = T \mid G = T) = \frac{\Pr(G = T, R = T)}{\Pr(G = T)} = \frac{\sum_{x \in \{T,F\}} \Pr(G = T, S = x, R = T)}{\sum_{x,y \in \{T,F\}} \Pr(G = T, S = x, R = y)}\]$
+    - $\[Pr(R = T \mid G = T) = \frac{0.00198_{TTT} + 0.1584_{TFT}}{0.00198_{TTT} + 0.288_{TFF} + 0.1584_{TFT} + 0.0_{TFF}} = \frac{891}{2491} \approx 35.77\%.\]$
+  - 결합확률 계산 예시 $\[Pr(G = T, S = T, R = T) = Pr(G = T \mid S = T, R = T) \times Pr(S = T \mid R = T) \times Pr(R = T)\]$
+    - $\[= 0.99 \times 0.01 \times 0.2 = 0.00198\]$ 
+
+### 🔎 CRFs(conditional random fields)
+- 순차 데이터와 의존 관계를 모델링하는 확률 그래프 모델
+- CRF는 주로 자연어 처리(NLP) 분야에서 텍스트 데이터의 특정 부분에 라벨을 할당하는 태깅 작업에 활용(예: POS 태깅, 개체명 인식)
+- 이미지 처리에서 사용되며, 데이터 간의 상관관계를 잘 반영할 수 있다는 장점
+- 입력 시퀀스가 주어졌을 때 각 항목에 가장 적합한 라벨을 예측하는 데 사용
+- **마르코프 랜덤 필드(MRF)** 의 확장으로, 조건부 확률을 사용해 전역적인 최적화를 수행
+- Undirected Graph, 주어진 관측값에 대해 조건부 확률을 모델링
