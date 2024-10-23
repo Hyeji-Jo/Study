@@ -88,13 +88,19 @@
 - 확률 변수들 간의 관계를 그래프 구조로 표현하는 모델
 - 변수들간의 상호 의존 관계를 표현한 확률 모델
 - 확률론적인 문제를 해결하기 위해 변수들 사이의 **의존성(dependencies)** 과 **독립성(independence)** 을 시각적으로 표현하고, 그 구조를 기반으로 추론이나 학습을 수행
+- Conditional Independence라는 가정
 - **구성요소**
   - Node (Vertex): 랜덤 변수(random variable)를 하나의 노드로 표현
   - Edge (Link) : 랜덤 변수 사이의 확률적인 관계
 - 그래프 방향성 여부에 따라 2가지 형태 존재
   - **Undirected Graph** : 아래 Nodes와 Edges 그림 처럼 방향성이 없는 그래프
+    ![image](https://github.com/user-attachments/assets/16121b9c-3725-456e-be1d-b6bad3e024b9)
+
     - 예시 : Markov Random Fields, Boltzmann Machine 
   - **Directed Graph** : 아래 오른쪽 그림처럼, 화살표가 존재하는 그래프
+    ![image](https://github.com/user-attachments/assets/1c3370ab-a932-4f1e-913e-1be53c7451f2)
+
+    - 자식 노드 이전에 부모 노드가 존재
     - 예시 : Bayesian Networks, HMM (Hidden Markov Models), Latent Variable Models 
   ![image](https://github.com/user-attachments/assets/24947be2-2e74-41ab-ae93-ebe1728a50e5)
 
@@ -111,9 +117,41 @@
 - DAG는 cycle이 없는 방향성 그래프
 ![image](https://github.com/user-attachments/assets/2f827e08-eb26-4d02-8dd4-ed23e9651cca)
 
+### 🔎 Conditional Vs. Marginal independence
+- **Marginal independence(주변 독립성)**
+  - P(A,B)=P(A)⋅P(B)
+  - 주변 독립성은 다른 변수가 없을 때도 **두 변수가 완전히 독립적**임을 의미하며, **조건 없이 독립적**
+  - 주사위 던지기: 두 개의 주사위를 던지는 경우, 첫 번째 주사위(A)와 두 번째 주사위(B)의 결과는 주변적으로 독립적
+  - 두 개의 주사위가 서로 영향을 미치지 않기 때문에, A와 B는 서로 독립적
+- **Conditional independence(조건부 독립성)**
+ - P(A,B∣C)=P(A∣C)⋅P(B∣C)
+ - 조건부 독립성은 제3의 변수(조건)가 주어졌을 때 두 변수 간의 독립성을 의미하며, **다른 변수가 존재할 때만 두 변수가 독립적**
+ - 음성 인식에서: "날씨"라는 변수(C)가 주어졌을 때, "우산을 쓰는지(A)"와 "비가 오는지(B)"는 조건부 독립적
+ - 날씨가 비가 오는 날이라면, 이미 날씨 정보를 알기 때문에 우산과 비의 관계는 독립적
+ - conditional independent 하다고 independent 한 것은 아니다
+- **관계**
+  - 조건부 독립일 수 있지만 주변 독립이 아닐 수 있음
+    - "환자의 나이(A)"와 "환자가 특정 질병을 가지고 있는지(B)"는 주변적으로 독립적
+    - 하지만, "흡연 여부(C)"가 주어졌을 때, 나이와 질병 여부는 조건부 독립적
+    - 흡연 여부를 알고 나면, 나이와 질병 간의 관계는 없어질 수 있기 때문 
+
 
 ### 🔎 Bayesian networks
 - Bayes 네트워크, 신뢰 네트워크 또는 의사결정 네트워크라고도 함
+- Conditional independence(조건부 독립성)
 - 변수 집합과 변수의 조건부 종속성을 나타내는 확률적 그래픽 모델
 - 예를 들어 베이지안 네트워크는 질병과 증상 간의 확률적 관계를 나타낼 수 있습니다
   - 증상이 주어지면 네트워크를 사용하여 다양한 질병의 존재 확률을 계산 
+![image](https://github.com/user-attachments/assets/7b8c42fb-190d-4ea6-9c0e-fdfd087ea5b7)
+
+- 활성 스프링클러 또는 비 두 가지 이벤트로 인해 잔디가 젖을 수 있음
+  - 비는 스프링클러 사용에 직접적인 영향을 미침(즉, 비가 올 때 일반적으로 스프링클러는 작동하지 않음)
+  - Pr(G,S,R) = Pr(G|S,R)Pr(S|R)Pr(R)
+    - G = Grass wet(true/false)
+    - S = Sprinkler turned on(true/false)
+    - R = Raining(true/false)
+    - Rain이 True일 때, Grass Wet이 True일 확률은 높음
+    - Sprinkler와 Rain은 서로 독립적이지 않으며, 둘 다 Grass Wet에 영향을 미침
+   - 잔디가 젖어 있을 때 비가 올 확률은?
+     - $\[\Pr(R = T \mid G = T) = \frac{\Pr(G = T, R = T)}{\Pr(G = T)} = \frac{\sum_{x \in \{T,F\}} \Pr(G = T, S = x, R = T)}{\sum_{x,y \in \{T,F\}} \Pr(G = T, S = x, R = y)}\]$
+     - 
