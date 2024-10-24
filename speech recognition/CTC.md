@@ -239,18 +239,18 @@
 > (2)에서 재배열하여 대입하면 다음을 얻습니다. <br/>
 > <img src="https://latex.codecogs.com/png.latex?%5Cfrac%7B%5Calpha_t%28s%29%5Cbeta_t%28s%29%7D%7By_%7Bl_s%27%7D%5E%7Bt%7D%7D%20%3D%20%5Csum_%7B%5Cpi%20%5Cin%20%5Cmathcal%7BB%7D%5E%7B-1%7D%28l%29%2C%20%5Cpi_t%20%3D%20l_s%27%7D%20p%28%5Cpi%7C%5Cmathbf%7Bx%7D%29" alt="Equation"/> <br/>
 >
-> (3)에서 우리는 주어진 시간 t에 **$l'_s$**를 통과하는 경로들에 의한 p(l|x) 의 전체 확률의 일부를 확인할 수 있습니다. 따라서, 임의의 t에 대해 모든 s에 대해 합을 구할 수 있습니다:  <br/>
+> (3)에서 우리는 주어진 시간 t에 **$\[l'_s\]$**를 통과하는 경로들에 의한 p(l|x) 의 전체 확률의 일부를 확인할 수 있습니다. 따라서, 임의의 t에 대해 모든 s에 대해 합을 구할 수 있습니다:  <br/>
 > <img src="https://latex.codecogs.com/png.latex?p%28l%7C%5Cmathbf%7Bx%7D%29%20%3D%20%5Csum_%7Bs%3D1%7D%5E%7B%7C%5Cl_s%27%7C%7D%20%5Cfrac%7B%5Calpha_t%28s%29%5Cbeta_t%28s%29%7D%7By_%7Bl_s%27%7D%5E%7Bt%7D%7D" alt="Equation (14)"/>
  <br/>
 >
-> 이 값을 $y_k^t$에 대해 미분하려면, 시간 t에서 라벨 k를 통과하는 경로들만 고려하면 됩니다. 같은 라벨(또는 빈칸)이 동일한 라벨링 l에서 여러 번 반복될 수 있으므로, 우리는 **$lab(l,k) = {s : l'_s = k}$**로 라벨 k가 발생하는 위치 집합을 정의합니다. 이 집합은 비어 있을 수도 있습니다. 그런 다음 (14)를 미분하여 다음을 얻습니다: <br/>
+> 이 값을 $\[y_k^t\]$에 대해 미분하려면, 시간 t에서 라벨 k를 통과하는 경로들만 고려하면 됩니다. 같은 라벨(또는 빈칸)이 동일한 라벨링 l에서 여러 번 반복될 수 있으므로, 우리는 **$\[lab(l,k) = {s : l'_s = k}\]$**로 라벨 k가 발생하는 위치 집합을 정의합니다. 이 집합은 비어 있을 수도 있습니다. 그런 다음 (14)를 미분하여 다음을 얻습니다: <br/>
 > <img src="https://latex.codecogs.com/png.latex?%5Cfrac%7B%5Cpartial%20p%28l%7C%5Cmathbf%7Bx%7D%29%7D%7B%5Cpartial%20y_k%5E%7Bt%7D%7D%20%3D%20%5Cfrac%7B1%7D%7B%28y_k%5E%7Bt%7D%29%5E2%7D%20%5Csum_%7Bs%20%5Cin%20lab%28l%2Ck%29%7D%20%5Calpha_t%28s%29%5Cbeta_t%28s%29.%20%5Cquad%2815%29" alt="Equation (15)"/>
  <br/>
 > 다음과 같이 관찰할 수 있습니다: <br/>
 > <img src="https://latex.codecogs.com/png.latex?%5Cfrac%7B%5Cpartial%20%5Cln%28p%28l%7C%5Cmathbf%7Bx%7D%29%29%7D%7B%5Cpartial%20y_k%5E%7Bt%7D%7D%20%3D%20%5Cfrac%7B1%7D%7Bp%28l%7C%5Cmathbf%7Bx%7D%29%7D%5Cfrac%7B%5Cpartial%20p%28l%7C%5Cmathbf%7Bx%7D%29%7D%7B%5Cpartial%20y_k%5E%7Bt%7D%7D" alt="Equation"/> <br/>
 > 이제 l = z로 설정하고 (8)과 (15)를 (13)에 대입하여 목적 함수를 미분할 수 있습니다.
 >
-> 마지막으로, 소프트맥스 층을 통해 기울기를 역전파하려면 정규화되지 않은 출력 $u_k^t$에 대한 목적 함수의 미분값이 필요합니다.
+> 마지막으로, 소프트맥스 층을 통해 기울기를 역전파하려면 정규화되지 않은 출력 $\[u_k^t\]$에 대한 목적 함수의 미분값이 필요합니다.
 >
 > 만약 4.1절의 재스케일링이 사용된다면, 우리는 다음을 얻습니다: <br/>
 > <img src="https://latex.codecogs.com/png.latex?%5Cfrac%7B%5Cpartial%20O%5E%7BML%7D%28%7B%5C%7B%28%5Cmathbf%7Bx%7D%2C%5Cmathbf%7Bz%7D%29%7D%2C%5Cmathcal%7BN_w%7D%29%7D%7B%5Cpartial%20u_k%5E%7Bt%7D%7D%20%3D%20y_k%5E%7Bt%7D%20-%20%5Cfrac%7B1%7D%7By_k%5E%7Bt%7D%20Z_t%7D%20%5Csum_%7Bs%20%5Cin%20lab%28z%2Ck%29%7D%20%5Chat%7B%5Calpha_t%28s%29%7D%5Chat%7B%5Cbeta_t%28s%29%7D.%20%5Cquad%2816%29" alt="Equation (16)"/>
@@ -258,11 +258,11 @@
 > 여기서 <img src="https://latex.codecogs.com/png.latex?Z_t%5E%7Bdef%7D%20%3D%20%5Csum_%7Bs%3D1%7D%5E%7B%7Cl%27%7C%7D%20%5Cfrac%7B%5Chat%7B%5Calpha_t%28s%29%7D%20%5Chat%7B%5Cbeta_t%28s%29%7D%7D%7By_%7Bl_s%27%7D%5E%7Bt%7D%7D." alt="Equation"/>
  <br/>
 > 식 (16)은 네트워크가 훈련 중에 받는 '오류 신호'를 나타냅니다 (그림 4 참조). <br/>
-> **[Figure 4]** <img width="400" alt="image" src="https://github.com/user-attachments/assets/18c1cc16-9d47-4f40-968b-37c8d42f7a2f"> <br/>
+> **[Figure 4]**   <img width="400" alt="image" src="https://github.com/user-attachments/assets/18c1cc16-9d47-4f40-968b-37c8d42f7a2f"> <br/>
 > 해당 그림은 CTC 훈련 중 오류 신호의 변화를 보여줍니다. 왼쪽 열은 동일한 시퀀스에 대해 훈련의 각 단계에서 출력 활성화를 나타내며, 오른쪽 열은 해당되는 오류 신호를 보여줍니다. 점선은 'blank' 유닛을 나타냅니다. <br/>
->**(a)** 처음에는 네트워크가 작은 랜덤 가중치를 가지고 있어 예측이 무작위적입니다. 오류는 주로 목표 시퀀스에 의해 결정되며, 출력이 거의 아무런 의미가 없는 상태입니다. 오류 신호는 출력 활성화의 증가나 감소를 유도합니다.<br/>
->**(b)** 네트워크가 목표 시퀀스를 어느 정도 예측하기 시작하며, 오류가 점차 특정 구간에 집중됩니다. 이 단계에서 네트워크는 잘못된 예측을 줄여가고, 특정 시퀀스에서 높은 확률의 활성화를 보입니다.<br/>
->**(c)** 네트워크가 목표 레이블을 정확히 예측하고, 오류는 거의 사라집니다. 이 시점에서 네트워크는 매우 정확한 예측을 수행하며, 오류 신호는 거의 없거나 매우 미미합니다.
+> **(a)** 처음에는 네트워크가 작은 랜덤 가중치를 가지고 있어 예측이 무작위적입니다. 오류는 주로 목표 시퀀스에 의해 결정되며, 출력이 거의 아무런 의미가 없는 상태입니다. 오류 신호는 출력 활성화의 증가나 감소를 유도합니다.<br/>
+> **(b)** 네트워크가 목표 시퀀스를 어느 정도 예측하기 시작하며, 오류가 점차 특정 구간에 집중됩니다. 이 단계에서 네트워크는 잘못된 예측을 줄여가고, 특정 시퀀스에서 높은 확률의 활성화를 보입니다.<br/>
+> **(c)** 네트워크가 목표 레이블을 정확히 예측하고, 오류는 거의 사라집니다. 이 시점에서 네트워크는 매우 정확한 예측을 수행하며, 오류 신호는 거의 없거나 매우 미미합니다.
 
 
 
