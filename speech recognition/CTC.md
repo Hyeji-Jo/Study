@@ -90,7 +90,7 @@
 > 다음 단계는 여러 개의 경로를 하나의 레이블 시퀀스로 매핑하는 함수 B를 정의하는 것입니다. **$\( B : L'^T \to L^{\leq T} \)$** 여기서 **$\( L^{\leq T} \)$** 는 길이가 T 이하인 모든 가능한 레이블 시퀀스를 나타냅니다. 즉, 원래의 알파벳 L에 대한 시퀀스들로 이루어진 집합입니다. 이 매핑은 단순히 경로에서 모든 **blank(빈칸)** 과 반복된 레이블을 제거함으로써 이루어집니다. 예를 들어: B(a - ab-) = B(-aa - abb) = aab. 이 과정은 네트워크가 빈 라벨에서 라벨로, 또는 하나의 라벨에서 다른 라벨로 전환할 때 새로운 라벨을 출력하는 것과 같습니다.**(figure 1)** 마지막으로, 우리는 함수 B를 사용해 조건부 확률을 정의합니다. 주어진 라벨링 **$\( l \in L^{\leq T} \)$** 의 조건부 확률은 그 라벨링에 해당하는 모든 경로의 확률을 합한 값입니다:
 > **(3)** **$\[p(l|x) = \sum_{\pi \in B^{-1}(l)} p(\pi|x). \tag{3}\]$**
 >
-> **[Figure 1]**  <img width="921" alt="image" src="https://github.com/user-attachments/assets/4bf00dca-a95d-4a3c-932e-f1e0faaca287">
+> **[Figure 1]**  <img width="921" alt="image" src="https://github.com/user-attachments/assets/4bf00dca-a95d-4a3c-932e-f1e0faaca287"> <br/>
 > 그림 1. Framewise 네트워크와 CTC 네트워크가 음성 신호를 분류하는 방법
 > 그림에서 음성 신호는 시간에 따라 변화하는 **파형(waveform)** 으로 표현되어 있습니다. 이 음성 신호를 처리하여 네트워크는 특정 시간에 **음소(phonemes)** 가 나올 확률을 계산합니다. **Framewise 네트워크**: 음성 신호의 각 시간 프레임마다 해당 음소가 나올 확률을 예측합니다. 각 프레임에서 어떤 음소가 나올 확률을 개별적으로 계산하기 때문에, 연속된 프레임에서 발생할 확률이 급격하게 변하거나 혹은 잘못된 타이밍으로 예측될 수 있습니다. 예를 들어, 특정 음소가 정확히 맞았더라도, 세그먼트 경계(수동으로 설정된 분할 라인)와 맞지 않으면 오류가 발생합니다. 또한 음소가 붙어 있을 때(예: 'dcl'과 'd'가 같이 나올 때), framewise 네트워크는 이를 따로 예측하는 반면, CTC 네트워크는 이를 함께 예측하는 경향이 있습니다. **CTC 네트워크**: CTC는 전체 시퀀스를 처리한 후, 특정 시간 프레임에서 어떤 음소가 나왔는지에 대한 확률을 추론합니다. 여기서 **'blank'** 라는 출력이 존재하는데, 이는 해당 시간에 아무 음소도 출력되지 않았다는 것을 의미합니다. 이 네트워크는 음소 간 경계를 명확히 맞추는 것이 아니라 음소 자체의 순서에 초점을 맞추어 처리합니다. 또한, CTC는 framewise 방식에 비해 더 연속적이고 명확한 출력을 제공합니다.
 >
@@ -109,7 +109,7 @@
 > **두 번째 방법 (Prefix Search Decoding, 접두사 탐색 디코딩)** 은 section 4.1에서 다룬 전방-후방 알고리즘을 수정하여 라벨링 접두사의 확장에 따른 확률을 효율적으로 계산하는 것에 기반하고 있습니다. 이 방법은 각 라벨링 접두사(시작 부분)를 확장해 나가면서 각 접두사의 확률을 계산해나갑니다.(figure 2)
 > 충분한 시간이 주어지면, Prefix Search Decoding은 항상 가장 높은 확률의 레이블링을 찾을 수 있습니다. 그러나 이 방법은 입력 시퀀스 길이가 길어질수록 확장해야 하는 접두사의 수가 기하급수적으로 증가하는 문제가 있습니다. 즉, 시퀀스가 길어질수록 이 방법이 확장해야 할 접두사(가능한 라벨의 시작 부분)가 많아지므로, 계산량이 매우 커질 수 있습니다. 다행히, 출력 확률 분포가 최대값 주변에 충분히 집중되어 있으면, 이 방법은 합리적인 시간 내에 완료될 수 있습니다. 그러나 이 논문에서 실험한 경우에는 추가적인 휴리스틱(경험적 규칙)이 필요하여, 이 방법을 실용적으로 사용할 수 있도록 했습니다.
 >
-> **[Figure 2]**   <img width="353" alt="image" src="https://github.com/user-attachments/assets/c1b564d1-b6ba-4b19-98b7-6d83dd3e981c">
+> **[Figure 2]**   <img width="353" alt="image" src="https://github.com/user-attachments/assets/c1b564d1-b6ba-4b19-98b7-6d83dd3e981c"> <br/>
 > 그림 2. Prefix Search Decoding(접두사 탐색 디코딩) 각 노드는 **'e'** 로 끝나거나, 그 부모 노드에서 접두사를 확장합니다. **확장하는 노드 위의 숫자는 해당 접두사로 시작하는 모든 레이블링의 총 확률**을 나타냅니다. 끝나는 노드(즉, 'e' 노드) 위의 숫자는 그 노드에 있는 단일 레이블링의 확률을 나타냅니다. 예를 들어, 노드 'X' 위의 0.7은 **'X'** 로 시작하는 모든 레이블링의 확률의 총합을 의미합니다. 매 단계마다, 가장 높은 확률을 가진 접두사를 확장하면서 탐색합니다. 예를 들어, 노드 'X'에서 시작해 'X'로 시작하는 레이블링을 확장한 다음, 다음 노드(확장된 라벨)에 대한 확률을 계산해나가는 방식입니다. 탐색은 **단일 레이블링(여기서는 'XY')** 의 확률이 남은 다른 모든 접두사보다 더 높은 확률을 가질 때 종료됩니다.
 >
 > 훈련된 CTC 네트워크의 출력은 '빈(blank)' 레이블로 강하게 예측되는 구간들로 나뉘고, 그 사이에 스파이크처럼 특정 라벨들이 나타나는 형태를 띠는 경향이 있습니다(그림 1 참고). 이를 바탕으로, 우리는 출력 시퀀스를 구간으로 나누는데, 이 구간은 매우 높은 확률로 빈 레이블로 시작하고 끝나는 구간입니다. 이 구간을 나누는 방법은 빈 레이블의 확률이 일정 임계값을 넘는 지점을 경계점으로 설정하여 나누는 것입니다. 그런 다음, 각 구간에 대해 개별적으로 가장 높은 확률의 라벨을 계산하고, 이를 연결하여 최종 분류 결과를 얻습니다.
@@ -191,13 +191,88 @@
 > $\[\alpha_1(2) = y_{l_1}^1\]$ <br/>
 > $\[\\alpha_1(s) = 0, \quad \forall s > 2\]$ <br/>
 > 그리고 재귀 관계식은 다음과 같습니다: <br/>
-> **(6)**  <img src="https://latex.codecogs.com/png.latex?\alpha_t(s)%20=%20\begin{cases}%20\bar{\alpha}_t(s)%20y_{l_s'}^t%20&%20\text{if%20}%20l_s'%20=%20b%20\text{or}%20l_{s-2}'%20=%20l_s'%20\\%20(\bar{\alpha}_t(s)%20+%20\alpha_{t-1}(s-2))%20y_{l_s'}^t%20&%20\text{otherwise}%20\end{cases}%20\tag{6}" alt="Equation (6)">
+> <img src="https://latex.codecogs.com/png.latex?\alpha_t(s)%20=%20\begin{cases}%20\bar{\alpha}_t(s)%20y_{l_s'}^t%20&%20\text{if%20}%20l_s'%20=%20b%20\text{or}%20l_{s-2}'%20=%20l_s'%20\\%20(\bar{\alpha}_t(s)%20+%20\alpha_{t-1}(s-2))%20y_{l_s'}^t%20&%20\text{otherwise}%20\end{cases}%20\tag{6}" alt="Equation (6)">
  <br/>
 > 여기서 : <br/>
-> **(7)**  **$\[\bar{\alpha}_t(s) = \alpha_{t-1}(s) + \alpha_{t-1}(s-1) \tag{7}\]$** <br/>
+> <img src="https://latex.codecogs.com/png.latex?\bar{\alpha}_t(s)%20=%20\alpha_{t-1}(s)%20+%20\alpha_{t-1}(s-1)%20\tag{7}" alt="Equation (7)">
+ <br/>
 > 이러한 초기설정 및 재귀식을 사용하여 라벨링 접두사에 대한 확률을 계산할 수 있습니다.
 >
-> 
+> **[Figure 3]**  <img width="422" alt="image" src="https://github.com/user-attachments/assets/199e8275-c0e3-42df-89f0-150acdfaab77"> <br/>
+> **'CAT'** 이라는 라벨링에 대해 전방-후방 알고리즘(forward-backward algorithm) 을 적용한 과정을 나타냅니다. 검은색 원은 라벨을 나타내고, 흰색 원은 빈(blank) 상태를 나타냅니다. 화살표는 허용되는 전이를 나타내며, 전방 변수는 화살표의 방향을 따라 업데이트되고, 후방 변수는 그 반대 방향으로 업데이트됩니다.
+>
+> 모든 **s < |l'| − 2(T − t) − 1** 에서 αₜ(s)은 0입니다. 이는 해당 변수들이 주어진 시퀀스를 완료하기에 충분한 시간이 남아있지 않은 상태에 대응하기 때문입니다. 이 경우에 대응되는 그래프의 연결되지 않은 원들이 **figure 3**의 오른쪽 상단에 있습니다. 또한, **모든 s < 1에서도 αₜ(s)은 0**입니다.
+>
+> l의 확률은 시간 T에서 l'의 마지막 빈칸이 포함된 경우와 포함되지 않은 경우의 전체 확률 합입니다. 즉, 다음과 같이 표현됩니다: <br/>
+> <img src="https://latex.codecogs.com/png.latex?p(l|x)%20=%20\alpha_T(l'|l')%20+%20\alpha_T(l'|l'%20-%201)" alt="Equation (8)"/><br/>
+
+>
+> 전방 변수(αₜ(s))와 유사하게 정의된 후방 변수(βₜ(s)) : 후방 변수는 시간 t에서 lₛ:|l|의 전체 확률을 나타냅니다. 후방 변수는 다음과 같이 정의됩니다:<br/>
+> <img src="https://latex.codecogs.com/png.latex?\beta_t(s)\overset{\mathrm{def}}{=}\sum_{\pi\in%20N^T:%20B(\pi_{t:T})=l_{1:s:|l|}}\prod_{t'=t}^{T}y_{\pi_{t'}}^{t'}" alt="Equation (9)"/><br/>
+<img src="https://latex.codecogs.com/png.latex?\beta_T(|l'|)%20=%20y_b^T" alt="Equation 9a"/><br/>
+<img src="https://latex.codecogs.com/png.latex?\beta_T(|l'|-1)%20=%20y_{l_{|l|_1}}^T" alt="Equation 9b"/><br/>
+<img src="https://latex.codecogs.com/png.latex?\beta_T(s)%20=%200,%20\forall%20s%20<%20|l'|%20-1" alt="Equation 9c"/><br/>
+<img src="https://latex.codecogs.com/png.latex?\beta_t(s)%20=%20\begin{cases}%20\bar{\beta}_t(s)y_{l'_s}^t&\text{if}%20l'_s%20=%20b%20\text{or}%20l'_{s+2}%20=%20l'_s\\(\bar{\beta}_t(s)+\beta_{t+1}(s+2))y_{l'_s}^t&\text{otherwise}\end{cases}" alt="Equation (10)"/><br/>
+<img src="https://latex.codecogs.com/png.latex?\bar{\beta}_t(s)\overset{\mathrm{def}}{=}\beta_{t+1}(s)+\beta_{t+1}(s+1)" alt="Equation (11)"/><br/>
+> βₜ(s) = 0 for all s > 2t (figure 3의 왼쪽 아래에 있는 연결되지 않은 원들) 및 s > |l₀|입니다. 이는 βₜ(s)의 값이 특정 조건에서 0이 되는 경우를 설명하는데, s가 t의 두 배보다 크거나 라벨 시퀀스 l₀의 길이보다 클 경우에는 βₜ(s)가 0이 된다는 의미입니다. 실제로 위의 재귀식은 디지털 컴퓨터에서 곧 underflow를 초래하게 됩니다. 이를 피하는 한 가지 방법은 forward 및 backward 변수를 rescale하는 것입니다(Rabiner, 1989). <br/>
+> <img src="https://latex.codecogs.com/png.latex?D_t%5E%7Bdef%7D%20%3D%20%5Csum_%7Bs%7D%20%5Cbeta_t%28s%29%2C%20%5Cquad%20%5Chat%7B%5Cbeta_t%28s%29%7D%5E%7Bdef%7D%20%3D%20%5Cfrac%7B%5Cbeta_t%28s%29%7D%7BD_t%7D" alt="Equation"/> <br/>
+> (식 6)과 (식 7)의 우변에 α 대신 α̂를 대입한다면, 전방 변수(forward variables)는 계산 가능한 범위 내에 머물게 됩니다.
+>
+> <img src="https://latex.codecogs.com/png.latex?D_t%5E%7Bdef%7D%20%3D%20%5Csum_%7Bs%7D%20%5Cbeta_t%28s%29%2C%20%5Cquad%20%5Chat%7B%5Cbeta_t%28s%29%7D%5E%7Bdef%7D%20%3D%20%5Cfrac%7B%5Cbeta_t%28s%29%7D%7BD_t%7D" alt="Equation"/> <br/>
+> 이와 마찬가지로, backward 변수에 대해 (10) 및 (11)에서 β 대신 β̂를 대입합니다.
+>
+> 최대 우도 오류를 평가하려면, 목표 레이블 확률의 자연 로그가 필요합니다. 재조정된 변수들을 사용하면, 이 값들은 특히 간단한 형태를 띱니다.
+> <img src="https://latex.codecogs.com/png.latex?%5Cln%28p%28l%7C%5Cmathbf%7Bx%7D%29%29%20%3D%20%5Csum_%7Bt%3D1%7D%5ET%20%5Cln%28C_t%29" alt="Equation"/> <br/>
+>
+> **4.2. Maximum Likelihood Training**
+> 최대 우도 학습의 목표는 학습 세트 내에서 올바른 분류에 해당하는 모든 로그 확률을 동시에 극대화하는 것입니다. 우리의 경우, 이것은 다음 목적 함수를 최소화하는 것을 의미합니다: <br/>
+> <img src="https://latex.codecogs.com/png.latex?O%5E%7BML%7D%28S%2C%5Cmathcal%7BN_w%7D%29%20%3D%20-%20%5Csum_%7B%28%5Cmathbf%7Bx%7D%2C%5Cmathbf%7Bz%7D%29%20%5Cin%20S%7D%20%5Cln%28p%28%5Cmathbf%7Bz%7D%7C%5Cmathbf%7Bx%7D%29%29" alt="Equation (12)"/> <br/>
+>
+> 경사 하강법을 사용하여 네트워크를 학습시키기 위해서는 네트워크 출력에 대해 (12)의 미분값을 구해야 합니다. 학습 예시들이 독립적이므로, 각각을 따로따로 고려할 수 있습니다: <br/>
+> <img src="https://latex.codecogs.com/png.latex?%5Cfrac%7B%5Cpartial%20O%5E%7BML%7D%28%7B%5C%7B%28%5Cmathbf%7Bx%7D%2C%5Cmathbf%7Bz%7D%29%7D%2C%5Cmathcal%7BN_w%7D%29%7D%7B%5Cpartial%20y_k%5E%7Bt%7D%7D%20%3D%20-%5Cfrac%7B%5Cpartial%20%5Cln%28p%28%5Cmathbf%7Bz%7D%7C%5Cmathbf%7Bx%7D%29%29%7D%7B%5Cpartial%20y_k%5E%7Bt%7D%7D" alt="Equation (13)"/>
+  <br/>
+> 이제 4.1절의 알고리즘을 사용하여 (13)을 계산하는 방법을 보여주겠습니다.
+>
+> 핵심은 라벨링 l에 대해 주어진 s와 t에서 전방 및 후방 변수의 곱은 시간 t에서 기호 s를 통과하는 l에 해당하는 모든 경로의 확률이라는 것입니다. 더 정확하게 말하면 (5)와 (9)에서 우리는 다음을 얻습니다.  <br/>
+> <img src="https://latex.codecogs.com/png.latex?%5Calpha_t%28s%29%5Cbeta_t%28s%29%20%3D%20%5Csum_%7B%5Cpi%20%5Cin%20%5Cmathcal%7BB%7D%5E%7B-1%7D%28l%29%7D%3A%20%5Cpi_t%20%3D%20l_s%27%7D%20y_%7Bl_s%27%7D%5E%7Bt%7D%20%5Cprod_%7Bt%3D1%7D%5ET%20y_%7B%5Cpi_t%7D%5E%7Bt%7D" alt="Equation"/> <br/>
+>
+> (2)에서 재배열하여 대입하면 다음을 얻습니다. <br/>
+> <img src="https://latex.codecogs.com/png.latex?%5Cfrac%7B%5Calpha_t%28s%29%5Cbeta_t%28s%29%7D%7By_%7Bl_s%27%7D%5E%7Bt%7D%7D%20%3D%20%5Csum_%7B%5Cpi%20%5Cin%20%5Cmathcal%7BB%7D%5E%7B-1%7D%28l%29%7D%3A%20%5Cpi_t%20%3D%20l_s%27%7D%20p%28%5Cpi%7C%5Cmathbf%7Bx%7D%29" alt="Equation"/>
+ <br/>
+>
+> (3)에서 우리는 주어진 시간 t에 **$l'_s$**를 통과하는 경로들에 의한 p(l|x) 의 전체 확률의 일부를 확인할 수 있습니다. 따라서, 임의의 t에 대해 모든 s에 대해 합을 구할 수 있습니다:  <br/>
+> <img src="https://latex.codecogs.com/png.latex?p%28l%7C%5Cmathbf%7Bx%7D%29%20%3D%20%5Csum_%7Bs%3D1%7D%5E%7B%7C%5Cl_s%27%7C%7D%20%5Cfrac%7B%5Calpha_t%28s%29%5Cbeta_t%28s%29%7D%7By_%7Bl_s%27%7D%5E%7Bt%7D%7D" alt="Equation (14)"/>
+ <br/>
+>
+> 이 값을 $y_k^t$에 대해 미분하려면, 시간 t에서 라벨 k를 통과하는 경로들만 고려하면 됩니다. 같은 라벨(또는 빈칸)이 동일한 라벨링 l에서 여러 번 반복될 수 있으므로, 우리는 **$lab(l,k) = {s : l'_s = k}$**로 라벨 k가 발생하는 위치 집합을 정의합니다. 이 집합은 비어 있을 수도 있습니다. 그런 다음 (14)를 미분하여 다음을 얻습니다: <br/>
+> <img src="https://latex.codecogs.com/png.latex?%5Cfrac%7B%5Cpartial%20p%28l%7C%5Cmathbf%7Bx%7D%29%7D%7B%5Cpartial%20y_k%5E%7Bt%7D%7D%20%3D%20%5Cfrac%7B1%7D%7B%28y_k%5E%7Bt%7D%29%5E2%7D%20%5Csum_%7Bs%20%5Cin%20lab%28l%2Ck%29%7D%20%5Calpha_t%28s%29%5Cbeta_t%28s%29.%20%5Cquad%2815%29" alt="Equation (15)"/>
+ <br/>
+> 다음과 같이 관찰할 수 있습니다: <br/>
+> <img src="https://latex.codecogs.com/png.latex?%5Cfrac%7B%5Cpartial%20%5Cln%28p%28l%7C%5Cmathbf%7Bx%7D%29%29%7D%7B%5Cpartial%20y_k%5E%7Bt%7D%7D%20%3D%20%5Cfrac%7B1%7D%7Bp%28l%7C%5Cmathbf%7Bx%7D%29%7D%5Cfrac%7B%5Cpartial%20p%28l%7C%5Cmathbf%7Bx%7D%29%7D%7B%5Cpartial%20y_k%5E%7Bt%7D%7D" alt="Equation"/> <br/>
+> 이제 l = z로 설정하고 (8)과 (15)를 (13)에 대입하여 목적 함수를 미분할 수 있습니다.
+>
+> 마지막으로, 소프트맥스 층을 통해 기울기를 역전파하려면 정규화되지 않은 출력 $u_k^t$에 대한 목적 함수의 미분값이 필요합니다.
+>
+> 만약 4.1절의 재스케일링이 사용된다면, 우리는 다음을 얻습니다: <br/>
+> <img src="https://latex.codecogs.com/png.latex?%5Cfrac%7B%5Cpartial%20O%5E%7BML%7D%28%7B%5C%7B%28%5Cmathbf%7Bx%7D%2C%5Cmathbf%7Bz%7D%29%7D%2C%5Cmathcal%7BN_w%7D%29%7D%7B%5Cpartial%20u_k%5E%7Bt%7D%7D%20%3D%20y_k%5E%7Bt%7D%20-%20%5Cfrac%7B1%7D%7By_k%5E%7Bt%7D%20Z_t%7D%20%5Csum_%7Bs%20%5Cin%20lab%28z%2Ck%29%7D%20%5Chat%7B%5Calpha_t%28s%29%7D%5Chat%7B%5Cbeta_t%28s%29%7D.%20%5Cquad%2816%29" alt="Equation (16)"/>
+<br/>
+> 여기서 <img src="https://latex.codecogs.com/png.latex?Z_t%5E%7Bdef%7D%20%3D%20%5Csum_%7Bs%3D1%7D%5E%7B%7Cl%27%7C%7D%20%5Cfrac%7B%5Chat%7B%5Calpha_t%28s%29%7D%20%5Chat%7B%5Cbeta_t%28s%29%7D%7D%7By_%7Bl_s%27%7D%5E%7Bt%7D%7D." alt="Equation"/>
+ <br/>
+> 식 (16)은 네트워크가 훈련 중에 받는 '오류 신호'를 나타냅니다 (그림 4 참조).
+>
+> **[Figure 4]** <img width="400" alt="image" src="https://github.com/user-attachments/assets/18c1cc16-9d47-4f40-968b-37c8d42f7a2f"> <br/>
+> 해당 그림은 CTC 훈련 중 오류 신호의 변화를 보여줍니다. 왼쪽 열은 동일한 시퀀스에 대해 훈련의 각 단계에서 출력 활성화를 나타내며, 오른쪽 열은 해당되는 오류 신호를 보여줍니다. 점선은 'blank' 유닛을 나타냅니다. <br/>
+>**(a)** 처음에는 네트워크가 작은 랜덤 가중치를 가지고 있어 예측이 무작위적입니다. 오류는 주로 목표 시퀀스에 의해 결정되며, 출력이 거의 아무런 의미가 없는 상태입니다. 오류 신호는 출력 활성화의 증가나 감소를 유도합니다.<br/>
+>**(b)** 네트워크가 목표 시퀀스를 어느 정도 예측하기 시작하며, 오류가 점차 특정 구간에 집중됩니다. 이 단계에서 네트워크는 잘못된 예측을 줄여가고, 특정 시퀀스에서 높은 확률의 활성화를 보입니다.<br/>
+>**(c)** 네트워크가 목표 레이블을 정확히 예측하고, 오류는 거의 사라집니다. 이 시점에서 네트워크는 매우 정확한 예측을 수행하며, 오류 신호는 거의 없거나 매우 미미합니다.
+
+
+
+
+
+
+
+
 
 
 - 
@@ -500,3 +575,13 @@
 ### 🔎 Log likelihood(
 - **로그 우도**는 확률의 로그 값을 의미하며, 학습 과정에서 **이 값을 최대화**하는 것이 목적
 - **목적 함수**를 최소화하면, 결과적으로 로그 우도 값이 커지며, 이는 **목표 라벨이 나올 가능성을 높이는 방향**으로 학습이 진행된다는 의미
+
+### 🔎 Underflow
+- 수치 계산에서 발생하는 문제로, 매우 작은 숫자를 표현하려고 할 때 발생하는 현상
+- 컴퓨터의 부동 소수점 표현 방식에서 숫자의 범위는 제한적이며, 너무 작은 값은 컴퓨터가 정확하게 표현할 수 없을 정도로 작아질 수 있음
+- 매우 작은 값을 계산하게 되면, 그 숫자가 부동 소수점 표현 방식의 하한보다 작아져 0으로 처리될 수 있음
+  - 즉, 결과적으로 소실이 발생하여 잘못된 결과를 얻을 수 있는 상황을 underflow라고 함
+- 해결방법
+  - 로그 변환(log transformation): 작은 확률 값을 다룰 때, 값 자체를 사용하는 대신, 그 값의 로그 값을 사용하면 underflow 문제를 완화
+  - 정규화(Normalization): 계산 중간중간에 값을 정규화(값을 일정 범위 내로 조정)하여 작은 값을 크게 만들어 underflow를 방지
+  - 재스케일링(Rescaling): 아주 작은 값을 곱하거나 더하는 계산을 하기 전에 값을 스케일링(배율 변경)하여 underflow를 방지  
