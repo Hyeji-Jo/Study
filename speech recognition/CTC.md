@@ -191,14 +191,8 @@
 > $\[\alpha_1(2) = y_{l_1}^1\]$ <br/>
 > $\[\\alpha_1(s) = 0, \quad \forall s > 2\]$ <br/>
 > 그리고 재귀 관계식은 다음과 같습니다: <br/>
-> **(6)**  $$ 
-\alpha_t(s) = 
-\begin{cases} 
-\bar{\alpha}_t(s) y_{l_s'}^t & \text{if } l_s' = b \text{ or } l_{s-2}' = l_s' \\ 
-(\bar{\alpha}_t(s) + \alpha_{t-1}(s-2)) y_{l_s'}^t & \text{otherwise} 
-\end{cases} 
-\tag{6}
-$$ <br/>
+> **(6)**  <img src="https://latex.codecogs.com/png.latex?\alpha_t(s)%20=%20\begin{cases}%20\bar{\alpha}_t(s)%20y_{l_s'}^t%20&%20\text{if%20}%20l_s'%20=%20b%20\text{or}%20l_{s-2}'%20=%20l_s'%20\\%20(\bar{\alpha}_t(s)%20+%20\alpha_{t-1}(s-2))%20y_{l_s'}^t%20&%20\text{otherwise}%20\end{cases}%20\tag{6}" alt="Equation (6)">
+ <br/>
 > 여기서 : <br/>
 > **(7)**  **$\[\bar{\alpha}_t(s) = \alpha_{t-1}(s) + \alpha_{t-1}(s-1) \tag{7}\]$** <br/>
 > 이러한 초기설정 및 재귀식을 사용하여 라벨링 접두사에 대한 확률을 계산할 수 있습니다.
