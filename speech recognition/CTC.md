@@ -259,7 +259,7 @@
 > 여기서 <img src="https://latex.codecogs.com/png.latex?Z_t%5E%7Bdef%7D%20%3D%20%5Csum_%7Bs%3D1%7D%5E%7B%7Cl%27%7C%7D%20%5Cfrac%7B%5Chat%7B%5Calpha_t%28s%29%7D%20%5Chat%7B%5Cbeta_t%28s%29%7D%7D%7By_%7Bl_s%27%7D%5E%7Bt%7D%7D." alt="Equation"/>
  <br/>
 > 식 (16)은 네트워크가 훈련 중에 받는 '오류 신호'를 나타냅니다 (그림 4 참조).
->
+> 
 > **[Figure 4]** <img width="400" alt="image" src="https://github.com/user-attachments/assets/18c1cc16-9d47-4f40-968b-37c8d42f7a2f"> <br/>
 > 해당 그림은 CTC 훈련 중 오류 신호의 변화를 보여줍니다. 왼쪽 열은 동일한 시퀀스에 대해 훈련의 각 단계에서 출력 활성화를 나타내며, 오른쪽 열은 해당되는 오류 신호를 보여줍니다. 점선은 'blank' 유닛을 나타냅니다. <br/>
 >**(a)** 처음에는 네트워크가 작은 랜덤 가중치를 가지고 있어 예측이 무작위적입니다. 오류는 주로 목표 시퀀스에 의해 결정되며, 출력이 거의 아무런 의미가 없는 상태입니다. 오류 신호는 출력 활성화의 증가나 감소를 유도합니다.<br/>
