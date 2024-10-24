@@ -234,11 +234,10 @@
 > 이제 4.1절의 알고리즘을 사용하여 (13)을 계산하는 방법을 보여주겠습니다.
 >
 > 핵심은 라벨링 l에 대해 주어진 s와 t에서 전방 및 후방 변수의 곱은 시간 t에서 기호 s를 통과하는 l에 해당하는 모든 경로의 확률이라는 것입니다. 더 정확하게 말하면 (5)와 (9)에서 우리는 다음을 얻습니다.  <br/>
-> <img src="https://latex.codecogs.com/png.latex?%5Calpha_t%28s%29%5Cbeta_t%28s%29%20%3D%20%5Csum_%7B%5Cpi%20%5Cin%20%5Cmathcal%7BB%7D%5E%7B-1%7D%28l%29%7D%3A%20%5Cpi_t%20%3D%20l_s%27%7D%20y_%7Bl_s%27%7D%5E%7Bt%7D%20%5Cprod_%7Bt%3D1%7D%5ET%20y_%7B%5Cpi_t%7D%5E%7Bt%7D" alt="Equation"/> <br/>
+> <img src="https://latex.codecogs.com/png.latex?%5Calpha_t%28s%29%5Cbeta_t%28s%29%20%3D%20%5Csum_%7B%5Cpi%20%5Cin%20%5Cmathcal%7BB%7D%5E%7B-1%7D%28l%29%2C%20%5Cpi_t%3Dl_s%27%7D%20y_%7Bl_s%27%7D%5E%7Bt%7D%20%5Cprod_%7Bt%3D1%7D%5ET%20y_%7B%5Cpi_t%7D%5E%7Bt%7D" alt="Equation"/> <br/>
 >
 > (2)에서 재배열하여 대입하면 다음을 얻습니다. <br/>
-> <img src="https://latex.codecogs.com/png.latex?%5Cfrac%7B%5Calpha_t%28s%29%5Cbeta_t%28s%29%7D%7By_%7Bl_s%27%7D%5E%7Bt%7D%7D%20%3D%20%5Csum_%7B%5Cpi%20%5Cin%20%5Cmathcal%7BB%7D%5E%7B-1%7D%28l%29%7D%3A%20%5Cpi_t%20%3D%20l_s%27%7D%20p%28%5Cpi%7C%5Cmathbf%7Bx%7D%29" alt="Equation"/>
- <br/>
+> <img src="https://latex.codecogs.com/png.latex?%5Cfrac%7B%5Calpha_t%28s%29%5Cbeta_t%28s%29%7D%7By_%7Bl_s%27%7D%5E%7Bt%7D%7D%20%3D%20%5Csum_%7B%5Cpi%20%5Cin%20%5Cmathcal%7BB%7D%5E%7B-1%7D%28l%29%2C%20%5Cpi_t%20%3D%20l_s%27%7D%20p%28%5Cpi%7C%5Cmathbf%7Bx%7D%29" alt="Equation"/> <br/>
 >
 > (3)에서 우리는 주어진 시간 t에 **$l'_s$**를 통과하는 경로들에 의한 p(l|x) 의 전체 확률의 일부를 확인할 수 있습니다. 따라서, 임의의 t에 대해 모든 s에 대해 합을 구할 수 있습니다:  <br/>
 > <img src="https://latex.codecogs.com/png.latex?p%28l%7C%5Cmathbf%7Bx%7D%29%20%3D%20%5Csum_%7Bs%3D1%7D%5E%7B%7C%5Cl_s%27%7C%7D%20%5Cfrac%7B%5Calpha_t%28s%29%5Cbeta_t%28s%29%7D%7By_%7Bl_s%27%7D%5E%7Bt%7D%7D" alt="Equation (14)"/>
@@ -258,8 +257,7 @@
 <br/>
 > 여기서 <img src="https://latex.codecogs.com/png.latex?Z_t%5E%7Bdef%7D%20%3D%20%5Csum_%7Bs%3D1%7D%5E%7B%7Cl%27%7C%7D%20%5Cfrac%7B%5Chat%7B%5Calpha_t%28s%29%7D%20%5Chat%7B%5Cbeta_t%28s%29%7D%7D%7By_%7Bl_s%27%7D%5E%7Bt%7D%7D." alt="Equation"/>
  <br/>
-> 식 (16)은 네트워크가 훈련 중에 받는 '오류 신호'를 나타냅니다 (그림 4 참조).
-> 
+> 식 (16)은 네트워크가 훈련 중에 받는 '오류 신호'를 나타냅니다 (그림 4 참조). <br/>
 > **[Figure 4]** <img width="400" alt="image" src="https://github.com/user-attachments/assets/18c1cc16-9d47-4f40-968b-37c8d42f7a2f"> <br/>
 > 해당 그림은 CTC 훈련 중 오류 신호의 변화를 보여줍니다. 왼쪽 열은 동일한 시퀀스에 대해 훈련의 각 단계에서 출력 활성화를 나타내며, 오른쪽 열은 해당되는 오류 신호를 보여줍니다. 점선은 'blank' 유닛을 나타냅니다. <br/>
 >**(a)** 처음에는 네트워크가 작은 랜덤 가중치를 가지고 있어 예측이 무작위적입니다. 오류는 주로 목표 시퀀스에 의해 결정되며, 출력이 거의 아무런 의미가 없는 상태입니다. 오류 신호는 출력 활성화의 증가나 감소를 유도합니다.<br/>
