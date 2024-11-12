@@ -13,8 +13,6 @@
 
 |                           | Full column rank (r = n < m)                  | Full row rank (r = m < n)                  | Full rank (r = m = n)                     | r < m, r < n                                  |
 |---------------------------|-----------------------------------------------|-------------------------------------------|--------------------------------------------|-----------------------------------------------|
-| rref                      | R = \[I 
-0\]                                   | R = \[I F\]                               | R = I (invertible)                         | R = \[I F 
-0 0\]                               |
+| rref                      | R = \[I <br> 0\]                                   | R = \[I F\]                               | R = I (invertible)                         | R = \[I F  <br>  0 0\]                               |
 | N(A)                      | only zero vector (no free variable)           | Exists (free variable이 있기 때문에)      | only zero vector (no free variable)        | Exists (free variable이 있기 때문에)         |
 | Solution Ax = b           | 0 or only 1 solution (unique solution : comb of columns of A) | 무수히 많음 - 모든 b에 대해 solution이 있다. (free variable이 있기 때문에) | unique solution (no free variable)          | no solution or infinite solutions             |
