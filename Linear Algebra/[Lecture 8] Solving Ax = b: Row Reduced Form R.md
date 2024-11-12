@@ -13,7 +13,8 @@
 
 |                           | Full column rank (r = n < m)                  | Full row rank (r = m < n)                  | Full rank (r = m = n)                     | r < m, r < n                                  |
 |---------------------------|-----------------------------------------------|-------------------------------------------|--------------------------------------------|-----------------------------------------------|
-| rref                      | R = \[I 0\]                                   | R = \[I F\]                               | R = I (invertible)                         | R = \[I F 0 0\]                               |
+| rref                      | R = \[I 
+0\]                                   | R = \[I F\]                               | R = I (invertible)                         | R = \[I F 
+0 0\]                               |
 | N(A)                      | only zero vector (no free variable)           | Exists (free variable이 있기 때문에)      | only zero vector (no free variable)        | Exists (free variable이 있기 때문에)         |
-| Solution Ax = b           | 0 or only 1 solution (unique solution : comb of columns of A) | 모든 b에 대해 solution이 있다. (free variable이 있기 때문에) | unique solution (no free variable)          | no solution or infinite solutions             |
-| 내 생각 정리             | ex) m=4, n=3 column space가 4차원인데 3개의 조합으로 4차원을 표현하려다 보면 b가 comb of columns이면 가능, 그 외이면 불가능일 것이다. | free variable이 있어서 special solution의 조합을 취해서 무한개의 솔루션이 있을 수 있다. | free variable이 없으므로 유일한 해를 갖는다. | no solution: rank가 너무 작으면 columns을 잘 조합해도 b가 안 나올 수 있다. |
+| Solution Ax = b           | 0 or only 1 solution (unique solution : comb of columns of A) | 무수히 많음 - 모든 b에 대해 solution이 있다. (free variable이 있기 때문에) | unique solution (no free variable)          | no solution or infinite solutions             |
