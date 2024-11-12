@@ -15,6 +15,7 @@
   - [Lecture 5] Transposes, Permutations, Spaces R^n - 대칭 행렬, Vector Space와 Sub Space의 정의 학습
   - [Lecture 6] Column Space and Nullspace - Column Space와 Ax=0을 만족하는 해들로 이루어진 Null Space 학습
   - [Lecture 7] Solving Ax = 0: Pivot Variables, Special Solutions - 소거법과 기약 행사다리꼴 행렬을 통한 Null space 풀이법 학습
+  - [Lecture 8] Solving Ax = b: Row Reduced Form R - 행렬을 기약 행사다리꼴(Row Reduced Echelon Form)로 변환하여 선형 방정식 Ax=b의 해를 구하고, rank의 범위에 따른 해의 존재 여부 판별
 
 
 
