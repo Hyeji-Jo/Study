@@ -18,7 +18,7 @@
   - 사인함수의 진폭 : $A_k$
   - 회전하는 속도 : $\exp()$ 괄호 안의 값
 
-- 진폭 수식 : $$A_k = \frac{1}{T} \int_{-\frac{T}{2}}^\frac{T}{2} f(t) \ \exp \left( -i\cdot 2\pi \frac{k}{T} t \right) \dt$$
+- 진폭 수식 : $$A_k = \frac{1}{T} \int_{-\frac{T}{2}}^\frac{T}{2} f(t) \ \exp \left( -i\cdot 2\pi \frac{k}{T} t \right)dt$$
   - 각 주파수의 성분이 신호에서 어느 정도의 크기로 기여하는지 나타내는 것
   - 시계방향으로 돌기 때문에 $\exp()$ 괄호 안의 값이 **마이너스**
   - 원형으로 회전하는 복소수 $\exp()$에 f(t)를 곱해 커졌다, 작아졌다를 반복 -> 원에 그래프가 감긴 형태 생성
@@ -34,13 +34,13 @@
         - $\[\frac{d}{dt} e^{i \omega t} = i \omega e^{i \omega t}\]$
         - $\[\frac{d}{dt} \cos(\omega t) = -\omega \sin(\omega t)\]$, $\[\frac{d}{dt} \sin(\omega t) = \omega \cos(\omega t)\]$
         - 적분은 지수 형태 그대로 남음
-        - $\[\int e^{i \omega t} \dt = \frac{e^{i \omega t}}{i \omega}\]$
-        - $\[\int \cos(\omega t) \dt = \frac{\sin(\omega t)}{\omega}\]$, $\[\int \sin(\omega t) \dt = -\frac{\cos(\omega t)}{\omega}\]$
+        - $\[\int e^{i \omega t}dt = \frac{e^{i \omega t}}{i \omega}\]$
+        - $\[\int \cos(\omega t)dt = \frac{\sin(\omega t)}{\omega}\]$, $\[\int \sin(\omega t)dt = -\frac{\cos(\omega t)}{\omega}\]$
       
 - 푸리에 변환 : $\[X(f) = \int_{-\infty}^{\infty} f(t) e^{-i 2 \pi f t} \, dt\]$
   - 주파수 $\( f \)$에서의 신호 성분 : $\( X(f) \)$
   - 시간 영역의 신호 : $\( f(t) \)$
   - 주파수 $\( f \)$에 해당하는 복소 지수 함수 : $\( e^{-i 2 \pi f t} \)$
 
-- 진폭 수식 : $\[X(f) = \int_{-\infty}^{\infty} f(t) e^{-i 2 \pi f t} \, dt\]$
+- 진폭 수식 : $\[X(f) = \int_{-\infty}^{\infty} f(t) e^{-i 2 \pi f t}dt\]$
 
