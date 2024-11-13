@@ -34,8 +34,8 @@
         - $\[\frac{d}{dt} e^{i \omega t} = i \omega e^{i \omega t}\]$
         - $\[\frac{d}{dt} \cos(\omega t) = -\omega \sin(\omega t)\]$, $\[\frac{d}{dt} \sin(\omega t) = \omega \cos(\omega t)\]$
         - 적분은 지수 형태 그대로 남음
-        - $\[\int e^{i \omega t} \, dt = \frac{e^{i \omega t}}{i \omega}\]
-        - $\[\int \cos(\omega t) \, dt = \frac{\sin(\omega t)}{\omega}\]$, $\[\int \sin(\omega t) \, dt = -\frac{\cos(\omega t)}{\omega}\]$
+        - $\[\int e^{i \omega t} \dt = \frac{e^{i \omega t}}{i \omega}\]$
+        - $\[\int \cos(\omega t) \dt = \frac{\sin(\omega t)}{\omega}\]$, $\[\int \sin(\omega t) \dt = -\frac{\cos(\omega t)}{\omega}\]$
       
 - 푸리에 변환 : $\[X(f) = \int_{-\infty}^{\infty} f(t) e^{-i 2 \pi f t} \, dt\]$
   - 주파수 $\( f \)$에서의 신호 성분 : $\( X(f) \)$
