@@ -18,6 +18,7 @@
   - [Lecture 8] Solving Ax = b: Row Reduced Form R - 행렬을 기약 행사다리꼴(Row Reduced Echelon Form)로 변환하여 선형 방정식 Ax=b의 해를 구하고, rank의 범위에 따른 해의 존재 여부 판별
   - [Lecture 9] Independence, Basis, and Dimension - basis 벡터들의 성질 및 column space와 null space의 dimension 학습
   - [Lecture 10] The Four Fundamental Subspaces - 행렬의 4가지 Subspaces (Column, Null, Row, Left Null Space) 공간의 정의 학습
+  - [Lecture 11] Matrix Spaces; Rank 1; Small World Graphs - 대칭 행렬, 상삼각 행렬에서의 basis와 rank 1 행렬 생성 방법 및 sub space에 대해 학습
 
 
 
