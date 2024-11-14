@@ -19,6 +19,7 @@
   - [Lecture 9] Independence, Basis, and Dimension - basis 벡터들의 성질 및 column space와 null space의 dimension 학습
   - [Lecture 10] The Four Fundamental Subspaces - 행렬의 4가지 Subspaces (Column, Null, Row, Left Null Space) 공간의 정의 학습
   - [Lecture 11] Matrix Spaces; Rank 1; Small World Graphs - 대칭 행렬, 상삼각 행렬에서의 basis와 rank 1 행렬 생성 방법 및 sub space에 대해 학습
+  - [Lecture 12] Graphs, Networks, Incidence Matrices - 그래프를 Incidence Matrix로 표현하는 방법과 Kirchhoff's 법칙을 활용한 Left Null Space의 Basis 도출 등 학습
 
 
 
