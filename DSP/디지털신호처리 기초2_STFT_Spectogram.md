@@ -44,3 +44,50 @@
 
 - 진폭 수식 : $\[X(f) = \int_{-\infty}^{\infty} f(t) e^{-i 2 \pi f t}dt\]$
 
+## DFT(Discrete Fourier Transform)
+- 주기가 무한대인 푸리에 변환
+  - **Inverse Fourier Transform**: $\[x(t) = \frac{1}{2\pi} \int_{-\infty}^{\infty} X(j\omega)e^{j\omega t} d\omega\]$
+  - **Fourier Transform**: $\[X(j\omega) = \int_{-\infty}^{\infty} x(t)e^{-j\omega t} dt\]$
+- **sampling한 신호는 시간의 간격과 소리의 amplitude가 모두 descrete한 데이터**
+- 주기가 무한대인 푸리에 변환식을 **discrete한 영역으로 변환**해야함
+- 수집한 데이터 x[t]에서, 이산 시계열 데이터가 주기 N으로 반복한다고 할때, DFT는 주파수와 진폭이 서로 다른 N개의 사인 함수의 합으로 표현 가능
+  - **Inverse Discrete Fourier Transform**: $\[x[t] = \frac{1}{N} \sum_{k=0}^{N-1} X[k] e^{j\omega_k n}\]$
+  - **Discrete Fourier Transform**: $\[X[k] = \sum_{n=0}^{N-1} x[n] e^{-j\omega_k n}\]$
+  - x[t] : input signal
+  - n : discrete time index
+  - k : discrete frequency index
+  - X[k] : k 번째 frequency에 대한 spectrum 값
+- 일정한 시간 간격으로 샘플링된 심호를 이산적인 주파수 성분으로 분해
+- 시간 신호 x[n]을 주파수 성분 X[k]로 변환
+- 계산량이 많아 속도가 느리다는 단점 존재 - O(nlogn)의 시간복잡도
+```py
+# DFT 함수 정의
+def DFT(x):
+    N = len(x)
+    X = np.array([]) #-> 계산된 주파수 성분(복소수 값)이 배열에 추가됨
+    nv = np.arange(N) #-> 0부터 N-1까지의 정수 배열 생성
+
+    for k in range(N):
+        s = np.exp(1j*2*np.pi*k/N*nv) #-> 인덱스 k에 해당하는 복소지수함수 s 계산
+        X = np.append(X, sum(x*np.conjugate(s))) #-> 입력 신호 x와 복소지수함수 s를 곱한 뒤 그 합을 계산해 X 배열에 추가
+    return X
+```
+
+## FFT(Fast Fourier Transform)
+![image](https://github.com/user-attachments/assets/f2dabd5c-2697-4bf5-84ac-fffd6cfcfdff)
+
+- 복잡한 연산을 최적화하여 DFT를 빠르게 수행가능
+  - 만약 N개의 샘플을 가진 신호에 대해 DFT를 계산하려면 $\[O(N^2)\]$번의 연산이 필요
+  - 그렇듯 신호 길이가 길어질수록 기하급수적으로 증가
+  - FFT는 O(NlogN) 시간복잡도 - 긴 신호에 대해서도 빠르게 계산 가능
+- **"분할 정복(divide and conquer)"** 방식으로 DFT를 계산
+  - 긴 신호를 더 작은 신호로 분할하고, 각 부분에서 계산한 결과를 다시 합치는 방식
+- 가장 일반적으로 사용되는 알고리즘 = 쿨리-튜키 알고리즘(Cooley-Tukey algorithm)
+  - 보통 크기 n을 재귀적으로 2등분하여 분할 정복을 적용
+- 우함수와 기함수의 성질을 활용하여 계산량을 줄이는데 기여
+  - 우함수(Even Function) : f(x)=f(−x) ex)cos(x)
+  - 우함수 신호의 푸리에 변환은 순수한 코사인 성분으로만 구성
+  - 기함수(Odd Function) : f(x)=−f(−x) ex)sin(x)
+  - 기함수 신호의 푸리에 변환은 순수한 사인 성분으로만 구성
+
+## STFT(Short-Time Fourier Transform)
