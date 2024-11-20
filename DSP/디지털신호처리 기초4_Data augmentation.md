@@ -1,13 +1,13 @@
 - 크게 3가지 대분류 존재
 1. 신호 변형(Signal-Level Augmentation)
-  - 원본 오디오 신호를 직접 변형
-  - ex) 잡음 추가, 시간 축 변화(Time Stretching), 피치 변환(Pitch Shifting), 볼륨 조정 등
+    - 원본 오디오 신호를 직접 변형
+    - ex) 잡음 추가, 시간 축 변화(Time Stretching), 피치 변환(Pitch Shifting), 볼륨 조정 등
 2. 스펙트럼 변형(Spectrum-Level Augmentation)
-  - STFT, Mel-spectrogram 등 주파수 변환 후의 데이터를 수정
-  - ex) Time Masking, Frequency Masking, SpecAugment
+    - STFT, Mel-spectrogram 등 주파수 변환 후의 데이터를 수정
+    - ex) Time Masking, Frequency Masking, SpecAugment
 3. 데이터 믹싱(Data Mixing) 혹은 Split
-  - 여러 신호를 혼합하거나 새로운 데이터셋 생성
-  - ex) Mixup, Noise Injection, Room Impulse Response (RIR) 적용
+    - 여러 신호를 혼합하거나 새로운 데이터셋 생성
+    - ex) Mixup, Noise Injection, Room Impulse Response (RIR) 적용
 - Train 데이터에서만 사용해야함
 
 ### 피치 변환(Pitch Shifting) - 중요(큰 도움이 됨)
