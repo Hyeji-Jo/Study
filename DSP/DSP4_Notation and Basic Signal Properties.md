@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/3d1da41b-b12a-4cd0-9a4e-823b45603c80)- Signals as functions
+- Signals as functions
 - Continuous and discrete-time signals
 - Periodic signals
 
