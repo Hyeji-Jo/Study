@@ -1,4 +1,15 @@
 # Study
+
+## ML Basic
+- Machine learning basic
+- Linear regression
+- Logistic regression(classification)
+- Multivariable (Vector) linear/logistic regression
+- Neaural networks
+- CNN
+- RNN
+- Bidirectional Neural networks
+
 ## NLP
 - Word2Vec
 - Node2Vec
