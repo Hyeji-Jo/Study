@@ -57,22 +57,22 @@
 ![image](https://github.com/user-attachments/assets/1e496e99-00a2-4d04-b81b-5a84dab53708)
 
 - **이산 시간 계단 함수**:
-  \[
+  $\[
   s[n] =
   \begin{cases}
   0, & n < 0 \\
   1, & n \geq 0
   \end{cases}
-  \]
+  \]$
   - \( s[n] \): 시간 \( n \)에 대한 이산 시간 신호.
 
 - **연속 시간 계단 함수**:
-  \[
+  $\[
   s(t) =
   \begin{cases}
   0, & t < 0 \\
   1, & t \geq 0
   \end{cases}
-  \]
+  \]$
   - \( s(t) \): 시간 \( t \)에 대한 연속 시간 신호.
 
