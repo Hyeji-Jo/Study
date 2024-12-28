@@ -56,7 +56,8 @@
 
 # Signal Processing: Causal and Non-Causal Systems
 
-<img width="753" alt="image" src="https://github.com/user-attachments/assets/8cfa8c87-dda0-4c7a-b8c5-05032c39cd40" />
+<img width="753" alt="image" src="https://github.com/user-attachments/assets/8cfa8c87-dda0-4c7a-b8c5-05032c39cd40" />  
+
 
 ## 1. Causal System
 - **정의**: 출력은 과거 또는 현재의 입력 신호에만 의존
@@ -80,7 +81,8 @@
 
 
 # Four LTI System Descriptions
-<img width="763" alt="image" src="https://github.com/user-attachments/assets/5c273019-c6c9-4051-837a-960f2c289d36" />
+![image](https://github.com/user-attachments/assets/0b5d92da-3d90-4534-962c-16f21cd5cbfb)
+
 
 ## 1. Overview  
 LTI (Linear Time-Invariant) 시스템은 네 가지 주요 방식으로 설명될 수 있습니다  
