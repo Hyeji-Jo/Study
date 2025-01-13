@@ -66,11 +66,22 @@
 ## 예제
 - $\[ X(z) = \frac{1 - z^{-1}}{1 - \frac{1}{2}z^{-1}}, \, |z| > \frac{1}{2} \]$
 
-- **장제법을 사용한 멱급수 전개**:
-  - $\[  \begin{aligned}  X(z) &= 1 - \frac{1}{2}z^{-1} - \frac{1}{4}z^{-2} - \frac{1}{8}z^{-3} - \frac{1}{16}z^{-4} + \cdots \\  &= \sum_{n=0}^{\infty} \left(-\frac{1}{2}\right)^n z^{-n}.  \end{aligned}  \]$
+- **장제법을 사용한 멱급수 전개**:  
+  $\[ X(z) = 1 - \frac{1}{2}z^{-1} - \frac{1}{4}z^{-2} - \frac{1}{8}z^{-3} - \frac{1}{16}z^{-4} + \cdots = \sum_{n=0}^{\infty} \left(-\frac{1}{2}\right)^n z^{-n}. \]$
 
-- $x[n]$의 값:  $\[  \begin{aligned}  x[n] &= 0, \, n < 0 \\  x[n] &= 1, \, n = 0 \\  x[n] &= -\frac{1}{2}, \, n = 1 \\  x[n] &= -\frac{1}{4}, \, n = 2 \\  x[n] &= -\frac{1}{8}, \, n = 3 \\  x[n] &= -\frac{1}{16}, \, n = 4 \\  &\vdots  \end{aligned}  \]
-
+- $x[n]$의 값:  
+  $\[ x[n] = 
+  \begin{cases} 
+  0, & n < 0 \\ 
+  1, & n = 0 \\ 
+  -\frac{1}{2}, & n = 1 \\ 
+  -\frac{1}{4}, & n = 2 \\ 
+  -\frac{1}{8}, & n = 3 \\ 
+  -\frac{1}{16}, & n = 4 \\ 
+  \vdots 
+  \end{cases} 
+  \]$
+  
 - 최종 결과: $\[ x[n] = \delta[n] - \left(\frac{1}{2}\right)^n u[n] \]$
 
 ## 요약
