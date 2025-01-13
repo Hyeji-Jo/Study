@@ -69,20 +69,14 @@
 - **장제법을 사용한 멱급수 전개**:  
   $\[ X(z) = 1 - \frac{1}{2}z^{-1} - \frac{1}{4}z^{-2} - \frac{1}{8}z^{-3} - \frac{1}{16}z^{-4} + \cdots = \sum_{n=0}^{\infty} \left(-\frac{1}{2}\right)^n z^{-n}. \]$
 
-- $x[n]$의 값:
-
-  \[
-  x[n] = 
-  \begin{cases} 
-  0, & \text{if } n < 0 \\ 
-  1, & \text{if } n = 0 \\ 
-  -\frac{1}{2}, & \text{if } n = 1 \\ 
-  -\frac{1}{4}, & \text{if } n = 2 \\ 
-  -\frac{1}{8}, & \text{if } n = 3 \\ 
-  -\frac{1}{16}, & \text{if } n = 4 \\ 
-  \vdots, & \text{otherwise}
-  \end{cases}
-  \]
+- $x[n]$의 값은 다음과 같습니다:
+  - $n < 0$인 경우: $x[n] = 0$
+  - $n = 0$인 경우: $x[n] = 1$
+  - $n = 1$인 경우: $x[n] = -\frac{1}{2}$
+  - $n = 2$인 경우: $x[n] = -\frac{1}{4}$
+  - $n = 3$인 경우: $x[n] = -\frac{1}{8}$
+  - $n = 4$인 경우: $x[n] = -\frac{1}{16}$
+  - 기타: $x[n] = \vdots$
   
 - 최종 결과: $\[ x[n] = \delta[n] - \left(\frac{1}{2}\right)^n u[n] \]$
 
