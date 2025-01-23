@@ -3,7 +3,7 @@
 ## AI Math
 - **참고 강의** 📺
   - [T아카데미 토크ON 49차. 머신러닝/딥러닝 수학 입문](https://youtube.com/playlist?list=PL9mhQYIlKEhewXqJaTy_wd5emhDwW6JU6&si=DAFj1uX6jCgovNxP)
-  - [AI를 위한 기초 수학](https://youtube.com/playlist?list=PL_iJu012NOxea6yN2PUzw8hQ2Aniog8ql&si=ScNHwPyMTClOlRyy)
+  - [혁펜하임_AI를 위한 기초 수학](https://youtube.com/playlist?list=PL_iJu012NOxea6yN2PUzw8hQ2Aniog8ql&si=ScNHwPyMTClOlRyy)
 
 
 ## Linear Algebra
@@ -15,14 +15,21 @@
 
 
 ## ML Basic
-- Machine learning basic
-- Linear regression
-- Logistic regression(classification)
-- Multivariable (Vector) linear/logistic regression
-- Neaural networks
-- CNN
-- RNN
-- Bidirectional Neural networks
+- **참고 강의** 🖥️
+  - 구글 부트캠프
+    - [공부 자료 📚](https://hyebitstory.notion.site/20921ed0db7a4bfb9785dd5012e62362?v=2279c4dfdeee4b2f977b6e2362234ae1)
+  - [모두를 위한 딥러닝 강좌](https://youtube.com/playlist?list=PLlMkM4tgfjnLSOjrEJN31gZATbcj_MpUm&si=M6b8MOn9331tZUMj)
+  - [혁펜하임_Easy! 딥러닝](https://youtube.com/playlist?list=PL_iJu012NOxdw1jc3KEo8Mq5oD5SXKhLu&si=ivWQn8GV-87IH9oy)
+
+- **학습 내용** 🗂️
+  - Machine learning basic
+  - Linear regression
+  - Logistic regression(classification)
+  - Multivariable (Vector) linear/logistic regression
+  - Neaural networks
+  - CNN
+  - RNN
+  - Bidirectional Neural networks
 
 
 ## NLP
