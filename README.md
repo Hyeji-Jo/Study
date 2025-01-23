@@ -1,8 +1,9 @@
 # Study
 
 ## AI Math
-- [T아카데미 토크ON 49차. 머신러닝/딥러닝 수학 입문](https://youtube.com/playlist?list=PL9mhQYIlKEhewXqJaTy_wd5emhDwW6JU6&si=DAFj1uX6jCgovNxP)
-- [AI를 위한 기초 수학](https://youtube.com/playlist?list=PL_iJu012NOxea6yN2PUzw8hQ2Aniog8ql&si=ScNHwPyMTClOlRyy)
+- **참고 강의** 📺
+  - [T아카데미 토크ON 49차. 머신러닝/딥러닝 수학 입문](https://youtube.com/playlist?list=PL9mhQYIlKEhewXqJaTy_wd5emhDwW6JU6&si=DAFj1uX6jCgovNxP)
+  - [AI를 위한 기초 수학](https://youtube.com/playlist?list=PL_iJu012NOxea6yN2PUzw8hQ2Aniog8ql&si=ScNHwPyMTClOlRyy)
 
 
 ## Linear Algebra
