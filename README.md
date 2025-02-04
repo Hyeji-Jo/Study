@@ -24,11 +24,9 @@
   - Machine learning basic
   - Linear regression
   - Logistic regression(classification)
-  - Multivariable (Vector) linear/logistic regression
-  - Neaural networks
   - CNN
   - RNN
-  - Bidirectional Neural networks
+  - 등등
 
 
 ## NLP
