@@ -37,8 +37,7 @@
 - Sentence_BERT
 
 ## Speech Recognition
-- Seq2Seq
-- Attention Mechanism
-- Transformer
+- CTC
+- LAS
+- RNN-T
 - Whisper
-- Simul_Whisper
