@@ -10,10 +10,11 @@
 | **Power** | [SuperFlower] SF-2000F14HP LEADEX PLATINUM (ATX/2000W) |
 
 <img width="699" alt="image" src="https://github.com/user-attachments/assets/90e3b225-2260-4025-9560-f20ed7547296" />
-<img width="553" alt="image" src="https://github.com/user-attachments/assets/3b54d47f-281f-48c3-b45c-f84e8a9ab3e4" />
+<img width="553" alt="image" src="https://github.com/user-attachments/assets/3b54d47f-281f-48c3-b45c-f84e8a9ab3e4" />  
 
 
 
+  
 # 2. Ubuntu 22.04 버전 설치
 
 ## 1) Ubuntu 초기화  부팅 USB 활용
@@ -107,7 +108,8 @@
 ### 6. 우분투 설치 및 부팅 설정
 
 - 모든 설정을 확인하고 **설치를 진행**  
-- 설치 완료 후, 재부팅하면 새롭게 설정된 LVM 기반 우분투 서버로 진입 가능  
+- 설치 완료 후, 재부팅하면 새롭게 설정된 LVM 기반 우분투 서버로 진입 가능
+
 
 
 
@@ -164,10 +166,11 @@ echo "/dev/vg_data/lv_shared /mnt/shared ext4 defaults 0 2" | sudo tee -a /etc/f
 ```
 sudo adduser user2  # user2 사용자 추가
 sudo usermod -aG sudo user2  # sudo 권한 부여 (필요하면)
-```
+```  
 
 
 
+  
 # 3. AI 모델링 준비
 ## 0) 기본 시스템 설정 및 최적화
 - 시스템 업데이트 및 업그레이드
@@ -202,12 +205,115 @@ source ~/.bashrc
 
 
 ## 2) AI 개발 환경 세팅 (PyTorch, TensorFlow, Docker 등)
+### 1. Python & AI 환경 구축
+- Python & pip 최신화
+```
+sudo apt install -y python3 python3-pip python3-venv
+```
+
+- 가상 환경 설정 (venv)
+```
+python3 -m venv ~/ai_env
+source ~/ai_env/bin/activate
+```
 
 
+- 필수 패키지 설치
+```
+pip install --upgrade pip
+pip install numpy scipy pandas matplotlib seaborn jupyter tqdm scikit-learn
+```
+
+### 2. PyTorch & TensorFlow 설치
+- PyTorch (CUDA 지원)
+```
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+```
+
+- TensorFlow (GPU 지원)
+```
+pip install tensorflow
+```
+
+- 설치 확인
+```
+python -c "import torch; print(torch.cuda.is_available())"
+python -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"
+```
+
+### 3. Jupyter Notebook & VS Code 설정
+- Jupyter Notebook 설치
+```
+pip install jupyterlab
+```
 
 
+- 백그라운드 실행
+```
+jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root
+```
 
-## 3) SSH 원격 접속 설정 (서버 운영 시 필수)
+
+- VS Code 원격 연결
+```
+sudo apt install -y code
+```
 
 
-## 4)
+## 3) 시스템 성능 최적화
+- SWAP 메모리 늘리기
+```
+sudo fallocate -l 32G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+```
+
+- CPU 성능 최적화
+```
+sudo apt install -y cpufrequtils
+sudo cpufreq-set -g performance
+```
+
+- 네트워크 속도 최적화
+```
+sudo sysctl -w net.ipv4.tcp_window_scaling=1
+sudo sysctl -w net.ipv4.tcp_sack=1
+```
+
+
+## 4) 보안 및 원격 접속 설정
+- SSH 보안 강화
+```
+sudo nano /etc/ssh/sshd_config
+```
+• PermitRootLogin no  
+• PasswordAuthentication no  
+```
+sudo systemctl restart sshd
+```
+
+- 방화벽 설정
+```
+sudo ufw allow 22/tcp
+sudo ufw allow 8888/tcp
+sudo ufw enable
+```
+
+## 5) Docker & ML Ops 환경 구축
+-  Docker 설치
+```
+sudo apt install -y docker.io
+sudo systemctl enable --now docker
+sudo usermod -aG docker $USER
+```
+
+- NVIDIA-Docker 추가
+```
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
+    && curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add - \
+    && curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list \
+    && sudo apt update && sudo apt install -y nvidia-docker2
+sudo systemctl restart docker
+```
