@@ -401,7 +401,18 @@ git push -u origin main
 
 
 # 기타
+## Q. GRUB Menu 페이지는 왜 없어지지 않을까?
 - GRUB는 일부러 보이게 하기도 한다
 
 - [우분투 20.04에서 Grub 편집: grub-customizer 와 Grub theme 설정](https://kibua20.tistory.com/128)
     - 위의 링크처럼 테마를 변경하기도
+
+## Ubuntu의 절전 모드 또는 화면 꺼짐 설정
+- 절전 모드 및 화면 꺼짐 비활성화
+```
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing'
+gsettings set org.gnome.settings-daemon.plugins.power idle-dim false
+gsettings set org.gnome.desktop.screensaver lock-enabled false
+gsettings set org.gnome.desktop.session idle-delay 0
+```
+
