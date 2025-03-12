@@ -317,3 +317,91 @@ distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
     && sudo apt update && sudo apt install -y nvidia-docker2
 sudo systemctl restart docker
 ```
+
+## 6) Git 연결
+### 1. Git 설치 확인 및 설치
+- 설치 확인
+```
+git --version
+```
+
+- 설치
+```
+sudo apt update && sudo apt install git -y
+```
+
+### 2. GitHub 계정 및 SSH 키 생성
+- SSH 키 생성
+```
+ssh-keygen -t rsa -b 4096 -C "your-email@example.com"
+```
+
+- SSH 에이전트 실행 후 키 추가
+```
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_rsa
+```
+
+- SSH 키 확인 및 복사
+```
+cat ~/.ssh/id_rsa.pub
+```
+
+### 3. GitHub에 SSH 키 등록  
+1️⃣ [GitHub SSH 키 설정 페이지](https://github.com/settings/keys)로 이동  
+2️⃣ “New SSH key” 클릭  
+3️⃣ “Title”에 서버 이름 입력 (예: “Ubuntu Server”)  
+4️⃣ “Key” 부분에 복사한 공개 키 붙여넣기  
+5️⃣ “Add SSH key” 클릭하여 저장  
+
+### 4. SSH 연결 테스트
+```
+ssh -T git@github.com
+```
+- 성공 : Hi <GitHub 사용자명>! You've successfully authenticated, but GitHub does not provide shell access.
+
+### 5. Git 설정 (최초 1회)
+- 사용자 정보 저장
+```
+git config --global user.name "Your Name"
+git config --global user.email "your-email@example.com"
+```
+
+- 적용 확인
+```
+git config --list
+```
+
+### 6. GitHub 저장소와 연결
+- GitHub에서 Clone (기존 프로젝트 가져오기)
+```
+git clone git@github.com:사용자명/저장소이름.git
+cd 저장소이름
+```
+
+- GitHub 새 저장소 생성 후 Push (신규 프로젝트 업로드)
+```
+# Git 초기화
+git init
+
+# 파일 추가
+git add .
+
+# 커밋 생성
+git commit -m "첫 커밋: Ubuntu 서버에서 Git 설정 완료"
+
+# GitHub 원격 저장소 연결
+git remote add origin git@github.com:사용자명/저장소이름.git
+
+# 원격 저장소로 Push
+git branch -M main
+git push -u origin main
+
+```
+
+
+# 기타
+- GRUB는 일부러 보이게 하기도 한다
+
+- [우분투 20.04에서 Grub 편집: grub-customizer 와 Grub theme 설정](https://kibua20.tistory.com/128)
+    - 위의 링크처럼 테마를 변경하기도
