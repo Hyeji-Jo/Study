@@ -512,4 +512,13 @@ gsettings set org.gnome.desktop.session idle-delay 0
 ```
 
 ## 한글 입력 설정
-
+- Setting에서 Region & Language 탭으로 이동한 후 **[Manage Installed Languages]**를 클릭
+- 팝업이 뜰 텐데 그냥 **[Install]**
+- 알아서 필요한 파일들을 설치
+```
+sudo reboot
+```
+- Setting에서 Keyboard 탭으로 이동해서 [+]을 클릭 후 [Korean]을 선택하면 재부팅 전에는 없던 "Korean (Hangul)"이 생긴 것을 볼 수 있다. 이것을 클릭 후 추가
+- Korean (Hangul)의 [Preferences]를 선택
+- Toggle Key들을 제거
+- Toggle Key를 추가해주기 위해 Add를 누른 뒤에 "한영키"(여기서는 Alt_R로 인식)를 한번만 클릭
