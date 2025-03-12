@@ -191,18 +191,26 @@ nvidia-smi
 ```
 - 설치되지 않았음 설치
 ```
-sudo ubuntu-drivers devices
-sudo ubuntu-drivers install
-reboot
+sudo ubuntu-drivers devices #-> recommended 나온거 설치
+sudo apt install -v nvidia-drivers-550
+sudo reboot
 ```
 
-- CUDA & cuDNN 설치
+- CUDA & cuDNN 설치 [링크](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=22.04&target_type=deb_local)
+  - Linux -> x86_64 -> Ubuntu -> 22.04 -> deb(local)
+- CUDA 경로 확인
 ```
-echo 'export PATH=/usr/local/cuda/bin:$PATH' >> ~/.bashrc
-echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+whereis cuda # /usr/local/cuda
+ls /usr/local/
+```
+- 환경 변수 설정
+```
+echo 'export PATH=/usr/local/(cuda 맞는 버전)/bin:$PATH' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH=/usr/local/(cuda 맞는 버전)/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
 source ~/.bashrc
+sudo reboot
 ```
-
+- 재확인 : nvcc --version
 
 ## 2) AI 개발 환경 세팅 (PyTorch, TensorFlow, Docker 등)
 ### 1. Python & AI 환경 구축
@@ -211,7 +219,7 @@ source ~/.bashrc
 sudo apt install -y python3 python3-pip python3-venv
 ```
 
-- 가상 환경 설정 (venv)
+- 가상 환경 설정 (venv) -> 선택
 ```
 python3 -m venv ~/ai_env
 source ~/ai_env/bin/activate
@@ -224,7 +232,39 @@ pip install --upgrade pip
 pip install numpy scipy pandas matplotlib seaborn jupyter tqdm scikit-learn
 ```
 
-### 2. PyTorch & TensorFlow 설치
+### 2. Jupyter Notebook & VS Code 설정
+- 아나콘다 설치 [설치 링크](https://www.anaconda.com/download/success)
+  - 64-Bit (x86) Installer 선택
+```
+cd ~/Downloads
+bash Anaconda3-2023.03-Linux-x86_64.sh # 설치
+source ~/.bashrc # 환경변수 설정
+```
+
+- Jupyter Notebook 설치
+```
+pip install jupyterlab
+```
+
+
+- 백그라운드 실행
+```
+jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root
+```
+
+
+- VS Code 설치 [설치 링크](https://code.visualstudio.com/)
+  - .deb 파일을 다운로드
+  - 다운로드 경로로 이동
+```
+sudo apt install ./(설치경로)/(설치파일명)
+
+sudo apt install ./Downloads/code_1.98.1-1741624510_amd64.deb
+```
+
+
+
+### 3. PyTorch & TensorFlow 설치
 - PyTorch (CUDA 지원)
 ```
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
@@ -239,24 +279,6 @@ pip install tensorflow
 ```
 python -c "import torch; print(torch.cuda.is_available())"
 python -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"
-```
-
-### 3. Jupyter Notebook & VS Code 설정
-- Jupyter Notebook 설치
-```
-pip install jupyterlab
-```
-
-
-- 백그라운드 실행
-```
-jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root
-```
-
-
-- VS Code 원격 연결
-```
-sudo apt install -y code
 ```
 
 
@@ -284,17 +306,17 @@ sudo sysctl -w net.ipv4.tcp_sack=1
 
 
 ## 4) 보안 및 원격 접속 설정
-- SSH 보안 강화
+- SSH 포트 번호 변경 -> **9972**
 ```
 sudo nano /etc/ssh/sshd_config
 ```
-• PermitRootLogin no  
-• PasswordAuthentication no  
+- ssh 업데이트
 ```
 sudo systemctl restart sshd
 ```
 
-- 방화벽 설정
+
+- 방화벽 설정 (설정 안함)
 ```
 sudo ufw allow 22/tcp
 sudo ufw allow 8888/tcp
@@ -415,4 +437,6 @@ gsettings set org.gnome.settings-daemon.plugins.power idle-dim false
 gsettings set org.gnome.desktop.screensaver lock-enabled false
 gsettings set org.gnome.desktop.session idle-delay 0
 ```
+
+## 한글 입력 설정
 
