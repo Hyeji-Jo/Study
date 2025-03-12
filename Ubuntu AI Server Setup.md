@@ -306,21 +306,62 @@ sudo sysctl -w net.ipv4.tcp_sack=1
 
 
 ## 4) 보안 및 원격 접속 설정
-- SSH 포트 번호 변경 -> **9972**
+### 1. SSH 설정
+- SSH 서버 설치
 ```
-sudo nano /etc/ssh/sshd_config
+sudo apt update
+sudo apt install openssh-server
+sudo systemctl status ssh
 ```
-- ssh 업데이트
+
+- SSH 포트 번호 변경 및 업데이트 -> **9972**
 ```
+sudo vi /etc/ssh/sshd_config
 sudo systemctl restart sshd
 ```
 
+- **맥북 터미널에 입력 : ssh -p 9972 hyebit@121.140.74.6**
+
+- **만약 WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED! 발생시**
+```
+cd /Users/hyebit/     
+ls # ssh 확인
+
+cd .ssh
+ls # 파일 확인
+
+# known으로 시작하는 파일을 지워야 함
+rm known_hosts
+rm known_hosts.old
+rm config
+
+clear
+```
+- 포트포워딩 등록 및 유지(설정하지 않음)
+```
+sudo iptables -A INPUT -p tcp --dport 9972 -j ACCEPT
+
+# 재부팅 시 유지
+sudo apt install iptables-persistent
+```
 
 - 방화벽 설정 (설정 안함)
 ```
 sudo ufw allow 22/tcp
 sudo ufw allow 8888/tcp
 sudo ufw enable
+```
+
+### 2. iptime 앱 설정
+- ssh 네트워크 인터페이스 이름 확인
+```
+ifconfig
+```
+<img width="817" alt="image" src="https://github.com/user-attachments/assets/d0281fc4-cbe8-4643-b730-68220adcaffb" />
+
+- WOL 패키지 설치
+```
+
 ```
 
 ## 5) Docker & ML Ops 환경 구축
