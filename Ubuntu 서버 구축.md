@@ -169,9 +169,43 @@ sudo usermod -aG sudo user2  # sudo 권한 부여 (필요하면)
 
 
 # 3. AI 모델링 준비
+## 0) 기본 시스템 설정 및 최적화
+- 시스템 업데이트 및 업그레이드
+```
+sudo apt update && sudo apt upgrade -y
+```
+
+- 필수 패키지 설치
+```
+sudo apt install -y build-essential dkms unzip net-tools htop tmux vim git curl wget
+```
+
+
 ## 1) NVIDIA 드라이버 및 CUDA 설치
+- 드라이버 확인
+```
+nvidia-smi
+```
+- 설치되지 않았음 설치
+```
+sudo ubuntu-drivers devices
+sudo ubuntu-drivers install
+reboot
+```
+
+- CUDA & cuDNN 설치
+```
+echo 'export PATH=/usr/local/cuda/bin:$PATH' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+source ~/.bashrc
+```
+
 
 ## 2) AI 개발 환경 세팅 (PyTorch, TensorFlow, Docker 등)
+
+
+
+
 
 ## 3) SSH 원격 접속 설정 (서버 운영 시 필수)
 
