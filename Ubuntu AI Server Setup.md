@@ -361,8 +361,40 @@ ifconfig
 
 - WOL 패키지 설치
 ```
-
+sudo apt-get install net-tools ethtool wakeonlan
 ```
+
+- 네트워크 인터페이스 설정 파일 변경
+```
+sudo vi /etc/network/interfaces
+
+# 내용 추가
+# post-up /sbin/ethtool -s (네트워크 인터페이스 이름) wol g
+# post-down /sbin/ethtool -s (네트워크 인터페이스 이름) wol g
+```
+
+- 서비스 등록 설정
+```
+sudo vi /etc/systemd/system/wol.service
+
+# 내용 추가
+# [Unit]
+# Description=Configure Wake-up on LAN
+
+# [Service]
+# Type=oneshot
+# ExecStart=/sbin/ethtool -s [인터페이스명] wol g
+
+# [Install]
+# WantedBy=basic.target
+```
+
+- 서비스 시작
+```
+sudo systemctl enable /etc/systemd/system/wol.service
+sudo systemctl start wol.service
+```
+
 
 ## 5) Docker & ML Ops 환경 구축
 -  Docker 설치
