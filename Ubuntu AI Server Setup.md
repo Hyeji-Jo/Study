@@ -505,7 +505,7 @@ git push -u origin main
 ## Ubuntu의 절전 모드 또는 화면 꺼짐 설정
 - 절전 모드 및 화면 꺼짐 비활성화
 ```
-gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing'
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing' -> 이것만 설정함
 gsettings set org.gnome.settings-daemon.plugins.power idle-dim false
 gsettings set org.gnome.desktop.screensaver lock-enabled false
 gsettings set org.gnome.desktop.session idle-delay 0
