@@ -13,6 +13,7 @@
 <img width="553" alt="image" src="https://github.com/user-attachments/assets/3b54d47f-281f-48c3-b45c-f84e8a9ab3e4" />  
 <br>
 <br>
+<br>
 
 
   
@@ -29,7 +30,7 @@
 <img width="539" alt="image" src="https://github.com/user-attachments/assets/a1b8b3ec-3960-4692-a1b1-751f29c135b6" />
 - USB 부팅을 통해 우분투를 새로 설치하려는 경우 = **Yes** -> **“Try or Install Ubuntu”를 선택한 후 엔터**
 
---  
+---    
 
 ## 2) 설치된 후 처음 부팅된 화면에서 옵션 선택  
 
@@ -51,9 +52,10 @@
 - 만약 **LVM을 수동 설정하고 싶다면**, “Custom storage layout”을 선택합니다.
 <img width="1245" alt="image" src="https://github.com/user-attachments/assets/2d900132-e8e5-4e70-b37f-0cff14409a2a" />
 <img width="1194" alt="image" src="https://github.com/user-attachments/assets/16fd5da5-208c-4ea6-a60e-80e7ce5c4c1e" />
+  
 - 위에는 **SSD에** 설치    
-    - NVMe SSD는 HDD보다 훨씬 빠른 속도(읽기/쓰기 성능)가 나오므로 운영체제(OS), 소프트웨어, AI 모델 실행에 최적
-	- OS를 HDD에 설치하면 부팅과 작업 속도가 느려짐
+  - NVMe SSD는 HDD보다 훨씬 빠른 속도(읽기/쓰기 성능)가 나오므로 운영체제(OS), 소프트웨어, AI 모델 실행에 최적
+  - OS를 HDD에 설치하면 부팅과 작업 속도가 느려짐
 - 아래는 HDD에 설치
 
   
@@ -120,7 +122,7 @@ sda         8:0    0   3.6T  0 disk
   - 출력 결과에서 sda1(512MB) 외에 추가적인 파티션이 없다면, 새롭게 파티션을 생성할 수 있음  
 ```
 sudo fdisk -l /dev/sda
-```
+```  
 
 - 불필요한 파티션이 있으면
 ```
@@ -131,12 +133,12 @@ sudo parted /dev/sda mklabel gpt  # GPT 파티션 테이블 생성
 sudo umount /dev/sda1
 sudo parted /dev/sda
 rm 1
-```
+```  
 
 - sda의 기존의 모든 파일 시스템 및 파티션을 삭제하고 GPT 파티션 테이블을 생성
 ```
 sudo wipefs --all /dev/sda
-```
+```  
   
 ### 2. 새로운 LVM 생성
 - 물리 볼륨(PV) 생성
@@ -144,18 +146,18 @@ sudo wipefs --all /dev/sda
 sudo pvcreate /dev/sda
 sudo pvs # PV 결과 확인
 sudo vgs # VG 내역 확인
-```
+```  
 
 - 볼륨 그룹(VG) 생성
 ```
 sudo vgcreate vg_data /dev/sda
-```
+```  
 
 - 논리 볼륨(LV) 생성
 ```
 sudo lvcreate -l 100%FREE -n lv_storage vg_data
 sudo lvdisplay # 결과 확인
-```
+```  
   
 ### 3. 마운트 설정
 - EXT4 파일 시스템 생성
@@ -163,23 +165,23 @@ sudo lvdisplay # 결과 확인
   -  대용량 병렬 I/O가 많은 환경에서는 XFS가 유리하지만, 일반적인 경우 EXT4가 충분히 빠르고 안정적
 ```
 sudo mkfs.ext4 /dev/vg_data/lv_storage
-```
+```  
 
 - 마운트할 디렉토리 생성
 ```
 sudo mkdir -p /mnt/data
-```
+```  
 
 - 논리 볼륨 마운트
 ```
 sudo mount /dev/vg_data/lv_storage /mnt/data
 df -h | grep data # 마운트 확인
-```
+```  
 
 - 자동 마운트 설정(재부팅 후에도 유지)
 ```
 echo "/dev/vg_data/lv_storage /mnt/data ext4 defaults 0 2" | sudo tee -a /etc/fstab
-```
+```  
   
 ### 4. 추후 사용자 추가되며 LVM 설정 변경시
 - 사용자별 논리 볼륨(LV) 생성 (예: user1=1TB, user2=2TB, 나머지=1TB)
@@ -187,7 +189,7 @@ echo "/dev/vg_data/lv_storage /mnt/data ext4 defaults 0 2" | sudo tee -a /etc/fs
 sudo lvcreate -L 1T -n lv_user1 vg_data
 sudo lvcreate -L 2T -n lv_user2 vg_data
 sudo lvcreate -l 100%FREE -n lv_shared vg_data  # 남은 공간 할당
-```
+```  
 - 파일 시스템 생성 및 마운트
 ```
 sudo mkfs.ext4 /dev/vg_data/lv_user1
@@ -198,13 +200,13 @@ sudo mkdir /mnt/user1 /mnt/user2 /mnt/shared
 sudo mount /dev/vg_data/lv_user1 /mnt/user1
 sudo mount /dev/vg_data/lv_user2 /mnt/user2
 sudo mount /dev/vg_data/lv_shared /mnt/shared
-```
+```  
 - 자동 마운트 설정 (재부팅 후에도 유지)
 ```
 echo "/dev/vg_data/lv_user1 /mnt/user1 ext4 defaults 0 2" | sudo tee -a /etc/fstab
 echo "/dev/vg_data/lv_user2 /mnt/user2 ext4 defaults 0 2" | sudo tee -a /etc/fstab
 echo "/dev/vg_data/lv_shared /mnt/shared ext4 defaults 0 2" | sudo tee -a /etc/fstab
-```
+```  
 
 ---   
 
@@ -222,12 +224,12 @@ sudo usermod -aG sudo user2  # sudo 권한 부여 (필요하면)
 - 시스템 업데이트 및 업그레이드
 ```
 sudo apt update && sudo apt upgrade -y
-```
+```  
 
 - 필수 패키지 설치
 ```
 sudo apt install -y build-essential dkms unzip net-tools htop tmux vim git curl wget
-```
+```  
 
 ---  
 
@@ -235,13 +237,13 @@ sudo apt install -y build-essential dkms unzip net-tools htop tmux vim git curl 
 - 드라이버 확인
 ```
 nvidia-smi
-```
+```  
 - 설치되지 않았음 설치
 ```
 sudo ubuntu-drivers devices #-> recommended 나온거 설치
 sudo apt install -v nvidia-drivers-550
 sudo reboot
-```
+```  
 
 - CUDA & cuDNN 설치 [링크](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=22.04&target_type=deb_local)
   - Linux -> x86_64 -> Ubuntu -> 22.04 -> deb(local)
@@ -249,14 +251,14 @@ sudo reboot
 ```
 whereis cuda # /usr/local/cuda
 ls /usr/local/
-```
+```  
 - 환경 변수 설정
 ```
 echo 'export PATH=/usr/local/(cuda 맞는 버전)/bin:$PATH' >> ~/.bashrc
 echo 'export LD_LIBRARY_PATH=/usr/local/(cuda 맞는 버전)/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
 source ~/.bashrc
 sudo reboot
-```
+```  
 - 재확인 : nvcc --version
 
 ---   
@@ -266,20 +268,20 @@ sudo reboot
 - Python & pip 최신화
 ```
 sudo apt install -y python3 python3-pip python3-venv
-```
+```  
 
 - 가상 환경 설정 (venv) -> 선택
 ```
 python3 -m venv ~/ai_env
 source ~/ai_env/bin/activate
-```
+```  
 
 
 - 필수 패키지 설치
 ```
 pip install --upgrade pip
 pip install numpy scipy pandas matplotlib seaborn jupyter tqdm scikit-learn
-```
+```  
   
 ### 2. Jupyter Notebook & VS Code 설정
 - 아나콘다 설치 [설치 링크](https://www.anaconda.com/download/success)
@@ -288,18 +290,18 @@ pip install numpy scipy pandas matplotlib seaborn jupyter tqdm scikit-learn
 cd ~/Downloads
 bash Anaconda3-2023.03-Linux-x86_64.sh # 설치
 source ~/.bashrc # 환경변수 설정
-```
+```  
 
 - Jupyter Notebook 설치
 ```
 pip install jupyterlab
-```
+```  
 
 
 - 백그라운드 실행
 ```
 jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root
-```
+```  
 
 
 - VS Code 설치 [설치 링크](https://code.visualstudio.com/)
@@ -309,7 +311,7 @@ jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root
 sudo apt install ./(설치경로)/(설치파일명)
 
 sudo apt install ./Downloads/code_1.98.1-1741624510_amd64.deb
-```
+```  
 
 
   
@@ -317,18 +319,18 @@ sudo apt install ./Downloads/code_1.98.1-1741624510_amd64.deb
 - PyTorch (CUDA 지원)
 ```
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-```
+```  
 
 - TensorFlow (GPU 지원)
 ```
 pip install tensorflow
-```
+```  
 
 - 설치 확인
 ```
 python -c "import torch; print(torch.cuda.is_available())"
 python -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"
-```
+```  
 
 ---  
 
@@ -340,19 +342,19 @@ sudo chmod 600 /swapfile
 sudo mkswap /swapfile
 sudo swapon /swapfile
 echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
-```
+```  
 
 - CPU 성능 최적화
 ```
 sudo apt install -y cpufrequtils
 sudo cpufreq-set -g performance
-```
+```  
 
 - 네트워크 속도 최적화
 ```
 sudo sysctl -w net.ipv4.tcp_window_scaling=1
 sudo sysctl -w net.ipv4.tcp_sack=1
-```
+```  
 
 ---  
 
@@ -363,13 +365,13 @@ sudo sysctl -w net.ipv4.tcp_sack=1
 sudo apt update
 sudo apt install openssh-server
 sudo systemctl status ssh
-```
+```  
 
 - SSH 포트 번호 변경 및 업데이트 -> **9972**
 ```
 sudo vi /etc/ssh/sshd_config
 sudo systemctl restart sshd
-```
+```  
 
 - **맥북 터미널에 입력 : ssh -p 9972 hyebit@121.140.74.6**
 
@@ -387,33 +389,33 @@ rm known_hosts.old
 rm config
 
 clear
-```
+```  
 - 포트포워딩 등록 및 유지(설정하지 않음)
 ```
 sudo iptables -A INPUT -p tcp --dport 9972 -j ACCEPT
 
 # 재부팅 시 유지
 sudo apt install iptables-persistent
-```
+```  
 
 - 방화벽 설정 (설정 안함)
 ```
 sudo ufw allow 22/tcp
 sudo ufw allow 8888/tcp
 sudo ufw enable
-```
+```  
   
 ### 2. iptime 앱 설정
 - ssh 네트워크 인터페이스 이름 확인
 ```
 ifconfig
-```
-<img width="817" alt="image" src="https://github.com/user-attachments/assets/d0281fc4-cbe8-4643-b730-68220adcaffb" />
+```  
+<img width="817" alt="image" src="https://github.com/user-attachments/assets/d0281fc4-cbe8-4643-b730-68220adcaffb" />  
 
 - WOL 패키지 설치
 ```
 sudo apt-get install net-tools ethtool wakeonlan
-```
+```  
 
 - 네트워크 인터페이스 설정 파일 변경
 ```
@@ -422,7 +424,7 @@ sudo vi /etc/network/interfaces
 # 내용 추가
 # post-up /sbin/ethtool -s (네트워크 인터페이스 이름) wol g
 # post-down /sbin/ethtool -s (네트워크 인터페이스 이름) wol g
-```
+```  
 
 - 서비스 등록 설정
 ```
@@ -438,13 +440,13 @@ sudo vi /etc/systemd/system/wol.service
 
 # [Install]
 # WantedBy=basic.target
-```
+```  
 
 - 서비스 시작
 ```
 sudo systemctl enable /etc/systemd/system/wol.service
 sudo systemctl start wol.service
-```
+```  
 
 
 ---   
@@ -455,7 +457,7 @@ sudo systemctl start wol.service
 sudo apt install -y docker.io
 sudo systemctl enable --now docker
 sudo usermod -aG docker $USER
-```
+```  
 
 - NVIDIA-Docker 추가
 ```
@@ -464,7 +466,7 @@ distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
     && curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list \
     && sudo apt update && sudo apt install -y nvidia-docker2
 sudo systemctl restart docker
-```
+```  
 
 ---  
 
@@ -473,29 +475,29 @@ sudo systemctl restart docker
 - 설치 확인
 ```
 git --version
-```
+```  
 
 - 설치
 ```
 sudo apt update && sudo apt install git -y
-```
+```  
   
 ### 2. GitHub 계정 및 SSH 키 생성
 - SSH 키 생성
 ```
 ssh-keygen -t rsa -b 4096 -C "your-email@example.com"
-```
+```  
 
 - SSH 에이전트 실행 후 키 추가
 ```
 eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_rsa
-```
+```  
 
 - SSH 키 확인 및 복사
 ```
 cat ~/.ssh/id_rsa.pub
-```
+```  
   
 ### 3. GitHub에 SSH 키 등록  
 1️⃣ [GitHub SSH 키 설정 페이지](https://github.com/settings/keys)로 이동  
@@ -507,7 +509,7 @@ cat ~/.ssh/id_rsa.pub
 ### 4. SSH 연결 테스트
 ```
 ssh -T git@github.com
-```
+```  
 - 성공 : Hi <GitHub 사용자명>! You've successfully authenticated, but GitHub does not provide shell access.
 
   
@@ -516,19 +518,19 @@ ssh -T git@github.com
 ```
 git config --global user.name "Your Name"
 git config --global user.email "your-email@example.com"
-```
+```  
 
 - 적용 확인
 ```
 git config --list
-```
+```  
   
 ### 6. GitHub 저장소와 연결
 - GitHub에서 Clone (기존 프로젝트 가져오기)
 ```
 git clone git@github.com:사용자명/저장소이름.git
 cd 저장소이름
-```
+```  
 
 - GitHub 새 저장소 생성 후 Push (신규 프로젝트 업로드)
 ```
@@ -548,7 +550,7 @@ git remote add origin git@github.com:사용자명/저장소이름.git
 git branch -M main
 git push -u origin main
 
-```
+```  
 
 <br>
 <br>
@@ -567,7 +569,7 @@ gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'no
 gsettings set org.gnome.settings-daemon.plugins.power idle-dim false
 gsettings set org.gnome.desktop.screensaver lock-enabled false
 gsettings set org.gnome.desktop.session idle-delay 0
-```
+```  
 
 ---   
 
@@ -577,7 +579,7 @@ gsettings set org.gnome.desktop.session idle-delay 0
 - 알아서 필요한 파일들을 설치
 ```
 sudo reboot
-```
+```  
 - Setting에서 Keyboard 탭으로 이동해서 [+]을 클릭 후 [Korean]을 선택하면 재부팅 전에는 없던 "Korean (Hangul)"이 생긴 것을 볼 수 있다. 이것을 클릭 후 추가
 - Korean (Hangul)의 [Preferences]를 선택
 - Toggle Key들을 제거
