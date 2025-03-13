@@ -542,9 +542,25 @@ ssh -T git@github.com
 - GitHub CLI 설치
 ```
 type -p gh >/dev/null || { sudo apt update && sudo apt install gh -y; }
+gh --version # 확인
 ```
 
--
+- GitHub 계정 인증
+```
+gh auth login
+
+# 선택 항목
+? What account do you want to log into?  -> GitHub.com
+? What is your preferred protocol for Git operations? -> SSH
+? Upload your SSH public key to your GitHub account? -> /home/hyebit/.ssh/id_rsa.pub
+? How would you like to authenticate GitHub CLI? -> Login with a web browser
+
+후에 코드 복사해서 엔터누르고 깃헙 열리면 붙여넣기
+
+
+gh auth status # 로그인 확인
+```  
+  
 - GitHub에서 Clone (기존 프로젝트 가져오기)
 ```
 git clone git@github.com:사용자명/저장소이름.git
