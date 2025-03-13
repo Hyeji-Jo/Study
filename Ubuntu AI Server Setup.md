@@ -646,7 +646,7 @@ sudo reboot
   | **학습 로그 (TensorBoard, MLflow)** | ✅ `/tmp/tensorboard_logs/` | ✅ `/mnt/data/logs/` |
   | **최종 모델 저장** | ❌ 사용하지 않음 | ✅ `/mnt/data/models/final_model.pth` |
   | **결과 분석 및 시각화 데이터** | ✅ `/tmp/results/` | ✅ `/mnt/data/outputs/` |
-  <br>
+  <br>  
 
 ### PyTorch
 ```py
@@ -674,7 +674,7 @@ torch.save(model.state_dict(), "/tmp/model_checkpoint.pth")
 
 # 최종 모델 저장 (HDD 사용)
 torch.save(model.state_dict(), "/mnt/data/models/final_model.pth")
-```
+```  
 
   <br>
   
@@ -706,4 +706,22 @@ model.fit(train_ds, epochs=10, callbacks=[checkpoint_callback])
 
 # 최종 모델 저장 (HDD)
 model.save(final_model_path)
+```  
+
+<br>  
+
+### 프로젝트 백업
+-  SSD에서 HDD로 프로젝트 백업
 ```
+mv ~/AIproject /mnt/data/projects/AIproject_backup
+```  
+  
+-  프로젝트 다시 시작할 때 (HDD → SSD)
+```
+cp -r /mnt/data/projects/AIproject_backup ~/AIproject
+```  
+  
+-  정리 후 SSD 용량 확인
+```
+df -h /
+```  
