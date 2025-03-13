@@ -627,3 +627,83 @@ sudo reboot
 - Korean (Hangul)의 [Preferences]를 선택
 - Toggle Key들을 제거
 - Toggle Key를 추가해주기 위해 Add를 누른 뒤에 "한영키"(여기서는 Alt_R로 인식)를 한번만 클릭
+
+
+
+---   
+<br>
+
+## AI 모델링에서 SSD + HDD를 효율적으로 사용
+- SSD → AI 모델 학습 중 임시 데이터, 캐시, 체크포인트 저장
+- HDD → 데이터셋, 로그, 결과 저장
+
+- 예시
+  | **사용 목적**                | 💾 **SSD (`/`)** | 📂 **HDD (`/mnt/data/`)** |
+  |-----------------------------|----------------|----------------|
+  | **AI 코드 실행 & 모델 학습** | ✅ `/home/username/AIproject/` | ❌ 사용하지 않음 |
+  | **데이터셋 저장 (Raw Data)** | ❌ 사용하지 않음 | ✅ `/mnt/data/dataset/` |
+  | **학습 중간 결과 저장 (체크포인트)** | ✅ `/tmp/model_checkpoint.pth` | ❌ 사용하지 않음 |
+  | **학습 로그 (TensorBoard, MLflow)** | ✅ `/tmp/tensorboard_logs/` | ✅ `/mnt/data/logs/` |
+  | **최종 모델 저장** | ❌ 사용하지 않음 | ✅ `/mnt/data/models/final_model.pth` |
+  | **결과 분석 및 시각화 데이터** | ✅ `/tmp/results/` | ✅ `/mnt/data/outputs/` |
+  <br>
+
+### PyTorch
+```py
+import torch
+from torch.utils.data import DataLoader
+from torchvision import datasets, transforms
+
+# HDD에 데이터셋 저장
+data_dir = "/mnt/data/dataset"
+
+# SSD에 캐시 저장 (학습 속도 최적화)
+cache_dir = "/tmp/pytorch_cache"
+
+# 데이터셋 로드
+dataset = datasets.ImageFolder(
+    root=data_dir,
+    transform=transforms.ToTensor()
+)
+
+# 데이터로더 생성
+dataloader = DataLoader(dataset, batch_size=32, shuffle=True, num_workers=4)
+
+# 모델 체크포인트 저장 (SSD 사용)
+torch.save(model.state_dict(), "/tmp/model_checkpoint.pth")
+
+# 최종 모델 저장 (HDD 사용)
+torch.save(model.state_dict(), "/mnt/data/models/final_model.pth")
+```
+
+  <br>
+  
+### TensorFlow
+```py
+import tensorflow as tf
+
+# 데이터셋 경로 설정 (HDD 사용)
+dataset_path = "/mnt/data/dataset"
+
+# 모델 체크포인트 경로 (SSD 사용)
+checkpoint_path = "/tmp/tf_checkpoint"
+
+# 최종 모델 저장 경로 (HDD 사용)
+final_model_path = "/mnt/data/models/final_model"
+
+# 데이터 로드
+train_ds = tf.keras.preprocessing.image_dataset_from_directory(
+    dataset_path,
+    image_size=(224, 224),
+    batch_size=32
+)
+
+# 모델 저장 콜백 (SSD 체크포인트)
+checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path, save_best_only=True)
+
+# 모델 학습
+model.fit(train_ds, epochs=10, callbacks=[checkpoint_callback])
+
+# 최종 모델 저장 (HDD)
+model.save(final_model_path)
+```
