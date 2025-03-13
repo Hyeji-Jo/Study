@@ -592,22 +592,108 @@ git push -u origin main
 <br>
 
 ## 6) Docker & ML Ops 환경 구축
--  Docker 설치
+### 1. Docker
+- 필수 패키지 설치
 ```
-sudo apt install -y docker.io
-sudo systemctl enable --now docker
-sudo usermod -aG docker $USER
+sudo apt update && sudo apt install -y \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
 ```  
   
-- NVIDIA-Docker 추가
+- Docker 공식 GPG Key 추가
+```
+sudo mkdir -m 0755 -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo tee /etc/apt/keyrings/docker.asc > /dev/null
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+```  
+<img width="672" alt="image" src="https://github.com/user-attachments/assets/394fc93a-2aa8-475a-9a9d-46ab53b17fb2" />
+  
+- Docker 권한 변경
+```
+sudo chmod 0755 /etc/apt/keyrings
+```  
+  
+- Docker 저장소 추가
+```
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+```  
+   
+-  Docker 설치
+```
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```  
+  
+- Docker 서비스 활성화 및 자동 시작
+```
+sudo systemctl start docker # 수동 시작(킬때마다 입력)
+sudo systemctl enable --now docker # 부팅 시 자동실행
+
+----------------
+# 설치 확인
+docker --version
+docker run hello-world
+
+sudo systemctl status docker # 도커 상태 확인
+```  
+  
+<br>
+### 2. NVIDIA-Docker
+  
+- 저장소 추가
 ```
 distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
-    && curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add - \
-    && curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list \
-    && sudo apt update && sudo apt install -y nvidia-docker2
+    && curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+    && curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | \
+    sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+    sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+```  
+  
+- NVIDIA 컨테이너 툴킷 설치
+```  
+sudo apt update
+sudo apt install -y nvidia-container-toolkit
+```  
+  
+
+- NVIDIA-Docker 활성화
+```
+sudo nano /etc/docker/daemon.json
+
+
+# 내용 추가
+{
+  "runtimes": {
+    "nvidia": {
+      "path": "nvidia-container-runtime",
+      "runtimeArgs": []
+    }
+  }
+}
+```  
+  
+- Docker 재시작
+``` 
 sudo systemctl restart docker
-```   
- 
+
+# 설치 확인
+docker run --rm --gpus all nvidia/cuda:12.8.0-base-ubuntu22.04 nvidia-smi
+# nvcc --version으로 확인해서 cuda 버전 맞추기
+```  
+  
+- Docker 이미지 제거방법
+```
+# 특정 지정 제거
+docker rmi nvidia/cuda:12.0.1-base-ubuntu22.04
+
+# 사용하지 않는 이미지 일괄 제거
+docker image prune -a
+```  
+  
 <br>
 <br>
 
