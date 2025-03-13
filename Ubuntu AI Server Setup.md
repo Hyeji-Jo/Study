@@ -480,52 +480,36 @@ sudo systemctl start wol.service
 
 <br>
 
-## 5) Docker & ML Ops 환경 구축
--  Docker 설치
-```
-sudo apt install -y docker.io
-sudo systemctl enable --now docker
-sudo usermod -aG docker $USER
-```  
-  
-- NVIDIA-Docker 추가
-```
-distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
-    && curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add - \
-    && curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list \
-    && sudo apt update && sudo apt install -y nvidia-docker2
-sudo systemctl restart docker
-```   
-  
----  
-
-<br>
-
-## 6) Git 연결
+## 5) Git 연결
 ### 1. Git 설치 확인 및 설치
 - 설치 확인
 ```
 git --version
 ```  
   
-- 설치
+- 설치 (설치 안되어 있을 경우)
 ```
 sudo apt update && sudo apt install git -y
 ```  
 
 <br>
     
-### 2. GitHub 계정 및 SSH 키 생성
-- SSH 키 생성
+### 2. 사용자 기본 정보 설정
 ```
-ssh-keygen -t rsa -b 4096 -C "your-email@example.com"
+git config --global user.name "(깃이름)"
+git config --global user.email "(본인깃메일)"
+
+git config --global --list #설정확인
 ```  
   
-- SSH 에이전트 실행 후 키 추가
+<br>
+
+### 3. GitHub 계정 및 SSH 키 생성
+- SSH 키 생성
 ```
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_rsa
-```    
+ssh-keygen -t rsa -b 4096 -C "(본인깃메일)"
+```  
+  
   
 - SSH 키 확인 및 복사
 ```
@@ -546,27 +530,15 @@ cat ~/.ssh/id_rsa.pub
 ### 4. SSH 연결 테스트
 ```
 ssh -T git@github.com
+
+# yes -> 깃 설정 비밀번호 입력 ex)112
 ```  
   
 - 성공 : Hi <GitHub 사용자명>! You've successfully authenticated, but GitHub does not provide shell access.
 
 <br>
 
-### 5. Git 설정 (최초 1회)
-- 사용자 정보 저장
-```
-git config --global user.name "Your Name"
-git config --global user.email "your-email@example.com"
-```   
-  
-- 적용 확인
-```
-git config --list
-```   
-
-<br>
-
-### 6. GitHub 저장소와 연결
+### 5. GitHub 저장소와 연결
 - GitHub에서 Clone (기존 프로젝트 가져오기)
 ```
 git clone git@github.com:사용자명/저장소이름.git
@@ -591,6 +563,27 @@ git remote add origin git@github.com:사용자명/저장소이름.git
 git branch -M main
 git push -u origin main
 
+```   
+  
+---  
+
+<br>
+
+## 6) Docker & ML Ops 환경 구축
+-  Docker 설치
+```
+sudo apt install -y docker.io
+sudo systemctl enable --now docker
+sudo usermod -aG docker $USER
+```  
+  
+- NVIDIA-Docker 추가
+```
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
+    && curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add - \
+    && curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list \
+    && sudo apt update && sudo apt install -y nvidia-docker2
+sudo systemctl restart docker
 ```   
  
 <br>
