@@ -539,6 +539,12 @@ ssh -T git@github.com
 <br>
 
 ### 5. GitHub 저장소와 연결
+- GitHub CLI 설치
+```
+type -p gh >/dev/null || { sudo apt update && sudo apt install gh -y; }
+```
+
+-
 - GitHub에서 Clone (기존 프로젝트 가져오기)
 ```
 git clone git@github.com:사용자명/저장소이름.git
