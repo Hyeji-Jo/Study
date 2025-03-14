@@ -155,12 +155,12 @@ sudo vgs # VG 내역 확인
 
 - 볼륨 그룹(VG) 생성
 ```
-sudo vgcreate vg_data /dev/sda
+sudo vgcreate vg_hdd /dev/sda
 ```  
   
 - 논리 볼륨(LV) 생성
 ```
-sudo lvcreate -l 100%FREE -n lv_storage vg_data
+sudo lvcreate -l 100%FREE -n lv_home vg_hdd
 sudo lvdisplay # 결과 확인
 ```  
 <br>
@@ -170,25 +170,25 @@ sudo lvdisplay # 결과 확인
   -  AI 모델 학습 서버에서는 대부분 EXT4 또는 XFS를 사용
   -  대용량 병렬 I/O가 많은 환경에서는 XFS가 유리하지만, 일반적인 경우 EXT4가 충분히 빠르고 안정적
 ```
-sudo mkfs.ext4 /dev/vg_data/lv_storage
+sudo mkfs.ext4 /dev/vg_hdd/lv_home
 ```  
   
 
 - 마운트할 디렉토리 생성
 ```
-sudo mkdir -p /mnt/data
+sudo mkdir -p /mnt/hdd_4t
 ```  
   
 
 - 논리 볼륨 마운트
 ```
-sudo mount /dev/vg_data/lv_storage /mnt/data
+sudo mount /dev/vg_hdd/lv_home /mnt/hdd_4t
 df -h | grep data # 마운트 확인
 ```  
   
 - 자동 마운트 설정(재부팅 후에도 유지)
 ```
-echo "/dev/vg_data/lv_storage /mnt/data ext4 defaults 0 2" | sudo tee -a /etc/fstab
+echo "/dev/vg_hdd/lv_home /mnt/hdd_4t ext4 defaults 0 2" | sudo tee -a /etc/fstab
 ```  
 
   <br>
@@ -196,26 +196,26 @@ echo "/dev/vg_data/lv_storage /mnt/data ext4 defaults 0 2" | sudo tee -a /etc/fs
 ### 4. 추후 사용자 추가되며 LVM 설정 변경시
 - 사용자별 논리 볼륨(LV) 생성 (예: user1=1TB, user2=2TB, 나머지=1TB)
 ```
-sudo lvcreate -L 1T -n lv_user1 vg_data
-sudo lvcreate -L 2T -n lv_user2 vg_data
-sudo lvcreate -l 100%FREE -n lv_shared vg_data  # 남은 공간 할당
+sudo lvcreate -L 1T -n lv_user1 vg_hdd
+sudo lvcreate -L 2T -n lv_user2 vg_hdd
+sudo lvcreate -l 100%FREE -n lv_shared vg_hdd  # 남은 공간 할당
 ```  
 - 파일 시스템 생성 및 마운트
 ```
-sudo mkfs.ext4 /dev/vg_data/lv_user1
-sudo mkfs.ext4 /dev/vg_data/lv_user2
-sudo mkfs.ext4 /dev/vg_data/lv_shared
+sudo mkfs.ext4 /dev/vg_hdd/lv_user1
+sudo mkfs.ext4 /dev/vg_hdd/lv_user2
+sudo mkfs.ext4 /dev/vg_hdd/lv_shared
 
 sudo mkdir /mnt/user1 /mnt/user2 /mnt/shared
-sudo mount /dev/vg_data/lv_user1 /mnt/user1
-sudo mount /dev/vg_data/lv_user2 /mnt/user2
-sudo mount /dev/vg_data/lv_shared /mnt/shared
+sudo mount /dev/vg_hdd/lv_user1 /mnt/user1
+sudo mount /dev/vg_hdd/lv_user2 /mnt/user2
+sudo mount /dev/vg_hdd/lv_shared /mnt/shared
 ```  
 - 자동 마운트 설정 (재부팅 후에도 유지)
 ```
-echo "/dev/vg_data/lv_user1 /mnt/user1 ext4 defaults 0 2" | sudo tee -a /etc/fstab
-echo "/dev/vg_data/lv_user2 /mnt/user2 ext4 defaults 0 2" | sudo tee -a /etc/fstab
-echo "/dev/vg_data/lv_shared /mnt/shared ext4 defaults 0 2" | sudo tee -a /etc/fstab
+echo "/dev/vg_hdd/lv_user1 /mnt/user1 ext4 defaults 0 2" | sudo tee -a /etc/fstab
+echo "/dev/vg_hdd/lv_user2 /mnt/user2 ext4 defaults 0 2" | sudo tee -a /etc/fstab
+echo "/dev/vg_hdd/lv_shared /mnt/shared ext4 defaults 0 2" | sudo tee -a /etc/fstab
 ```  
 
 ---   
@@ -825,4 +825,26 @@ cp -r /mnt/data/projects/AIproject_backup ~/AIproject
 -  정리 후 SSD 용량 확인
 ```
 df -h /
+```  
+
+<br>  
+
+### 바탕화면에 바로가기 아이콘 추가
+-  hdd_4t.desktop 파일 생성
+```
+nano ~/바탕화면/hdd_4t.desktop
+
+# 내용 추가
+[Desktop Entry]
+Type=Application
+Name=HDD 4TB
+Exec=xdg-open /mnt/hdd_4t
+Icon=drive-harddisk
+Terminal=false
+Categories=Utility;
+```  
+  
+-  실행 권한 부여
+```
+chmod +x ~/바탕화면/hdd_4t.desktop
 ```  
