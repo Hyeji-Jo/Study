@@ -848,3 +848,53 @@ Categories=Utility;
 ```
 chmod +x ~/바탕화면/hdd_4t.desktop
 ```  
+
+
+<br>  
+
+### 블루투스 설정
+-  블루투스 서비스가 실행 중인지 확인
+```
+sudo systemctl status bluetooth
+```   
+  
+-  블루투스 장치 검색 및 페어링
+```
+lsusb | grep -i bluetooth
+```   
+  
+-  블루투스 컨트롤러 활성화
+```
+bluetoothctl power on
+bluetoothctl agent on
+bluetoothctl scan on
+```  
+  
+-  연결할 장치 확인
+```  
+bluetoothctl devices
+
+MAC 주소를 확인
+```  
+
+- 페어링 & 신뢰 등록
+```
+bluetoothctl pair <MAC주소>
+bluetoothctl trust <MAC주소>
+
+# 예시
+bluetoothctl pair AA:BB:CC:DD:EE:FF
+bluetoothctl trust AA:BB:CC:DD:EE:FF
+```   
+
+- 연결하기
+```
+bluetoothctl connect <MAC주소>
+
+# 연결 자동화
+bluetoothctl trust <MAC주소>
+
+# 연결 확인
+bluetoothctl info <MAC주소>
+```
+
