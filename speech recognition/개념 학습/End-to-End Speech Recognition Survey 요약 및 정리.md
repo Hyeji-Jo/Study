@@ -92,7 +92,7 @@
   - 메모리, 연산 자원이 줄어들어 임베디드 환경에서의 ASR 적용에도 유리
 - **학습 최적화와 안정성 (Learning Optimization & Robustness)**
   - 통합 학습(joint training)으로 잘못된 국소 최적화 지점 피할 수 있음
-- **외부 리소스 없이 데이터 기반 학습 (Data-Driven & Resource-Free)**
+- **외부 리소스 없이 데이터 기반 학습 (Data-Driven & Resource-Free)**
   - 발음사전과 같은 2차 지식원 불필요
   - 2차 지식원이 잘못된 경우 생기는 오류 방지
   - 충분한 작업-특화 데이터(task-specific data)만 있으면 학습 가능
@@ -109,3 +109,7 @@
 - 제9장: E2E ASR의 실제 적용 사례
 - 제10장: E2E ASR 향후 연구 방향
 - 제11장: 결론
+
+
+
+## 2. End-to-End 음성 인식 모델의 분류 체계
