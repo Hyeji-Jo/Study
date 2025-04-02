@@ -128,3 +128,20 @@
   - $`𝒯 = { (Xᵢ, Cᵢ) ∣ i = 1, …, N }`$
  
 - 모델의 학습 목표는, **입력 음성 X에 대한 조건부 확률 분포**인 $P(C|X)$ = $P(C|H(X))$ 를 정확히 추정하는 것
+
+### E2E 모델 정렬 방식(alignment strategy)
+- 일반적으로, E2E 모델로 $P(C|X)$ 를 추정하는 데 있어서의 핵심 도전 과제 중 하나는, **음향 프레임 시퀀스(길이 T′)** 와 이에 대응되는 **라벨 시퀀스(길이 L)** 사이의 **정렬(Alignment)이 알려지지 않았다는 점**을 처리하는 것
+- 전통적인 ASR 시스템에서는 이러한 프레임 단위 정렬을 **HMM(Hidden Markov Model)** 로 모델링하고, **GMM(Gaussian Mixture Model)** 또는 **신경망**을 통해 음향 프레임의 출력 분포를 학습
+- 신경망 기반의 음향 모델을 훈련할 때 프레임 단위 정렬은 기존 **GMM-HMM 시스템을 이용한 강제 정렬(force-alignment)** 을 통해 얻을 수 있지만, **초기 정렬 없이도 바로 시퀀스를 학습하는 방법** 또한 가능
+- 전통적인 ASR 시스템에서의 **음소 단위 정렬**은 자연스럽지만, E2E 시스템에서는 보통 **문자 기반의 (sub-)word 단위 라벨을 사용**
+- 하지만, **문자 단위로의 정렬 개념**은 그리 명확하지 않다
+- 따라서 본 논문에서는 **정렬을 어떻게 모델링하는지에 따라** E2E 모델들을 **명시적(Explicit) 정렬** 또는 **암시적(Implicit) 정렬** 방식으로 구분
+
+- 초기의 E2E 모델들은 정렬을 명시적으로(latent variable로) 모델링했으며, 학습과 추론 과정에서 이 **잠재 변수(latent variable)** 는 (근사적으로라도) **주변화(marginalization) 처리**
+- 이 계열의 대표적인 모델들에는 **CTC (Connectionist Temporal Classification)**, **RNN-T (Recurrent Neural Network Transducer)**, **RNA (Recurrent Neural Aligner)**, **HAT (Hybrid Auto-Regressive Transducer)** 등이 존재
+- 이들 중 후속에 등장한 모델일수록 더 정교한 정렬 모델링을 수행하며, **독립 가정(independence assumption)** 을 줄이고, 그만큼 **모델 성능이나 표현력도 향상**되었다는 점은 이후 섹션에서 설명될 것
+- 반대편 극단에는, 기계 번역(MT) 분야에서 처음 주목을 받은 attention 기반의 인코더-디코더(encoder-decoder) 모델
+- CTC와 같은 명시적 정렬 모델들과 달리, attention 기반 인코더-디코더 모델은 attention mechanism을 사용하여 전체 음향 시퀀스와 개별 라벨 간의 매핑 관계 학습
+- 마지막으로, 이 두 극단 사이에는 **중간적인 접근 방식들도 존재**
+- 예를 들어: Neural Transducer, 모노토닉 정렬(monotonic alignment) 기반 모델들과 그 변형들(예: MoChA, MILK 등)은, **명시적 정렬 모델 구조**를 갖고 있으면서도, 동시에 **attention 메커니즘을 활용해 주변 음향 정보를 참고하여 예측을 정제(refine)** 할 수 있게 한다
+- 이후 섹션에서는 이러한 각각의 모델 유형을 순서대로 설명할 것
