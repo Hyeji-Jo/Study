@@ -221,12 +221,12 @@
   - 모델은 하나의 정렬이 아닌, **여러 가능한 정렬 시퀀스(A)** 를 고려
   - 특정 훈련 예제 (X, C)에 대해, 유효한 정렬 집합 ${A}_{(T,C)}$ 를 정의
   - 이를 기반으로 전체 조건부 확률 P(C|X) 주변화
-  -  $`[
-P(C|X) = P(C|H(X)) = \sum_{A} P(C | A, H(X)) \cdot P(A | H(X)) <br>
-= \sum_{A \in \mathcal{A}_{(T = |H(X)|, C)}} P(A | H(X)) \tag{1}
-]`$
-
-  - 여기서 조건 : $`P(C | A, H(X)) = 1 \quad \text{iff} \quad A \in \mathcal{A}_{(T, C)}`$
+  - $`P(C|X) = P(C|H(X)) = \sum_{A} P(C | A, H(X)) \cdot P(A | H(X)) <br>
+= \sum_{A \in \mathcal{A}_{(T = |H(X)|, C)}} P(A | H(X)) \tag{1}`$
+    - $`\sum_{A} P(C | A, H(X)) \cdot P(A | H(X))`$ -> 가능한 모든 정렬 시퀀스 A를 다 고려해서 평균을 냄(sum A)
+      - P(A | H(X)) -> 인코더 출력 H(X)가 주어졌을 때 **정렬 A가 일어날 확률**
+      - P(C | A, H(X)) -> 정렬 A가 주어졌을 때, 실제로 그 정렬이 **정확히 C를 만들었는지 여부**
+  - 여기서 조건 : $`P(C | A, H(X)) = 1 \quad \text{if} \quad A \in \mathcal{A}_{(T, C)}`$
     - 즉, **특정 정렬 A가 라벨 시퀀스 C를 정확히 생성할 수 있을 경우에만 1의 확률을 부여**
     - 하나의 정렬 A에서 라벨 시퀀스 C로의 매핑은 **유일하게 정의**
 
