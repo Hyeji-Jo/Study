@@ -281,7 +281,7 @@
 - ***유효한 정렬**
   - T + L 길이의 시퀀스 A로 정의되며, blank를 제거했을 때 C
     - 모든 ⟨b⟩ 기호를 제거하면 정확히 C가 되는 시퀀스만 유효한 정렬로 간주 
-  - $\mathcal{A}^{\text{RNNT}}(X, C) = \{ A = (a_1, …, a{T+L}) \}$  
+  - \$\mathcal{A}^{\text{RNNT}}(X, C) = \{ A = (a_1, …, a{T+L}) \}$  
   - 출력 위치 $\tau$ 에서, $i_\tau$ 는 정렬 시퀀스 A의 처음부터 $\tau$ - 1까지 등장한 non-blank 라벨의 수를 나타냄
     - 이때, 그 구간에 포함된 blank의 수는 $\tau - i_\tau - 1$  
   - 예를 들어 T = 7, C = (s, e, e)일 때 $A = (\langle b \rangle, s, \langle b \rangle, \langle b \rangle, \langle b \rangle, e, e, \langle b \rangle, \langle b \rangle, \langle b \rangle)$   이는 유효한 정렬에 포함
