@@ -272,3 +272,48 @@
     - 매 스텝마다 ⟨b⟩ 혹은 실제 라벨 중 하나를 선택하여 출력
 
 
+#### 2) RNN-T
+- 기존 CTC가 갖는 **강한 조건부 독립 가정(각 시간 스텝 출력이 독립)을 완화**하여 개선한 모델
+- **Blank 라벨 ⟨b⟩**
+  - CTC : 반복 라벨을 구분하기 위한 중간 기호
+  - 각 인코더 프레임 $h_t$에 대해, 모델은 0개 이상의 라벨을 출력하고, 마지막에 blank로 종료
+  - 즉, 반복되는 라벨을 위한 별도 조치가 필요 없음
+- ***유효한 정렬**
+  - T + L 길이의 시퀀스 A로 정의되며, blank를 제거했을 때 C
+    - 모든 ⟨b⟩ 기호를 제거하면 정확히 C가 되는 시퀀스만 유효한 정렬로 간주 
+  - $`\mathcal{A}^{\text{RNNT}}(X, C) = \{ A = (a_1, …, a{T+L}) \}`$
+  - 출력 위치 $\tau$ 에서, $i_\tau$ 는 정렬 시퀀스 A의 처음부터 $\tau$ - 1까지 등장한 non-blank 라벨의 수를 나타냄
+    - 이때, 그 구간에 포함된 blank의 수는 $`\tau - i_\tau - 1`$
+  - 예를 들어 T = 7, C = (s, e, e)일 때 $`A = (\langle b \rangle, s, \langle b \rangle, \langle b \rangle, \langle b \rangle, e, e, \langle b \rangle, \langle b \rangle, \langle b \rangle)`$ 이는 유효한 정렬에 포함
+  <img width="586" alt="image" src="https://github.com/user-attachments/assets/ed774ebb-60e9-4164-b86f-1da32f4dcd25" />
+
+- **RNN-T 확률 계산**
+  - $$`
+P_{\text{RNNT}}(C \mid X)
+= \sum_{A \in \mathcal{A}^{\text{RNNT}}(X, C)} P(A \mid H(X)) \\
+= \sum_{A \in \mathcal{A}^{\text{RNNT}}(X, C)} \prod_{\tau = 1}^{T+L} P(a_\tau \mid a_{\tau-1}, \dots, a_1, H(X)) \\
+= \sum_{A \in \mathcal{A}^{\text{RNNT}}(X, C)} \prod_{\tau = 1}^{T+L} P(a_\tau \mid c_{i_\tau}, \dots, c_0, \mathbf{h}_{\tau - i_\tau}) \\
+= \sum_{A \in \mathcal{A}^{\text{RNNT}}(X, C)} \prod_{\tau = 1}^{T+L} P(a_\tau \mid \mathbf{p}_{i_\tau}, \mathbf{h}_{\tau - i_\tau}) \tag{3}
+`$$ 
+    - 여기서 $`a_\tau`$: 정렬된 시퀀스 A의 τ번째 심볼 (blank 포함 가능)
+      - 이전까지 예측된 non-blank 라벨 시퀀스에 조건부 종속
+      - 하지만 정렬이 이루어진 프레임의 위치 (즉, 언제 출력되었는지)는 고려하지 않음
+  	- $`p_{i_\tau}`$: prediction network의 출력 (non-blank 라벨들에 기반)
+    - $`h_{\tau - i_\tau}`$: 인코더에서 나온 acoustic context vector
+    - $`P = (p_1, \cdots, p_L)`$ 은 prediction network의 출력 시퀀스
+      - 이전까지 예측된 non-blank 라벨들의 시퀀스를 요약한 벡터들
+  - RNN-T는 CTC보다 약한 독립 가정 사용
+
+- **모델 구조**
+  <img width="580" alt="image" src="https://github.com/user-attachments/assets/9951c35a-c928-4cde-bccf-b2adc764af85" />
+
+  - 이 prediction network는 또 하나의 신경망으로 구현
+    - 각 출력은 다음과 같이 정의된다: $`p_j = NN(c_0, …, c_{j-1})`$
+    - 여기서 $c_0$ 은 문장의 시작을 나타내는 특수 라벨 ⟨sos⟩
+
+- **RNN-T의 일반화**
+  - [43]의 연구에서는 RNN-T 모델을 더 일반화된 형태로 확장
+  - 정렬 가능한 프레임 단위 시퀀스를 임의의 그래프 구조로 표현 가능
+  - 조건부 확률 계산을 위한 forward-backward 알고리즘을 일반화하여 적용
+  - 이 구조에서는 CTC처럼 각 프레임마다 하나의 출력만 발생시키는 방식도 포함 가능
+  - **Prediction Network를 통한 문맥 반영은 그대로 유지**
