@@ -246,7 +246,7 @@
 - **유효한 정렬**
   - **연속된 동일 라벨을 먼저 병합(collapse)한 후, 모든 ⟨b⟩ 기호 제거했을때, A가 정확히 C가 되는 경우만 유효**
   - 예를 들어, T = 10, C = (s, e, e) 라고 할 때, $`A = (s, \langle b \rangle, \langle b \rangle, e, e, \langle b \rangle, e, e, \langle b \rangle, \langle b \rangle)`$
-  <img width="603" alt="image" src="https://github.com/user-attachments/assets/440025e6-6530-4535-9c77-3a44baa330e7" />
+  <img width="603" alt="image" src="https://github.com/user-attachments/assets/440025e6-6530-4535-9c77-3a44baa330e7" />  
 
 - **CTC 확률 계산**
   - 가능한 모든 정렬에 대해 **확률을 합산** - **주변화(marginalization)**
@@ -258,8 +258,8 @@
     - 오직 해당 시점의 인코더 출력 $h_t$ 만을 기반으로 결정
   - 이 가정 덕분에 학습과 추론이 단순해지지만, 긴 문맥 정보나 복잡한 의존 관계를 반영하는 데는 한계 존재
 
-- **모델 구조**
-  <img width="586" alt="image" src="https://github.com/user-attachments/assets/0776e2ca-66d2-4474-b64d-a9d55195e3f9" />
+- **모델 구조**  
+  <img width="586" alt="image" src="https://github.com/user-attachments/assets/0776e2ca-66d2-4474-b64d-a9d55195e3f9" />   
 
   - 각 시점 t에서 $P(a_t | X)$ 를 모델링하는 신경망 구조로 구성
   - **인코더(Encoder)**
@@ -288,13 +288,11 @@
   <img width="586" alt="image" src="https://github.com/user-attachments/assets/ed774ebb-60e9-4164-b86f-1da32f4dcd25" />
 
 - **RNN-T 확률 계산**
-  - $$`
-P_{\text{RNNT}}(C \mid X)
+  - $`P_{\text{RNNT}}(C \mid X)
 = \sum_{A \in \mathcal{A}^{\text{RNNT}}(X, C)} P(A \mid H(X)) \\
 = \sum_{A \in \mathcal{A}^{\text{RNNT}}(X, C)} \prod_{\tau = 1}^{T+L} P(a_\tau \mid a_{\tau-1}, \dots, a_1, H(X)) \\
 = \sum_{A \in \mathcal{A}^{\text{RNNT}}(X, C)} \prod_{\tau = 1}^{T+L} P(a_\tau \mid c_{i_\tau}, \dots, c_0, \mathbf{h}_{\tau - i_\tau}) \\
-= \sum_{A \in \mathcal{A}^{\text{RNNT}}(X, C)} \prod_{\tau = 1}^{T+L} P(a_\tau \mid \mathbf{p}_{i_\tau}, \mathbf{h}_{\tau - i_\tau}) \tag{3}
-`$$ 
+= \sum_{A \in \mathcal{A}^{\text{RNNT}}(X, C)} \prod_{\tau = 1}^{T+L} P(a_\tau \mid \mathbf{p}_{i_\tau}, \mathbf{h}_{\tau - i_\tau}) \tag{3}`$
     - 여기서 $`a_\tau`$: 정렬된 시퀀스 A의 τ번째 심볼 (blank 포함 가능)
       - 이전까지 예측된 non-blank 라벨 시퀀스에 조건부 종속
       - 하지만 정렬이 이루어진 프레임의 위치 (즉, 언제 출력되었는지)는 고려하지 않음
@@ -304,8 +302,8 @@ P_{\text{RNNT}}(C \mid X)
       - 이전까지 예측된 non-blank 라벨들의 시퀀스를 요약한 벡터들
   - RNN-T는 CTC보다 약한 독립 가정 사용
 
-- **모델 구조**
-  <img width="580" alt="image" src="https://github.com/user-attachments/assets/9951c35a-c928-4cde-bccf-b2adc764af85" />
+- **모델 구조**  
+  <img width="580" alt="image" src="https://github.com/user-attachments/assets/9951c35a-c928-4cde-bccf-b2adc764af85" />  
 
   - 이 prediction network는 또 하나의 신경망으로 구현
     - 각 출력은 다음과 같이 정의된다: $`p_j = NN(c_0, …, c_{j-1})`$
