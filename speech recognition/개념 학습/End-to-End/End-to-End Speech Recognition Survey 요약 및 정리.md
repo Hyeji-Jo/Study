@@ -281,8 +281,7 @@
 - **유효한 정렬**
   - T + L 길이의 시퀀스 A로 정의되며, blank를 제거했을 때 C
     - 모든 ⟨b⟩ 기호를 제거하면 정확히 C가 되는 시퀀스만 유효한 정렬로 간주 
-  - 𝒜ᴿᴺᴺᵀ(X, C) = $A = (a₁, a₂, ..., a_{T+L})$
-  - The formula for the area of a circle is given by $A = \pi r^2$, where $r$ is the radius.
+  - <img src="https://latex.codecogs.com/svg.image?\mathcal{A}^{\text{RNNT}}(X,&space;C)&space;=&space;\{&space;A&space;=&space;(a_1,&space;a_2,&space;\ldots,&space;a_{T&plus;L})&space;\}" />
   - 출력 위치 τ에서, $i_τ$ 는 정렬 시퀀스 A의 처음부터 τ - 1까지 등장한 non-blank 라벨의 수를 나타냄
     - 이때, 그 구간에 포함된 blank의 수는 τ - $ i_τ $ - 1
   - 예를 들어 T = 7, C = (s, e, e)일 때 A = (⟨b⟩, s, ⟨b⟩, ⟨b⟩, ⟨b⟩, e, e, ⟨b⟩, ⟨b⟩, ⟨b⟩)
