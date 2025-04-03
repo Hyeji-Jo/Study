@@ -208,3 +208,25 @@
     - MILK (Monotonic Infinite Lookback) 
 
 
+### A. 명시적 정렬 기반 E2E 접근법 (Explicit Alignment E2E Approaches)
+- 입력 음성의 인코더 출력 시퀀스와 정답 텍스트 사이의 정렬 관계를 **잠재 변수(latent variable)** 로 정의
+  - **T 길이의 인코더 출력 H(X)** 와 **L 길이의 출력 시퀀스 C** 사이의 정렬 정보를 **명시적인 정렬 변수 A**로 표현
+  - CTC, RNN-T, RNA 각각의 모델별 정렬 A를 정의하는 방식이 다름
+  - 해당 차이는 모델의 내부 **조건부 독립 가정(conditional independence assumption)**, 그리고 학습 및 디코딩 방식에도 영향
+- 공통 구조 : ⟨b⟩ - blank 기호 도입
+  - 출력 기호 집합 확장 : $C_b = C \cup \{⟨b⟩\}$
+  - 문자와 문자 사이의 공백 혹은 타이밍 조절 역할 수행
+  - 각 모델마다 그 의미나 사용 방식은 조금씩 차이 존재
+- 주변화(Marginalization)
+  - 모델은 하나의 정렬이 아닌, **여러 가능한 정렬 시퀀스(A)** 를 고려
+  - 특정 훈련 예제 (X, C)에 대해, 유효한 정렬 집합 ${A}_{(T,C)}$ 를 정의
+  - 이를 기반으로 전체 조건부 확률 P(C|X) 주변화
+  -  $`[
+P(C|X) = P(C|H(X)) = \sum_{A} P(C | A, H(X)) \cdot P(A | H(X)) <br>
+= \sum_{A \in \mathcal{A}_{(T = |H(X)|, C)}} P(A | H(X)) \tag{1}
+]`$
+
+  - 여기서 조건 : $`P(C | A, H(X)) = 1 \quad \text{iff} \quad A \in \mathcal{A}_{(T, C)}`$
+    - 즉, **특정 정렬 A가 라벨 시퀀스 C를 정확히 생성할 수 있을 경우에만 1의 확률을 부여**
+    - 하나의 정렬 A에서 라벨 시퀀스 C로의 매핑은 **유일하게 정의**
+
