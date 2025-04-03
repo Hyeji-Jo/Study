@@ -155,23 +155,56 @@
 
 
 
-### E2E 모델 정렬 방식(alignment strategy) 개요
+### 정렬(Alignment)의 필요성
 - End-to-End ASR 모델의 핵심 목표는 **입력 음성 X로부터 출력 텍스트 C를 직접 예측하는 확률 분포 P(C|X)를 학습하는 것**
   - 음성(X)은 길고 연속적인 시퀀스이고, 텍스트(C)는 상대적으로 짧은 **불연속적인 단위(문자, 단어 등)** 로 이루어져 있음
   - 이 둘을 연결하기 위해 **어떤 프레임이 어떤 문자/단어에 대응되는지 정렬하는 과정(Alignment)** 이 필요
 
-- 일반적으로, E2E 모델로 $P(C|X)$ 를 추정하는 데 있어서의 핵심 도전 과제 중 하나는, **음향 프레임 시퀀스(길이 T′)** 와 이에 대응되는 **라벨 시퀀스(길이 L)** 사이의 **정렬(Alignment)이 알려지지 않았다는 점**을 처리하는 것
-- 전통적인 ASR 시스템에서는 이러한 프레임 단위 정렬을 **HMM(Hidden Markov Model)** 로 모델링하고, **GMM(Gaussian Mixture Model)** 또는 **신경망**을 통해 음향 프레임의 출력 분포를 학습
-- 신경망 기반의 음향 모델을 훈련할 때 프레임 단위 정렬은 기존 **GMM-HMM 시스템을 이용한 강제 정렬(force-alignment)** 을 통해 얻을 수 있지만, **초기 정렬 없이도 바로 시퀀스를 학습하는 방법** 또한 가능
-- 전통적인 ASR 시스템에서의 **음소 단위 정렬**은 자연스럽지만, E2E 시스템에서는 보통 **문자 기반의 (sub-)word 단위 라벨을 사용**
-- 하지만, **문자 단위로의 정렬 개념**은 그리 명확하지 않다
-- 따라서 본 논문에서는 **정렬을 어떻게 모델링하는지에 따라** E2E 모델들을 **명시적(Explicit) 정렬** 또는 **암시적(Implicit) 정렬** 방식으로 구분
 
-- 초기의 E2E 모델들은 정렬을 명시적으로(latent variable로) 모델링했으며, 학습과 추론 과정에서 이 **잠재 변수(latent variable)** 는 (근사적으로라도) **주변화(marginalization) 처리**
-- 이 계열의 대표적인 모델들에는 **CTC (Connectionist Temporal Classification)**, **RNN-T (Recurrent Neural Network Transducer)**, **RNA (Recurrent Neural Aligner)**, **HAT (Hybrid Auto-Regressive Transducer)** 등이 존재
-- 이들 중 후속에 등장한 모델일수록 더 정교한 정렬 모델링을 수행하며, **독립 가정(independence assumption)** 을 줄이고, 그만큼 **모델 성능이나 표현력도 향상**되었다는 점은 이후 섹션에서 설명될 것
-- 반대편 극단에는, 기계 번역(MT) 분야에서 처음 주목을 받은 attention 기반의 인코더-디코더(encoder-decoder) 모델
-- CTC와 같은 명시적 정렬 모델들과 달리, attention 기반 인코더-디코더 모델은 attention mechanism을 사용하여 전체 음향 시퀀스와 개별 라벨 간의 매핑 관계 학습
-- 마지막으로, 이 두 극단 사이에는 **중간적인 접근 방식들도 존재**
-- 예를 들어: Neural Transducer, 모노토닉 정렬(monotonic alignment) 기반 모델들과 그 변형들(예: MoChA, MILK 등)은, **명시적 정렬 모델 구조**를 갖고 있으면서도, 동시에 **attention 메커니즘을 활용해 주변 음향 정보를 참고하여 예측을 정제(refine)** 할 수 있게 한다
-- 이후 섹션에서는 이러한 각각의 모델 유형을 순서대로 설명할 것
+### 정렬(Alignment)의 발전
+- 전통적인 ASR에서는 프레임 단위 정렬을 **HMM(Hidden Markov Model)** 로 모델링하고, **GMM(Gaussian Mixture Model)** 또는 **신경망**을 통해 음향 프레임의 출력 분포를 학습
+  - 프레임 단위 정렬 : 음성 시퀀스의 각 시간 단위(프레임)가 어떤 음소 또는 문자에 대응되는지를 명확히 지정하는 것
+    - 예를 들어 “hello”라는 단어를 사람이 말하면, 약 1초 정도의 음성이 나온다고 가정
+    - 이 1초를 10ms 단위로 쪼개면 총 100개의 프레임 생성
+    - → **이 100개의 프레임 중 1~10은 h, 11~20은 e, …** 처럼 **각 프레임이 어떤 라벨에 해당되는지를 정렬**
+  - 음향 프레임의 출력 분포 학습 : 이 프레임이 어떤 소리를 의미할 확률이 높은지 학습
+    - 프레임 xₜ가 있을 때 → 이게 음소 /h/ 일 확률, /l/일 확률 등
+    - 각 프레임을 입력받아서, **그 프레임이 어떤 소리에 해당될 확률 분포를 출력하는 모델** 
+- 신경망 기반 음향 모델 학습을 위해, GMM-HMM을 기반으로 한 **강제 정렬(Forced Alignment) 기법** 이 널리 사용됨
+- 최근에는 초기 정렬 없이 **전체 시퀀스를 직접 학습하는 방법(Sequence-level training)** 도 사용 가능
+
+
+### E2E의 정렬
+- 일반적으로 **문자 또는 (sub-)word 단위**로 라벨 정의
+  - 전통적인 ASR 시스템에서의 **음소 단위 정렬**은 자연스러운데, **문자 단위 정렬은 직관적이지 않음**
+  - **음소**는 발음과 직접 연결되기 때문에 **프레임과의 정렬이 비교적 자연스러움**
+  - 하지만 E2E는 문자나 서브워드 단위로 정렬하기에 어떤 프레임이 ‘a’, ‘b’에 대응되는지 모호
+- **명시적(Explicit) 정렬**
+  - 정렬을 **잠재 변수(latent variable)** 로 명시하고, 학습 시 이를 주변화(marginalization) 처리
+    - 잠재 변수 : **직접 관측할 수는 없지만, 모델 내부에서 반드시 추정해야 하는 변수**
+    - 주변화 : **가능한 모든 정렬 경우의 수에 대해 확률을 더해서 전체 확률을 계산**
+  - **CTC (Connectionist Temporal Classification)**
+  - **RNN-T (Recurrent Neural Network Transducer)**
+  - **RNA (Recurrent Neural Aligner)**
+  - **HAT (Hybrid Auto-Regressive Transducer)**
+  - 후속 모델일수록 **독립 가정(independence assumption)** 을 줄이고, **모델 성능이나 표현력이 향상**
+    - 독립 가정 : “각 시간 프레임의 예측은 서로 독립적이다”라고 가정
+      - “프레임 1에서 h 예측”이 “프레임 2에서 e 예측”에 아무 영향도 안 준다고 가정
+    - 독립 가정이 줄어들면 좋은점
+      - 자연어는 연속성(context) 이 중요한데, 독립 가정이 있으면 문맥을 반영하지 못함
+      - **프레임 간 의존성(문맥)을 모델이 더 잘 학습할 수 있어 → 성능 향상**
+- **암시적(Implicit) 정렬**
+  - **정렬을 명시하지 않고, attention 메커니즘**을 통해 동적으로 정렬 관계를 학습
+  - 전체 음향 시퀀스와 개별 라벨 간의 매핑 관계 학습
+  - **Attention-based Encoder-Decoder (LAS 등)**
+- **중간적인 접근 방식**
+  - 정렬을 명시적으로 구성하면서도, attention 매커니즘을 활용해 유연성 확보
+    - **attention 메커니즘을 활용해 주변 음향 정보를 참고하여 예측을 정제(refine)**
+  - **Neural Transducer**
+  - 모노토닉 정렬(monotonic alignment) 기반
+    - **monotonic = 일방향으로만 진행하는** -> 시간 순서를 앞으로만 진행하는 정렬 방식
+      - 자연스러운 말하기는 **시간적으로 순차적**이기 때문에, 모델도 정렬을 **시간 순서대로만 하도록 제한하면 더 현실적인 학습**
+    - MoChA (Monotonic Chunkwise Attention)
+    - MILK (Monotonic Infinite Lookback) 
+
+
