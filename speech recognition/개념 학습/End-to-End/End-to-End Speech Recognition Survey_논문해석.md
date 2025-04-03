@@ -179,3 +179,38 @@
 - 즉, 각 시점 t에서 모델은 다음과 같은 확률 분포를 출력한다: $$P(a_t = c \mid X) = P(a_t = c \mid H(X))$$
 - 결과적으로, 각 시간 스텝마다 모델은 하나의 인코딩된 프레임 $h_t$ 를 받아들이고, ⟨b⟩를 포함한 전체 라벨 집합 $C_b$에 대한 확률 분포를 출력
 - 다시 말해, 모델은 ⟨b⟩ 혹은 실제 라벨 중 하나를 매 스텝마다 출력하는 구조
+
+#### 2) RNN-T
+- RNN-T는 Graves가 제안한 모델로, 기존 CTC 모델의 강한 조건부 독립 가정을 완화하여 개선한 모델
+- 이 모델은 Figure 3에서 보여지며, CTC 모델과 비교해서 이해하는 것이 가장 좋습니다.
+- CTC와 마찬가지로, RNN-T도 출력 기호 집합에 blank 기호 ⟨b⟩를 추가하여 $$C_b = C \cup {\langle b \rangle}$$ 라는 확장된 출력 집합에 대한 확률 분포를 정의
+- 역시 CTC처럼, 입력 음성 시퀀스 X를 고차원 표현 H(X) = (h₁, …, h_T) 로 변환하는 인코더를 포함
+
+- 하지만 CTC와는 달리, RNN-T에서의 blank는 다소 다른 의미를 가진다.
+- 각 인코더 프레임 $h_t$ 에 대해, 모델은 0개 이상의 실제 라벨을 출력하고, 마지막에 blank로 종료되는 시퀀스를 생성
+- 따라서 RNN-T의 유효한 정렬 시퀀스는 T + L 길이의 시퀀스 A로 정의되며, blank를 제거했을 때 C가 되어야 함$`\mathcal{A}^{\text{RNNT}}(X, C) = \{ A = (a_1, …, a{T+L}) \}`$
+- 모든 ⟨b⟩ 기호를 제거하면 정확히 C가 되는 시퀀스만 유효한 정렬로 간주
+- 출력 위치 $\tau$ 에서, $i_\tau$ 는 정렬 시퀀스 A의 처음부터 $\tau$ - 1까지 등장한 non-blank 라벨의 수를 나타냄
+- 이때, 그 구간에 포함된 blank의 수는 $`\tau - i_\tau - 1`$
+- 예를 들어 T = 7, C = (s, e, e)일 때 $`A = (\langle b \rangle, s, \langle b \rangle, \langle b \rangle, \langle b \rangle, e, e, \langle b \rangle, \langle b \rangle, \langle b \rangle)`$ 이는 유효한 정렬에 포함
+- 주목할 점은, CTC와는 달리 RNN-T에서는 반복되는 라벨을 위해 특별한 조치를 취할 필요가 없다는 것(그림 4 참조)
+
+- 이제, 출력 시퀀스 C에 대한 posterior 확률 P(C|X) 를 다음과 같이 정의할 수 있다:
+- $`P_{\text{RNNT}}(C|X) =
+\sum_{A \in \mathcal{A}{\text{RNNT}}(X,C)} \prod{\tau=1}^{T+L} P(a_\tau \mid p_{i_\tau}, h_{\tau - i_\tau}) \tag{3}`$
+  - 여기서 $`a_\tau`$: 정렬된 시퀀스 A의 τ번째 심볼 (blank 포함 가능)
+	- $`p_{i_\tau}`$: prediction network의 출력 (non-blank 라벨들에 기반)
+  - $`h_{\tau - i_\tau}`$: 인코더에서 나온 acoustic context vector
+- 여기서 $`P = (p_1, \cdots, p_L)`$ 은 Figure 3에 나오는 prediction network의 출력 시퀀스를 나타내며, 이전까지 예측된 non-blank 라벨들의 시퀀스를 요약한 벡터들
+- 이 prediction network는 또 하나의 신경망으로 구현되며, 각 출력은 다음과 같이 정의된다: $`p_j = NN(c_0, …, c_{j-1})`$
+- 여기서 $c_0$ 은 문장의 시작을 나타내는 특수 라벨 ⟨sos⟩
+- 따라서 수식 (3)에서 볼 수 있듯, RNN-T는 CTC보다 약한 독립 가정을 사용
+- 출력 $`a_\tau`$ 는 이전까지 예측된 non-blank 라벨 시퀀스에 조건부 종속
+- 하지만 정렬이 이루어진 프레임의 위치 (즉, 언제 출력되었는지)는 고려하지 않는다
+
+- 마지막으로, [43]의 연구에서는 RNN-T 모델을 더 일반화된 형태로 확장하였다.
+- 정렬 가능한 프레임 단위 시퀀스를 임의의 그래프 구조로 표현할 수 있도록 하였다.
+
+- 이러한 그래프 기반 표현에서도, 조건부 확률 계산을 위한 forward-backward 알고리즘을 일반화하여 적용
+- 이러한 구조는, 예를 들어 RNN-T 모델 내에서 CTC와 유사한 정렬 방식도 사용 가능하게 한다.
+- 즉, 각 프레임마다 blank 또는 non-blank 중 하나만 출력하는 구조(CTC처럼) 를 사용하면서도, 이전의 non-blank 라벨 시퀀스를 조건으로 하는 RNN-T의 특성은 그대로 유지
