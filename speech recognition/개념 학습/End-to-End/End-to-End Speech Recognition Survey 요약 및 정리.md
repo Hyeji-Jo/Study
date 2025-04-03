@@ -234,23 +234,23 @@
 #### 1) CTC (Connectionist Temporal Classification)
 - 입력된 **음성 시퀀스 X를 출력 텍스트 시퀀스 C로 직접 매핑**하는 모델
 - **Blank 라벨 ⟨b⟩**
-  - $C_b = C \cup \{\langle b \rangle\}$
+  - $`C_b = C \cup \{\langle b \rangle\}`$
   - 인코더 출력 H(X)와 라벨 시퀀스 C 사이의 정렬을 명시적으로 모델링하기 위해
   - 반복되는 라벨을 구분하기 위해 <b> 추가
 - **정렬 A의 정의**
-  - $A \in C_b^*$ - 전체 길이는 T (인코더 출력 길이)와 동일
+  - $`A \in C_b^*`$ - 전체 길이는 T (인코더 출력 길이)와 동일
     - 인코더 출력 H(X)는 길이 T의 시퀀스 == 정렬 A도 길이 T인 라벨 시퀀스
-  - 가능한 정렬 집합 : $\mathcal{A}_{\text{CTC}}(X, C) = \{ A = (a_1, a_2, …, a_T) \mid a_t \in C_b \}$
+  - 가능한 정렬 집합 : $`\mathcal{A}_{\text{CTC}}(X, C) = \{ A = (a_1, a_2, …, a_T) \mid a_t \in C_b \}`$
 - **유효한 정렬**
   - **연속된 동일 라벨을 먼저 병합(collapse)한 후, 모든 ⟨b⟩ 기호 제거했을때, A가 정확히 C가 되는 경우만 유효**
-  - 예를 들어, T = 10, C = (s, e, e) 라고 할 때, $$A = (s, \langle b \rangle, \langle b \rangle, e, e, \langle b \rangle, e, e, \langle b \rangle, \langle b \rangle)$$
+  - 예를 들어, T = 10, C = (s, e, e) 라고 할 때, $`A = (s, \langle b \rangle, \langle b \rangle, e, e, \langle b \rangle, e, e, \langle b \rangle, \langle b \rangle)`$
   <img width="603" alt="image" src="https://github.com/user-attachments/assets/440025e6-6530-4535-9c77-3a44baa330e7" />
 
 - **CTC 확률 계산**
   - 가능한 모든 정렬에 대해 **확률을 합산** - **주변화(marginalization)**
-  - $P_{\text{CTC}}(C | X) = \sum_{A \in \mathcal{A}_{\text{CTC}}(X, C)} P(A | H(X))$
-    - $= \sum_{A \in \mathcal{A}{\text{CTC}}(X, C)} \prod{t=1}^{T} P(a_t \mid a_{t-1}, …, a_1, H(X))$
-    - $= \sum_{A \in \mathcal{A}{\text{CTC}}(X, C)} \prod{t=1}^{T} P(a_t \mid h_t) \tag{2}$
+  - $`P_{\text{CTC}}(C | X) = \sum_{A \in \mathcal{A}_{\text{CTC}}(X, C)} P(A | H(X))`$
+    - $`= \sum_{A \in \mathcal{A}{\text{CTC}}(X, C)} \prod{t=1}^{T} P(a_t \mid a_{t-1}, …, a_1, H(X))`$
+    - $`= \sum_{A \in \mathcal{A}{\text{CTC}}(X, C)} \prod{t=1}^{T} P(a_t \mid h_t) \tag{2}`$
 - **강한 독립 가정**
   - 각 시간 t의 출력은 다른 시간 스텝과 독립적이라고 가정
     - 오직 해당 시점의 인코더 출력 $h_t$ 만을 기반으로 결정
@@ -261,11 +261,11 @@
 
   - 각 시점 t에서 $P(a_t | X)$ 를 모델링하는 신경망 구조로 구성
   - **인코더(Encoder)**
-    - 입력 음성 X → 인코더 → 고차원 시퀀스 표현 $H(X) = (h_1, …, h_T)$
-      - $h_t \in \mathbb{R}^k$
+    - 입력 음성 X → 인코더 → 고차원 시퀀스 표현 $`H(X) = (h_1, …, h_T)`$
+      - $`h_t \in \mathbb{R}^k`$
     - **CNN, RNN (예: LSTM)**
   - **출력(Softmax layer)**
-    - 각 시간 t에서 : $P(a_t = c \mid X) = P(a_t = c \mid H(X))$
+    - 각 시간 t에서 : $`P(a_t = c \mid X) = P(a_t = c \mid H(X))`$
     - 각 프레임에서 ⟨b⟩ 포함 전체 라벨 집합 $C_b$ 에 대한 확률 분포 출력
     - 매 스텝마다 ⟨b⟩ 혹은 실제 라벨 중 하나를 선택하여 출력
 
