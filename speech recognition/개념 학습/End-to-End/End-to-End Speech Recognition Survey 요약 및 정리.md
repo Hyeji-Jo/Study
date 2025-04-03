@@ -276,16 +276,17 @@
 - 기존 CTC가 갖는 **강한 조건부 독립 가정(각 시간 스텝 출력이 독립)을 완화**하여 개선한 모델
 - **Blank 라벨 ⟨b⟩**
   - CTC : 반복 라벨을 구분하기 위한 중간 기호
-  - 각 인코더 프레임 $`h_t`$에 대해, 모델은 0개 이상의 라벨을 출력하고, 마지막에 blank로 종료
+  - 각 인코더 프레임 $h_t$에 대해, 모델은 0개 이상의 라벨을 출력하고, 마지막에 blank로 종료
   - 즉, 반복되는 라벨을 위한 별도 조치가 필요 없음
 - **유효한 정렬**
   - T + L 길이의 시퀀스 A로 정의되며, blank를 제거했을 때 C
     - 모든 ⟨b⟩ 기호를 제거하면 정확히 C가 되는 시퀀스만 유효한 정렬로 간주 
-  - $`\mathcal{A}^{\text{RNNT}}(X, C) = \{ A = (a_1, …, a{T+L}) \}`$   
-  - 출력 위치 $`\tau`$ 에서, $`i_\tau`$ 는 정렬 시퀀스 A의 처음부터 $`\tau`$ - 1까지 등장한 non-blank 라벨의 수를 나타냄
-    - 이때, 그 구간에 포함된 blank의 수는 $`\tau - i_\tau - 1`$ 
-  - 예를 들어 T = 7, C = (s, e, e)일 때 $`A = (\langle b \rangle, s, \langle b \rangle, \langle b \rangle, \langle b \rangle, e, e, \langle b \rangle, \langle b \rangle, \langle b \rangle)`$  이는 유효한 정렬에 포함  
-  
+  - $\mathcal{A}^{\text{RNNT}}(X, C) = \{ A = (a_1, …, a{T+L}) \}$   
+  - 출력 위치 $\tau$ 에서, $i_\tau$ 는 정렬 시퀀스 A의 처음부터 $\tau$ - 1까지 등장한 non-blank 라벨의 수를 나타냄
+    - 이때, 그 구간에 포함된 blank의 수는 $\tau - i_\tau - 1$ 
+  - 예를 들어 T = 7, C = (s, e, e)일 때 $A = (\langle b \rangle, s, \langle b \rangle, \langle b \rangle, \langle b \rangle, e, e, \langle b \rangle, \langle b \rangle, \langle b \rangle)$  이는 유효한 정렬에 포함  
+
+   
   <img width="586" alt="image" src="https://github.com/user-attachments/assets/ed774ebb-60e9-4164-b86f-1da32f4dcd25" />  
 
 - **RNN-T 확률 계산**  
