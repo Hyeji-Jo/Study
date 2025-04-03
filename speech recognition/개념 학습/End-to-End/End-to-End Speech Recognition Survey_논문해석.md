@@ -152,9 +152,9 @@
 - 이러한 각 접근 방식은 정렬을 정의하는 방식이 서로 다르며, 그에 따라 모델 내부의 조건부 확률 독립 가정(conditional independence assumptions),그리고 훈련 및 디코딩 방식 또한 달라집니다.
 - 모든 명시적 정렬 모델들의 공통점은, ⟨b⟩ 기호로 표기되는 추가적인 blank 기호를 도입하여, 출력 기호 집합을 다음과 같이 확장된 집합으로 정의한다는 점입니다: $`C_b = C \cup \{⟨b⟩\}`$
 - 이때 ⟨b⟩ 기호의 해석은 모델마다 약간씩 차이가 있으며, 이후에 더 자세히 설명될 예정입니다.
-- 우선 지금 시점에서는, 특정 훈련 예제 (X, C) 가 주어졌을 때, 각 모델은 유효한 정렬(valid alignments) 의 집합 $`{A}_{(T,C)}`$ 를 정의하며, 다음과 같이 모든 가능한 정렬 시퀀스에 대해 주변화(marginalize) 함으로써 정의한다는 점만 이해하면 충분합니다: $`
-P(C \mid X) = P(C \mid H(X)) = \sum_{A} P(C \mid A, H(X)) \cdot P(A \mid H(X))\\
-\quad = \sum_{A \in \mathcal{A}_{(T = |H(X)|, C)}} P(A \mid H(X)) \tag{1}`$
+- 우선 지금 시점에서는, 특정 훈련 예제 (X, C) 가 주어졌을 때, 각 모델은 유효한 정렬(valid alignments) 의 집합 $`{A}_{(T,C)}`$ 를 정의하며, 다음과 같이 모든 가능한 정렬 시퀀스에 대해 주변화(marginalize) 함으로써 정의한다는 점만 이해하면 충분합니다: $`P(C \mid X) = P(C \mid H(X)) = \sum_{A} P(C \mid A, H(X)) \cdot P(A \mid H(X))\\
+
+      \quad = \sum_{A \in \mathcal{A}_{(T = |H(X)|, C)}} P(A \mid H(X)) \tag{1}`$
 - 여기서, 정의에 따라 $`P(C | A, H(X)) = 1 \quad \text{iff} \quad A \in \mathcal{A}_{(T, C)}`$
 - 즉, 정렬 A가 유효한 정렬 집합에 속할 경우에만 1이고, 그렇지 않으면 0이 됩니다.
 - 이는 곧, 하나의 정렬 A로부터 라벨 시퀀스 C로의 매핑이 유일하게 정의된다는 것을 의미
