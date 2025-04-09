@@ -361,4 +361,4 @@
 - 반면, Attention-based Encoder-Decoder (AED, 예: **LAS**)는 **정렬 정보를 attention으로 암시적(implicitly)** 처리함
   - 디코더가 출력할 때마다 **인코더 출력 전체에서 attention mechanism을 통해 정렬 정보를 학습**함
   - 명시적 접근방식의 경우 최종 프레임을 처리할 때까지 symbols를 계속 출력하고, 그 시점에서 디코딩 프로세스가 완료
-- 출력 집합에 문장 종료 symbol인 〈eos〉를 추가 = $$\(C \cup \{\langle eos\rangle\}\)$$
+- 출력 집합에 문장 종료 symbol인 〈eos〉를 추가 = $`\(C \cup \{\langle eos\rangle\}\)`$
