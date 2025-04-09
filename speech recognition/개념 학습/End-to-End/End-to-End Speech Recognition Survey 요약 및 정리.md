@@ -641,7 +641,12 @@
     - 예: attention 기반 AED는 **전체 입력 시퀀스를 고려해 현재 출력을 예측**
     - 문맥 정보 활용 가능 → **긴 종속성(long dependency)** 처리에 강함
    
-### A. 통합 엔드포인트(Alignment in Training)
+### A. Training에서의 정렬(Alignment in Training)
+- **명시적 정렬 기반 모델의 학습**
+  - **CTC, RNN-T, RNA**와 같은 명시적 정렬 기반 E2E 모델은 정렬을 명시적으로 모델링함
+    - 이들 모델은 **blank 심볼 ⟨b⟩** 를 도입하여 다양한 정렬 시퀀스를 허용
+
+
 
 
 ### B. 통합 엔드포인트(Training with External Language Models)
