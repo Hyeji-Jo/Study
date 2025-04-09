@@ -311,9 +311,46 @@
     - 각 출력은 다음과 같이 정의된다:  𝐩ⱼ = NN(c₀, c₁, …, cⱼ₋₁)
     - 여기서 c₀ 은 문장의 시작을 나타내는 특수 라벨 ⟨sos⟩
 
+
 - **RNN-T의 일반화**
   - [43]의 연구에서는 RNN-T 모델을 더 일반화된 형태로 확장
   - 정렬 가능한 프레임 단위 시퀀스를 임의의 그래프 구조로 표현 가능
   - 조건부 확률 계산을 위한 forward-backward 알고리즘을 일반화하여 적용
   - 이 구조에서는 CTC처럼 각 프레임마다 하나의 출력만 발생시키는 방식도 포함 가능
   - **Prediction Network를 통한 문맥 반영은 그대로 유지**
+ 
+
+#### 3) RNA
+- **RNA는 RNN-T의 일반화 모델**로, RNN-T보다 간단한 정렬 구조와 계산 효율성을 제공
+  - 조건부 독립에 대한 가정 중 하나를 제거
+- **Blank 라벨 ⟨b⟩**
+  - CTC 모델과 동일한 의미 - 반복 라벨을 구분하기 위한 중간 기호
+  - 각 프레임에서 모델은 다음 프레임으로 진행하기 전에 blank 또는 non-blank 레이블 중 하나만 출력
+    - 즉, 정렬 시퀀스 A는 항상 **입력 길이 T와 동일한 길이**
+  - But, CTC와 달리 RNN-T 처럼 모델은 각 non-blank 레이블의 단일 인스턴스만 출력
+    - RNN-T에서 blank 심볼을 출력하면 모델이 다음 프레임으로 진행
+    - RNA에서 모델은 단일 blank 또는 non-blank 레이블을 출력한 후 다음 프레임으로 진행
+    - 각 프레임에서 단일 non-blank 레이블을 출력하도록 모델을 제한
+      - 각 프레임에서 모델 확장 수를 제한하여 계산 효율성이 향상되고 디코딩 프로세스가 단순화 됨 
+- **유효한 정렬**
+  - $\(A_{RNA}(X,C) = (a_1, \cdot \cdot \cdot , a_T )\)$
+    - 길이 T
+  - T - L개의 blank 심볼
+  - A에서 blank를 모두 제거했을 때 정확히 라벨 시퀀스 C와 일치해야 함
+  - 예를 들어, T = 8이고 C = (s, e, e)인 경우
+    - $\(A = (\langle b \rangle, s, \langle b \rangle, e, \langle b \rangle, \langle b \rangle, e, \langle b \rangle) \in A_{RNA}(X,C)\)$
+  ![image](https://github.com/user-attachments/assets/ed1c8f2d-2663-4f36-9403-3fb65cba8aee)
+
+
+- **RNA 확률 계산**
+  - $\(P_{RNA}(C|X) = \sum_{A \in A_{RNA}(X, C)} P(A|H(X))\)$
+    - $\(= \sum_{A \in A_{RNA}(X, C)} \prod_{t=1}^{T} P(a_t|a_{t-1}, ..., a_1, H(X))\)$
+    - $\(= \sum_{A \in A_{RNA}(X, C)} \prod_{t=1}^{T} P(a_t|q_{t-1}, h_t)\)$
+  - $\(q_{t-1} = NN(\cdot|a_{t-1}, ..., a_1)\)$는 전체 부분 정렬을 요약하는 신경망의 출력
+
+- **모델 구조**
+  ![image](https://github.com/user-attachments/assets/5133da2a-79f1-443b-ad74-e3abc4e20353)
+
+  - non-blank 레이블의 시퀀스(RNN-T에서와 같이)와 이러한 레이블이 방출되는 특정 프레임 모두에 대해 조건화
+    - 로그-우도(및 해당 기울기)의 정확한 계산은 해결하기 어려움
+    - 단일 레이블만 출력할 수 있다는 제약 조건을 활용하면서 **가장 가능성 높은 정렬 경로만 사용**하는 근사 학습 방식 사용
