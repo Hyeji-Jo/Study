@@ -194,3 +194,102 @@
   - **음성 변환(task)** 에 직접 적용됨
   - **cycle consistency loss를 학습 과정에 직접 활용**
   - **음성 변환 분야에서 최초 시도**
+
+
+## 4. 실험 - Experiments
+
+### 1) 실험 환경
+- **데이터**: VCTK 하위 세트 사용 (화자 4명: F1, F2, M1, M2)
+  - 각 화자: 461개 훈련 발화, 10개 테스트 발화
+  - 총 테스트 샘플: 1080개 (12개 변환 방향 × 9개 대상 화자)
+- **입력 특징**: 80차원 Mel-spectrogram
+  - 22.05kHz, 1024-point Hanning window, 256 hop size
+- **Vocoder**: Pretrained HiFi-GAN 사용 (mel → waveform 복원)
+- **Optimizer**: Adam (학습률 η = 0.00003)
+- **Epoch 수**: 270
+- **Noise schedule**: βₜ = 0.05 + (0 - 0.05)t
+- **Cycle Loss 적용 시점**:
+  - i ∈ [1, 50] : λᵢ = 0 (재구성만)
+  - i ∈ [51, 270] : λᵢ = 1 (변환 학습 시작)
+- **Baseline 모델**: DiffVC [23] (동일 encoder 사용)
+
+### 2) Objective Evaluation – 정량 평가
+- **화자 유사성 평가 (Speaker Similarity)**
+  - **지표**: cosine similarity (i-vector, x-vector 기반)
+  - 결과
+    - i-vector: CycleDiffusion ↑ 0.5376 (vs. DiffVC 0.4850)
+    - x-vector: CycleDiffusion ↑ 0.9070 (vs. DiffVC 0.8909)
+    - 평균 성능 개선, confidence interval 39% 감소 → 안정성 증가 
+
+- **언어 정보 보존 (Linguistic Preservation)**
+  - **지표**: ASR 정확도 (Whisper 사용, GT 대신 변환 전 음성의 인식 결과와 비교)
+  - 결과
+    - DiffVC: 71.3%
+    - CycleDiffusion: 74.4% (↑ 3.1%, 상대적 8% 개선)
+    - cycle loss → 발음 명확성 및 언어 정보 보존 향상에 기여
+- **Mel-Cepstral Distance (MCD)**
+  - **지표**: MCD (낮을수록 좋음, DTW alignment 후 측정)
+  - 결과
+    - 평균 MCD **15.9% 감소** (CycleDiffusion → 더 유사한 음성 생성)
+    - **모든 변환 방향에서 일관된 성능 향상 확인**
+   
+### 3) Subjective Evaluation – 주관 평가
+- **Mean Opinion Score (MOS)**
+  - **평가 방법**: MOSNet (human evaluator 시뮬레이션)
+  - **스케일**: 0 (가장 부자연스러움) ~ 5 (자연스러움)
+  - **결과**
+    - 평균 MOS: **CycleDiffusion = 3.70** (vs. DiffVC = 3.50)
+    - 최고 향상 사례:
+      - F1→M2: +0.49 (3.76 → 4.25)
+      - M2→F2: +0.27
+    - 일부 경우 소폭 감소했지만, 전체 평균 5.7% ↑
+    - **confidence interval 평균 32% ↓ → 변환 품질 일관성 증가**
+   
+### 4) Spectrograms - 시각적 비교
+- **결과**: CycleDiffusion의 스펙트로그램은 formant 구조가 **더 선명하고 명확하게 구분됨**
+- 시각적으로도 DiffVC보다 우수한 음성 품질을 확인 가능
+
+
+
+## 5. Conclusions - 결론
+### 1) 연구의 출발점 및 문제의식
+- **Diffusion Models (DMs)** 는 고품질 데이터 생성을 위해 최근 주목받는 생성 모델임
+  - **VAE/GAN 대비** 훈련 안정성과 생성 품질이 뛰어남
+- 하지만 기존 DM 기반 음성 변환 방식은 **VAE처럼 재구성 경로만 학습**
+  - **변환 경로 학습이 배제되어** 실제 음성 변환 품질은 제한적
+ 
+### 2) 제안 방법: CycleDiffusion
+- **핵심 아이디어**: Diffusion model에 **CycleGAN의 cycle consistency loss** 개념을 결합
+- 목표
+  - 단순 재구성뿐 아니라, **소스 → 타겟 → 소스**로 이어지는 **변환 경로도 학습**
+  - **언어 정보 보존 + 음질 향상 동시 달성**
+ 
+### 3) 주요 실험 결과 요약
+- 화자 유사성 : 평균 7~10.8% 향상 (Cosine similarity 기준)
+- 언어 정보 보존 : 10.8% 오류율 감소(ASR 정확도 기준)
+- 음성 유사성(MCD) : 9% 향상 (더 낮은 MCD -> 더 비슷한 음성)
+- 음질 (MOSNet) : 평균 MOS +5.7%, 신뢰구간 32.1% 감소 (더 자연스럽고 일관된 음질)
+- **Cycle consistency loss를 도입한 것이 모든 측면에서 성능 개선에 기여**
+
+### 4) 훈련 복잡도 및 향후 과제
+- **단점**: 훈련 화자 수가 늘어날수록 **변환 경로 학습 복잡도는 2차 함수적으로 증가**
+  - 해결책: 각 배치에서 일부만 선택해 학습 (훈련 효율화)
+- **향후 연구 방향**
+  - **데이터 사용량 vs 변환 성능 간 trade-off 분석**
+    - 더 적은 데이터로도 높은 성능을 내기 위한 **효율적인 변환 경로 학습 전략 설계**
+  - **Cycle consistency loss를 hybrid 모델(GAN+DM)에 통합**
+    - GAN의 sharpness + DM의 안정성 → **최고 성능 기대**
+   
+## 기호 정리
+- 𝐱₀ : 입력 음성 특징 벡터
+- 𝐱ₜ, 𝑥̃ₜ : 시간 t에서의 순방향 및 역방향 시간 확률 과정
+- 𝐱 : 𝐱₀에 포함된 언어 정보
+- 𝐰, 𝑤̃ : 순방향 및 역방향 시간 Wiener process
+- βₜ : 시간 t에서의 노이즈 스케줄 값
+- ζ, ξ : 화자 인덱스 (소스: ζ, 타겟: ξ)
+- 𝑆ᵩ : 파라미터 θ를 갖는 score function 근사 DNN
+- ℱ : 순방향 diffusion 과정 결과 함수
+- ℜ : 역방향 확산 과정 (reverse SDE)의 해
+- λᵢ : i번째 반복에서의 cycle consistency loss 가중치
+- η : 학습률 (learning rate)
+
