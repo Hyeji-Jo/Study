@@ -645,23 +645,299 @@
 - **명시적 정렬 기반 모델의 학습**
   - **CTC, RNN-T, RNA**와 같은 명시적 정렬 기반 E2E 모델은 정렬을 명시적으로 모델링함
     - 이들 모델은 **blank 심볼 ⟨b⟩** 를 도입하여 다양한 정렬 시퀀스를 허용
+  - 학습 시에는 가능한 모든 정렬 시퀀스에 대한 **확률을 합산(marginalization)** 해야 하므로,
+    - 각 모델에 특화된 **forward-backward 알고리즘**을 사용하여 확률과 그 gradient를 효율적으로 계산
+    - 이는 전통적인 hybrid ANN/HMM 학습 방식에서의 **full-sum 방식과 유사**함
+
+- **AED 모델은 latent alignment가 없음**
+  - **Attention-based Encoder-Decoder (AED)** 모델은 정렬을 latent variable로 명시하지 않음
+  - 대신 **attention mechanism**을 통해 soft하게 alignment를 학습
+  - 따라서 AED는 forward-backward를 사용하지 않으며, 구조적으로 학습이 간단
+  - 하지만, 모든 E2E 모델(AED 포함)은 정렬을 명시적이든 암시적이든 반드시 **모델 내부에서 해결함**
+
+- **침묵(silence)에 대한 처리**
+  - **Hybrid 모델 - hybrid ANN/HMM**에서는 silence를 latent label로 따로 분리해 처리할 수 있지만,
+  - **E2E 모델에서는 silence에 대해 별도 라벨 없이, 자동적으로 정렬 시 무시**되는 형태로 처리됨
+
+- **Hierarchical Training Schedule**
+  - E2E 모델에서도 다음과 같은 **계층적 학습 전략**을 사용할 수 있음:
+    - 먼저 **Viterbi-style**로 정렬을 고정한 상태에서 학습
+    - 이후 다시 **full-sum** 학습으로 전환
+  - 예시
+    - [45] Zeyer et al.: 초기 full-sum RNN-T → 정렬 생성 → cross-entropy 기반 프레임별 학습
+    - [94]: CTC로 초기 정렬 생성 → 중간 RNN-T Viterbi 학습 → full-sum fine-tuning
+  - 이와 같은 절차는 **정렬 초기화**와 **학습 안정화**에 효과적이며, **수렴 속도 향상**에도 도움
+
+- **CTC의 정렬 특성과 Peaky Behavior**
+  - RNN-T, RNA는 각 label에 대해 명확한 방출 시점을 정의하는 반면,
+  - **CTC는 특정 label당 정해진 시점 없이 반복 가능하게 설계됨**
+    - 그런데 실제 학습 결과에서는 각 label이 **하나의 피크 타이밍에만 집중해서 방출되는 현상**이 나타남
+    - 이를 **Peaky Behavior**라고 하며, CTC가 알아서 프레임 정렬을 학습해나간다는 성질로 볼 수 있음
+
+
+### B. 외부 언어 모델을 활용한 Training (Training with External Language Models)
+- **E2E ASR 모델의 기본 학습 특징**
+  - 일반적인 End-to-End ASR 모델은 **시퀀스 수준(sequence-level)** 에서 학습을 수행하며,
+    - 이는 **조건부 확률 P(C | X)** 를 최대화하는 방식
+    - **Cross Entropy Loss** 또는 **Conditional Likelihood Loss** 사용
+  - 이 방식은 **Maximum Mutual Information (MMI)** 기준과 수학적으로 동일하다고 볼 수 있음
+ 
+- **외부 언어 모델을 활용할 때의 변화**
+  - 외부 언어 모델(LM)은 일반적으로 **텍스트 전용 데이터로 별도 학습됨**
+  - 이를 **E2E 모델 학습 단계**에 함께 반영하고자 하면,
+    - 단순한 Cross Entropy Loss로는 부족하며,
+    - **시퀀스 정규화(sequence normalization)** 를 명시적으로 도입해야 함
+    - 이는 모든 가능한 출력 시퀀스에 대한 총합을 계산하는 식으로 구성
+  - 결과적으로 **MMI 기반의 시퀀스 차별(discriminative) 학습 방식**으로 확장
+    
+- **이런 학습이 중요한 이유**
+  - 기존 E2E 모델은 텍스트 데이터 활용에 제한이 있음
+  - 외부 LM과의 결합을 통해
+    - **텍스트 전용 데이터 활용 가능**
+    - **드문 단어나 고유 명사 처리 개선**
+    - **전반적인 언어 유창성 향상**
+
+### C. 최소 오류 학습(Minimum Error Training)
+- **왜 Minimum Error Training이 필요한가?**
+  - ASR의 진짜 목표는 **모델의 로그우도 최대화(log-likelihood)** 가 아니라,
+  - **실제 사용자가 체감하는 단어 오류율(WER) 을 직접 최소화**하는 것
+  - 따라서 학습 목표 함수도 **WER을 직접 반영하는 방향**으로 구성하는 게 더 타당
+
+- **시퀀스/차별(discriminative) 학습의 핵심 아이디어**
+  - 기존 E2E 모델은 일반적으로 교사 강제(teacher forcing) 방식으로 학습 → 학습과 추론 시의 불일치 발생
+  - 시퀀스 학습 / 차별 학습은 이를 해결하기 위해 **beam search를 사용한 실제 디코딩 상황에서의 예측 오류를 기반**으로 손실을 구성
+    - 즉, beam search로 여러 후보 시퀀스를 생성한 뒤,
+    - **실제 정답과의 WER 차이를 계산해 모델을 업데이트**
+  - 대표적 방법
+    - **MWER (Minimum Word Error Rate)** 학습: 후보 시퀀스들의 예상 단어 오류 수의 기대값을 최소화
+    - 𝐸₍Ĉ ∼ 𝑃(𝐶|𝑋)₎[WER(Ĉ, 𝐶ₜᵣᵤₑ)]
+
+- **학습 방식의 종류**
+  - 2단계 방식
+    - 먼저 일반 로그우도 기반으로 학습
+    - 이후 MVWER 기반으로 미세 조정
+  - 직접 판별 학습
+    - 처음부터 WER 기반 loss로 학습
+  - Beam-based WER 학습
+    - Beam search 결과로부터 손실을 구성해 학습 (n-best list 사용)
+  - Prefix-based MWER
+    - n-best 대신 prefix 경로 기반으로 손실을 구성 (더 효율적)
+
+### D. 사전학습(Pretraining)
+- **사전학습이 필요한 이유**
+  - **E2E 모델은 처음부터 end-to-end로 학습이 가능**하지만,
+  - 실전에서는 **효율적인 수렴과 성능 향상**을 위해 **사전학습(pretraining)** 기법이 널리 사용됨
+  - **복잡한 모델을 단번에 학습하기 어렵기 때문**
+  - 모델 초기 상태에서 좋은 성능을 빠르게 얻고, **최적점에 수렴**하는 데 도움을 줌
+  - 특히, 학습 데이터가 부족하거나, label이 없는 오디오만 존재할 때 **더 큰 효과**
+
+- **지도 학습 기반 Layer-wise Pretraining**
+  - 모델 전체를 한 번에 학습하는 게 아니라, **레이어 단위로 점진적으로 학습**
+  - **CTC, Attention 기반 모델, DNN/HMM**에도 적용 가능
+  - 예시
+    - 하위 레이어 먼저 학습 → 고정
+    - 그 위에 상위 레이어를 추가하고 학습 → 점점 성장
+- **중간 Subsampling 및 모델 성장 기법과 결합**
+  - 긴 음성 시퀀스 학습을 빠르게 하기 위해 중간에 프레임을 샘플링 (subsampling)
+  - 초기에는 작은 네트워크로 시작하고 점차 확장
+  - 예) 시간 차원 압축 → 더 빠른 학습
+- **대규모 비지도 / 준지도 Pretraining**
+  - **전사되지 않은 오디오(unlabeled audio), 다국어 음성, 자체 구축한 대규모 말뭉치를 활용**
+    - **Wav2Vec 2.0, HuBERT 등**
+    - 언어 레이블 없이도 음성 특징을 예측하며 사전학습
+  - **E2E, DNN/HMM 모두에 활용 가능**
+  
+### E. 학습 스케줄과 커리큘럼(Training Schedules and Curricula)
+- **필요성**
+  - **정렬 구조 유도**를 위해, 적절한 학습 스케줄이 중요함
+  - 모델이 latent alignment 구조를 올바르게 학습하도록 **훈련 순서와 방식을 설계**
+- **학습률(Learning Rate) 제어 기법**
+  - 다양한 학습률 조절 방식이 존재하며, 수렴 속도와 성능 향상에 중요함
+  - **NewBob 방식**: validation loss가 줄어들지 않으면 학습률 감소
+  - **지수/거듭제곱 감쇠**: 전체 학습 epoch 대비 일정하게 감소
+  - **Warm-up & Cosine Annealing**: 학습 초기에 천천히 증가 → 이후 점차 감소
+  - **Fine-tuning**: 후반에 학습률을 낮춰 세밀하게 조정
+  - **Population-Based Training**: 다양한 학습률을 병렬로 탐색
+- **커리큘럼 학습 (Curriculum Learning)**
+  - 학습 난이도를 조절하며, **쉬운 샘플부터 시작해 점점 어려운 샘플**로 훈련
+    - 짧은 문장 → 긴 문장
+    - 낮은 noise → 높은 noise
+    - 단일 화자 → 다중 화자
+    
+### F. 최적화 및 정규화(Optimization and Regularization)
+- **최적화 (Optimization)**
+  - 대부분 **SGD + Momentum** 또는 **Adam** 사용
+  - Adam은 학습 초기에 빠른 수렴을 유도
+  - 장기 학습 시에는 평균화(SWA, EMA 등)나 epoch 평균화 기법도 성능 개선
+  - 학습 초반에 빠른 손실 감소, 후반에는 천천히 미세 조정하는 구조가 일반적
+
+- **정규화 기법 (Regularization)**
+  - 과적합 방지, 일반화 능력 향상, 훈련 안정화 등을 위해 정규화 기법 다양하게 사용됨
+  - **가중치 기반**
+    - L2, 가중치 감쇠(weight decay)
+    - 가중치 노이즈, 가중치 dropout(dropconnect)
+  - **출력/은닉값 기반**
+    - dropout / layer dropout / zoneout
+    - attention score smoothing
+    - label smoothing (정답 확률 1.0 → 0.9 등)
+  - **훈련 방식/스케줄**
+    - scheduled sampling (예측값을 다음 step 입력으로 활용)
+    - auxiliary loss (예: 정렬 loss, 길이 예측 loss 등 추가)
+    - variable backpropagation depth (시간에 따라 gradient 길이 조절)
+  - **데이터 관련**
+    - mixup (두 입력을 혼합해 일반화 향상)
+    - 프레임 속도 증가 (frame rate upsampling)
+    - 배치 정규화 (BatchNorm)
+
+### G. 데이터 증강(Data Augmentation)
+- **개요**
+  - E2E ASR 모델은 복잡한 음성-텍스트 매핑을 직접 학습하기 때문에 다양한 데이터에 노출되는 것이 성능에 큰 영향
+  - 이로 인해 **데이터 증강 기법**은 학습 효율과 **일반화 성능 향상**을 위한 사실상 필수적인 전략으로 활용
+  - 데이터 증강은 훈련 데이터를 인위적으로 변형시켜 더 많은 상황에 모델이 노출되도록 함
+  - 이는 모델의 **overfitting 방지**와 **robustness 향상**에 도움
+  - **정규화(regularization) 기법**으로도 간주될 수 있음
+
+- **주요 음성 기반 데이터 증강 기법**
+  - Speed Perturbation
+    - 음성의 재생 속도를 조금 빠르게/느리게
+  - Tempo/Length Perturbation
+    - 발화 길이를 변경하되, Pitch나 음질은 보존
+  - Frequency Warping
+    - 주파수 축을 왜곡
+  - Sequence Noise Injection
+    - 잡음 추가
+  - SpecAugment
+    - 스팩트로그램에 대해 시간/주파수 영역 마스킹 수행
+    - 특히 **강력함**, 시간-주파수 마스킹을 통해 강건성(robustness)을 높이고 overfitting을 막아주는 데 효과적임
+  - Semantic Masking
+    - 의미론적으로 중요한 정보 일부를 의도적으로 제거
+   
+- **텍스트 기반 증강 (TTS 활용)**
+  - **텍스트 전용 데이터도 음성 학습에 활용 가능**
+     - 텍스트 → TTS 변환 → 모사 음성 생성 → ASR 모델 학습에 추가
+  - 두 가지 방식으로 나뉨
+     - **Feature-level TTS**: TTS를 통해 스펙트로그램 등 중간 특성만 생성
+     - **Signal-level TTS**: 실제 waveform까지 생성 후 입력
+  - [179]에 따르면, 다양한 E2E 구조 중 **AED 모델만이 TTS 데이터 활용에 효과적**임이 보고됨
+
+- **최신 연구 흐름**
+  - **여러 정규화 및 데이터 증강 기법을 조합**하여 단일 모델에서도 최첨단 성능을 도출
+  - **단일-head AED** 모델에서도 Switchboard 데이터셋 기준 최상 성능 달성
+ 
+## 5. E2E 모델 디코딩
+- **디코딩의 목표**
+  - E2E ASR 시스템은 음성 입력 X에 대해 가능한 출력 시퀀스 C 중에서 가장 가능성 높은 시퀀스 Ĉ 를 찾아냄
+  - 이때 디코딩은 아래의 최적화 문제를 푸는 과정으로 정의됨: Ĉ = argmax₍C ∈ U*₎ P(C | X)
+     - U: 출력 어휘(token set), 예: 문자, subword, 음소 등
+     - U*: Kleene closure, 즉 어휘의 가능한 모든 조합 시퀀스
+     - P(C|X): E2E 모델이 추정한 조건부 확률 분포
+     - 모델 구조에 따라 CTC, RNN-T, AED 등에서 다르게 정의됨
+   
+- **디코딩이 중요한 이유**
+  - 학습된 모델이 P(C|X)를 잘 예측해도, 실제 디코딩 단계에서 **서브옵티멀한 후보 선택**이 일어나면 전체 인식 성능이 저하됨
+  - 특히 **search space 제한**과 디코딩 효율성, 실시간성, **language model 통합 여부** 등이 모두 디코딩 전략에 좌우됨
+ 
+
+### A. 그리드 탐색(Greedy search)
+- **정의**
+  - **Greedy Search**는 매 타임스텝마다 **가장 확률이 높은 출력을 선택**하는 방식의 디코딩 알고리즘
+  - 주로 **CTC 모델**에서 사용되며, 디코딩 과정을 **매우 빠르게 수행**할 수 있다는 장점
+ 
+- **동작방식**
+  - 시간 프레임 t마다 확률이 가장 높은 alignment 토큰 aₜ를 선택:
+  - Â = (argmaxₐₜ P(aₜ | X)) for t = 1 to T
+  - 이렇게 얻은 alignment 시퀀스 **Â를 후처리(collapse + blank 제거)** 하여 최종 **출력 시퀀스 Ĉ** 생성
+
+- **장점**
+  - 각 프레임에 대해 독립적으로 디코딩 → **병렬 처리 가능** → **속도가 매우 빠름**
+     - 병렬 계산 구조를 가진 **Transformer 기반 CTC 모델**과 특히 궁합이 좋음
+  - 실시간 요소 (RTF, Real-Time Factor)가 낮음
+     - 예: Intel 20GHz에서 **RTF = 0.06** 수준의 매우 빠른 처리 가능【186】
+
+- **단점**
+  - 출력 간의 **종속성(Dependency)을 고려하지 않음**
+  - 예를 들어 문맥 기반 예측이 필요한 경우 성능이 하락할 수 있음
+     - 모델이 **충분히 잘 학습된 조건**에서는 성능 저하가 크지 않음
+     - 예: Self-conditioned CTC에서 WER 19.7% vs. attention/RNN-T에서 9%【185】
+  - 따라서 일반적으로 **attention 또는 RNN-T 기반 디코딩보다 정확도는 떨어짐**
+
+- **근사 디코딩**
+  - 아래와 같은 방식으로 다른 모델에서도 근사 디코딩 형태로 사용 가능 : Attention/RNN-T/RNA 모델에서도 가능
+  - ĉᵢ = argmax P(cᵢ | ĉ₁:ᵢ₋₁, X)
+  - âₜ = argmax P(aₜ | â₁:ₜ₋₁, X)
+  - **후보 시퀀스를 확장하지 않고 단일 최적 경로만 추적** → beam search보다 단순하지만 빠름
+
+### B. 빔 탐색(Beam search)
+- **개요**
+  - **가능한 출력 시퀀스 전체 집합** 𝐔* 중에서, 현실적으로 고려 가능한 **하위 집합 𝐶̃ ⊂ 𝐔*** 내에서 최적의 가설 𝐂̂ 를 선택하는 **근사적 탐색 알고리즘**
+  - 즉, **Greedy Search가 하나의 경로만** 탐색하는 데 비해, **Beam Search는 여러 가능한 경로를 동시에 유지하며 탐색**
+- **목적**
+  - 가능한 출력 시퀀스 𝐂̂를 다음과 같이 근사적으로 선택 : 𝐂̂ = argmax₍𝐂 ∈ 𝐶̃₎ 𝐏(𝐂 | 𝐗)
+  - 여기서 \tilde{C}는 모델이 탐색 가능한 **제한된 후보 시퀀스 집합 (beam)**
+  - \tilde{C}는 Beam Width라는 하이퍼파라미터에 의해 크기가 조정
+- **필요성**
+  - 출력 공간 U^*은 **토큰 수의 지수적 증가**로 인해 모든 조합을 고려할 수 없음 → **조합 폭발 문제**
+  - 따라서 Beam Search는 확률적으로 유망한 시퀀스만 선택적으로 유지하며 탐색함
+- **검색 공간 확장 ≠ 항상 성능 향상**
+  - 특히 AED 모델의 경우, Beam Width를 늘려도 항상 WER(단어 오류율)이 향상되지는 않음
+  - 이는 **신경망 기계 번역(NMT)** 에서도 유사하게 관찰됨
+     - 모델 자체가 높은 확률을 가진 잘못된 토큰에 수렴하는 경향이 있기 때문
+- **Beam Search의 두 가지 유형**
+  - 프레임 동기 (Frame-synchronous)
+     - 입력 시간 프레임 t 기준
+     - RNN-T, CTC 등에서 사용
+     - 매 프레임마다 가능한 가설을 확장하고 pruning
+  - 레이블 동기 (Label-synchronous)
+     - 출력 토큰 i 기준
+     - AED에서 사용
+     - 각 디코딩 스텝마다 후보 시퀀스 확장
+       
+### C. 레이블 동기 빔 서치(Label synchronous beam search)
+- **개요**
+  - 레이블 동기 빔 서치는 **출력 토큰 단위(label 단위)** 로 빔 탐색을 진행하는 방식
+     - 반대로 프레임 동기 빔 서치는 **입력 음성 프레임 단위로** 탐색
+  - 이 방식은 CTC, RNN-T, AED 모델 등의 **디코딩 효율성과 정렬 유연성 향상**을 위해 널리 사용
+
+- **작동방식**
+  - **이전까지의 출력 토큰 시퀀스** : 𝐶̃₁:ᵢ₋₁ - i번째 토큰을 예측하기 위한 후보 가설(부분 시퀀스)
+  - **i번째 토큰에 대한 확장** : 𝐶₁:ᵢ = { (𝐶₁:ᵢ₋₁, cᵢ = c) | c ∈ 𝑈 }
+     - 가능한 토큰 집합 U에 대해 확장
+     - 최대 가설 수:   |𝐶₁:ᵢ| ≤ |𝐶₁:ᵢ₋₁| × |𝑈|
+  - **가설 정리 (Pruning)** : 𝐶̃₁:ᵢ = NBEST₍𝐶₁:ᵢ ∈ 𝐶₁:ᵢ₎ (𝑃(𝐶₁:ᵢ | 𝑋))
+     - 확장된 가설 중 상위 Δ개만 유지
+     - 여기서 Δ는 빔 크기
+   
+- **EOS 토큰 처리**
+  - 디코딩 과정에서 **〈eos〉 토큰이 출력된 가설은 ‘완성된 가설’** 로 간주되어 최종 후보 세트에 포함
+  - 이를 통해 출력이 끝났음을 판단
+
+- **특징 및 이슈**
+  - **프레임 기반 정렬을 사용하지 않음** → 동일 길이의 시퀀스라도 각기 다른 프레임 수를 가질 수 있음
+     - 이로 인해 **짧은 or 긴 시퀀스에 대해 삽입/삭제 오류가 커질 수 있음**
+  - **길이 제한 필요** - 예측 시퀀스의 길이를 제한하는 **휴리스틱이** 필요함
+     - 𝐿ₘᵢₙ = ⌊𝜌ₘᵢₙ × |𝑋|⌋
+     - 𝐿ₘₐₓ = ⌊𝜌ₘₐₓ × |𝑋|⌋
+     - 여기서 𝜌ₘᵢₙ, 𝜌ₘₐₓ는 하이퍼파라미터
+  - **대체 휴리스틱** - 길이 보정(length penalty), 커버리지 항(coverage term) 등을 추가로 점수 계산에 포함시켜 보완 가능
+  - **종료 추정** - 〈eos〉 이외에도 attention 가중치 변화 등을 통해 자동 종결 판단을 수행하는 방식도 있음
+  - CTC의 경우 정렬이 명시되지 않기 때문에 가능한 모든 정렬을 **주변화(marginalization)** 하여 레이블 기반 빔 서치를 구현
+
+### D. 프레임 동기 빔 서치(Frame synchronous beam search)
+
+
+### E. 그리드 탐색(Block-wise decoding)
 
 
 
-
-### B. 통합 엔드포인트(Training with External Language Models)
-
-
-### C. 통합 엔드포인트(Minimum Error Training)
+### F. 그리드 탐색(Model fusion during decoding)
 
 
-### D. 통합 엔드포인트(Pretraining)
+
+### G. 그리드 탐색(Lexical constraint during score fusion)
 
 
-### E. 통합 엔드포인트(Training Schedules and Curricula)
+### H. 그리드 탐색(Multi-pass fusion)
 
 
-### F. 통합 엔드포인트(Optimization and Regularization)
 
-
-### G. 통합 엔드포인트(Data Augmentation)
+### I. 그리드 탐색(Vectorization across both hypotheses and utterances)
