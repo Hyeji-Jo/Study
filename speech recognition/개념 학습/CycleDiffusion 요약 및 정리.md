@@ -75,31 +75,31 @@
 
 #### 수학적 모델링 (확률 미분 방정식 기반)
 - **순방향 과정 (Forward SDE)**
-  - dx_t = \frac{1}{2} \beta_t (\bar{x} - x_t) dt + \sqrt{\beta_t} dw_t
-  - x_0: 입력 음성 특징 (언어 정보 포함)
-  - \bar{x}: 평균 상태 (보통 0), w_t: Wiener process
+  - 𝑑𝑥ₜ = ½ βₜ (𝑥̄ − 𝑥ₜ) 𝑑𝑡 + √βₜ 𝑑𝑤ₜ
+  - 𝑥₀: 입력 음성 특징 (언어 정보 포함)
+  - 𝑥̄: 평균 상태 (보통 0), 𝑤ₜ: Wiener process
 - **역방향 과정 (Reverse SDE)**
-  - d\tilde{x}_t = \left( \frac{1}{2} (\bar{x} - \tilde{x}_t) - \nabla \log p(\tilde{x}_t) \right) \beta_t dt + \sqrt{\beta_t} d\tilde{w}_t
-  - \tilde{x}_t: 재구성 과정의 상태
-  - \nabla \log p(\cdot): score function (데이터 확률 밀도의 gradient)
+  - 𝑑𝑥̃ₜ = [½ (𝑥̄ − 𝑥̃ₜ) − ∇ log 𝑝(𝑥̃ₜ)] βₜ 𝑑𝑡 + √βₜ 𝑑𝑤̃ₜ
+  - 𝑥̃ₜ: 재구성 과정의 상태
+  - ∇ log 𝑝(·): score function (데이터 확률 밀도의 gradient)
  
 #### 학습 메커니즘
-- 목표: **forward trajectory**와 **reverse trajectory** 간의 차이를 줄이고, x_0 \approx \tilde{x}_0 가 되도록 학습
-- 손실 함수 (Score Matching Loss): \mathcal{L}{diffusion}(x_0^\zeta) = \mathbb{E}t\left[ (1 - \alpha_t^2) \cdot \mathbb{E}{x_t^\zeta | x_0^\zeta} \left[ \| S\theta(x_t^\zeta, \bar{x}, \zeta, t) - \nabla \log p(x_t^\zeta | x_0^\zeta) \|_2^2 \right] \right]
-  - S_\theta: 학습 가능한 score 함수 네트워크
-  - x_0^\zeta: 화자 \zeta의 음성 특징
+- 목표: **forward trajectory**와 **reverse trajectory** 간의 차이를 줄이고, 𝑥₀ ≈ 𝑥̃₀ 가 되도록 학습
+- 손실 함수 (Score Matching Loss): 𝐿_diffusion(𝑥₀^ζ) = 𝐸ₜ [ (1 − αₜ²) · 𝐸_{𝑥ₜ^ζ | 𝑥₀^ζ} [ ‖ S_θ(𝑥ₜ^ζ, 𝑥̄, ζ, t) − ∇ log 𝑝(𝑥ₜ^ζ | 𝑥₀^ζ) ‖²₂ ] ]
+  - S_θ: 학습 가능한 score 함수 네트워크
+  - 𝑥₀^ζ: 화자 ζ의 음성 특징
  
 #### 변환 절차
-- **화자 \zeta**의 입력 x_0^\zeta를 forward diffusion → x_T^\zeta
-  - x_T^\zeta = F(x_0^\zeta)
-- x_T^\zeta를 **화자 \xi**의 embedding을 주어 역방향 SDE 수행
-  - \tilde{x}_0^{\zeta \rightarrow \xi} = R(x_T^\zeta, \xi)
-  - score는 S_\theta(\tilde{x}_t, \bar{x}, \xi, t)로 대체됨
+- **화자 ζ**의 입력 𝑥₀^ζ 를 forward diffusion → 𝑥_T^ζ
+  - 𝑥_T^ζ = 𝐹(𝑥₀^ζ)
+- 𝑥_T^ζ 를 화자 ξ의 embedding을 주어 역방향 SDE 수행
+  - 𝑥̃₀^{ζ→ξ} = 𝑅(𝑥_T^ζ, ξ)
+  - score는 S_θ(𝑥̃ₜ, 𝑥̄, ξ, t) 로 대체됨
   - inference에서는 화자 임베딩만 바꿔줌
  
 #### 한계점
-- 학습 시 S_\theta는 재구성 용도로 학습되며, inference 시에는 변환에 사용됨 → **사용 목적 불일치 문제 발생**
-- 변환 목적에 맞게 S_\theta 학습 방식 자체를 **변환 중심으로 전환할 필요 있음**
+- 학습 시 S_θ는 재구성 용도로 학습되며, inference 시에는 변환에 사용됨 → **사용 목적 불일치 문제 발생**
+- 변환 목적에 맞게 S_θ 학습 방식 자체를 **변환 중심으로 전환할 필요 있음**
 
 ### 2) CycleGAN 기반 음성 변환
 #### 핵심 개념
@@ -110,16 +110,16 @@
 
 #### 학습 구조
 - **Forward 변환**
-  - Generator G_1: x_{\zeta \rightarrow \xi} = G_1(x_\zeta)
-  - Discriminator D_1: \text{Adversarial loss: } D_1(x_{\zeta \rightarrow \xi})
+  - Generator 𝐺₁: 𝑥_{ζ→ξ} = 𝐺₁(𝑥_ζ)
+  - Discriminator 𝐷₁: adversarial loss → 𝐷₁(𝑥_{ζ→ξ})
 - **Cycle 재구성**
-  - Generator G_2: x_{\zeta \rightarrow \xi \rightarrow \zeta} = G_2(x_{\zeta \rightarrow \xi})
-  - Discriminator D_2: D_2(x_{\zeta \rightarrow \xi \rightarrow \zeta})
+  - Generator 𝐺₂: 𝑥_{ζ→ξ→ζ} = 𝐺₂(𝑥_{ζ→ξ})
+  - Discriminator 𝐷₂: 𝐷₂(𝑥_{ζ→ξ→ζ})
 - **Cycle Consistency Loss**
-  - 언어 정보 보존을 위해: L_{cycle}(x_\zeta, x_{\zeta \rightarrow \xi \rightarrow \zeta}) = \| x_\zeta - x_{\zeta \rightarrow \xi \rightarrow \zeta} \|_1
+  - 언어 정보 보존을 위해: 𝐿_cycle(𝑥_ζ, 𝑥_{ζ→ξ→ζ}) = ‖𝑥_ζ − 𝑥_{ζ→ξ→ζ}‖₁
  
 #### 양방향 학습
-- 동일한 구조로 화자 \xi → \zeta 방향도 학습
+- 동일한 구조로 화자 ξ → ζ 방향도 학습
 - 총 loss = **2× adversarial loss + 2× cycle consistency loss**
 
 #### 한계점
@@ -146,42 +146,40 @@
  
 #### 전체 학습 프로세스
 - **기본 재구성 경로 학습 (pretraining)**
-  - 화자 \zeta: \[
-\mathbf{x}\zeta \xrightarrow{\text{DM}} \tilde{\mathbf{x}}\zeta
-\]
-  - 손실: \mathcal{L}{\text{diffusion}}(\mathbf{x}\zeta, \zeta)
+  - 화자 ζ: 𝒙₍ζ₎ → 𝒙̃₍ζ₎ (DM 통과)
+  - 손실: 𝓛_diffusion(𝒙₍ζ₎, ζ)
 - **변환 경로 학습 (cycle loss 적용)**
-  - 화자 \zeta → \xi: \mathbf{x}{\zeta \rightarrow \xi} = R(F(\mathbf{x}\zeta), \xi)
-  - 다시 화자 \zeta로: \mathbf{x}{\zeta \rightarrow \xi \rightarrow \zeta} = R(F(\mathbf{x}{\zeta \rightarrow \xi}), \zeta)
-  - cycle consistency loss 적용: \mathcal{L}{\text{cycle}}(\mathbf{x}\zeta, \mathbf{x}_{\zeta \rightarrow \xi \rightarrow \zeta}) = \|\cdot\|_1
-  - 동일한 과정이 화자 \xi에서도 반복됨
+  - 화자 ζ → ξ: 𝒙₍ζ→ξ₎ = ℜ(𝔽(𝒙₍ζ₎), ξ)
+  - 다시 화자 ζ로: 𝒙₍ζ→ξ→ζ₎ = ℜ(𝔽(𝒙₍ζ→ξ₎), ζ)
+  - cycle consistency loss 적용: 𝓛_cycle(𝒙₍ζ₎, 𝒙₍ζ→ξ→ζ₎) = ‖𝒙₍ζ₎ − 𝒙₍ζ→ξ→ζ₎‖₁
+  - 동일한 과정이 화자 ξ에서도 반복됨
  
 #### 최종 학습 손실 함수
-- \mathcal{L} = \mathcal{L}{\text{diffusion}}(\mathbf{x}\zeta, \zeta) + \mathcal{L}{\text{diffusion}}(\mathbf{x}\xi, \xi) + \lambda_i \left( \mathcal{L}{\text{cycle}}(\mathbf{x}\zeta, \mathbf{x}{\zeta \rightarrow \xi \rightarrow \zeta}) + \mathcal{L}{\text{cycle}}(\mathbf{x}\xi, \mathbf{x}{\xi \rightarrow \zeta \rightarrow \xi}) \right)
-- \lambda_i: 학습 초반 0부터 시작해 점진적으로 증가하는 cycle loss 가중치
+- 𝓛 = 𝓛_diffusion(𝒙₍ζ₎, ζ) + 𝓛_diffusion(𝒙₍ξ₎, ξ) + λᵢ × (𝓛_cycle(𝒙₍ζ₎, 𝒙₍ζ→ξ→ζ₎) + 𝓛_cycle(𝒙₍ξ₎, 𝒙₍ξ→ζ→ξ₎))
+- λᵢ: 학습 초반 0부터 시작해 점진적으로 증가하는 cycle loss 가중치
 
 #### Figure 1 
 ![image](https://github.com/user-attachments/assets/3cc8ec95-d614-4253-9857-d08acf47c6a0)  
 
-- 실선: 기존 DM 학습 (\mathcal{L}_{\text{diffusion}})
-- 점선/파선: 변환 경로 학습 (\mathcal{L}_{\text{cycle}})
-  - **파란 점선**: \zeta \rightarrow \xi
-  - **파란 파선**: \xi \rightarrow \zeta
+- 실선: 기존 DM 학습 (𝓛_diffusion)
+- 점선/파선: 변환 경로 학습 (𝓛_cycle)
+  - **파란 점선**: ζ → ξ
+  - **파란 파선**: ξ → ζ
   - **빨간선**: 파란선의 역방향
 - **점선은 고정된 경로**, **파선은 gradient가 업데이트되는 경로**
 
 #### Cycle loss의 효과 (2가지 측면)
 - **변환 경로 자체를 명시적으로 학습**
-  - x_{\zeta \rightarrow \xi} \rightarrow x_{\zeta \rightarrow \xi \rightarrow \zeta} 간의 차이 최소화
+  - 𝒙_{ζ→ξ} → 𝒙_{ζ→ξ→ζ} 간의 차이를 최소화
 - **언어 정보 보존**
-  - x_\zeta vs x_{\zeta \rightarrow \xi \rightarrow \zeta},
-  - x_\xi vs x_{\xi \rightarrow \zeta \rightarrow \xi} 간의 차이 최소화 → **같은 문장을 말한 것처럼 보존됨**
+  - 𝒙_ζ ↔ 𝒙_{ζ→ξ→ζ},
+  - 𝒙_ξ ↔ 𝒙_{ξ→ζ→ξ} 간의 차이 최소화 → **같은 문장을 말한 것처럼 보존됨**
  
 ### 2) Training Algorithm
 ![image](https://github.com/user-attachments/assets/141f6505-f147-4d26-9024-f6727159d430)
 
 - **Many-to-Many 음성 변환**을 위한 CycleDiffusion 알고리즘은 Algorithm 1에 명시됨
-  - 학습률 \eta, loss 감소 기준 사용
+  - 학습률 η, loss 감소 기준 사용
   - 모든 화자 쌍 간에 위의 cycle consistency 과정을 적용 가능
  
 ### 3) 기존 연구와의 비교
