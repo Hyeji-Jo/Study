@@ -1,5 +1,6 @@
 # 📑 AI 분야 논문 리뷰 및 코드 구현 정리 저장소입니다.
 - A curated collection of paper reviews and code studies on AI.
+- Category : ![CV](https://img.shields.io/badge/CV-1E90FF?style=flat&logo=opencv&logoColor=white), ![Speech](https://img.shields.io/badge/SPEECH-FF7F50?style=flat&logo=audacity&logoColor=white), ![LLM](https://img.shields.io/badge/LLM-9370DB?style=flat&logo=OpenAI&logoColor=white)
 
 | Title | Year | Conference | Category | Subcategory | Review | Code | ETC. |
 |-------|------|------------|----------|-------------|--------|------|------|
