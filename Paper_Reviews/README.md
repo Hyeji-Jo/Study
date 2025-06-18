@@ -4,7 +4,6 @@
 - Subcategory : ![VC](https://img.shields.io/badge/VC-8BD145?style=flat), ![ASR](https://img.shields.io/badge/ASR-FACC00?style=flat)  
   
 <br>  
-<br>  
 
 | Title | Year | Venue | Type | Category | Subcategory | Review | Code | ETC. |
 |-------|:------:|:------------:|:------------:|:----------:|:-------------:|:--------:|:------:|:------:|
