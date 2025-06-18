@@ -25,7 +25,9 @@
 
 <br>  
 
-# Paper Reviews [더보기](https://github.com/Hyeji-Jo/Study/blob/a568eed0c8ced2cf1db7158fca1aa26f7e34745c/Paper_Reviews/README.md)
+# Paper Reviews 
+- [(더보기 ✅)](https://github.com/Hyeji-Jo/Study/blob/a568eed0c8ced2cf1db7158fca1aa26f7e34745c/Paper_Reviews/README.md)  
+  
 | Title | Year | Venue | Type | Category | Subcategory | Review | Code | ETC. |
 |-------|:------:|:------------:|:------------:|:----------:|:-------------:|:--------:|:------:|:------:|
 | [CycleDiffusion: Voice Conversion Using Cycle-Consistent Diffusion Models](https://www.mdpi.com/2076-3417/14/20/9595) | 2024 | Applied Sciences (MDPI) | Journal | [![SPEECH](https://img.shields.io/badge/🎙️%20%20SPEECH-FF9900?style=flat)](https://github.com/Hyeji-Jo/Study/tree/38ce884452a29ffdc42d673672cf3954b922b2d0/Paper_Reviews/Speech) | ![VC](https://img.shields.io/badge/VC-8BD145?style=flat) | [Review](https://github.com/Hyeji-Jo/Study/blob/9123b53418d6c5d1e6be6b67474fd96f85116c25/Paper_Reviews/Speech/CycleDiffusion%20%EC%9A%94%EC%95%BD%20%EB%B0%8F%20%EC%A0%95%EB%A6%AC.md) | - | - |
