@@ -3,4 +3,4 @@
 
 | Title | Year | Conference | Category | Subcategory | Review | Code | ETC. |
 |-------|------|------------|----------|-------------|--------|------|------|
-| [Connectionist Temporal Classification: Labelling Unsegmented Sequence Data with Recurrent Neural Networks](https://www.cs.toronto.edu/~graves/icml_2006.pdf) | 2006 | ICML | ![CV](https://img.shields.io/badge/CV-1E90FF?style=flat&logo=opencv&logoColor=white) | STT | ![#FFB6C1](https://via.placeholder.com/15/FFB6C1/000000?text=+) LLM / ![#ADD8E6](https://via.placeholder.com/15/ADD8E6/000000?text=+) STT | [Review](#) | [Code](#) |
+| [Connectionist Temporal Classification: Labelling Unsegmented Sequence Data with Recurrent Neural Networks](https://www.cs.toronto.edu/~graves/icml_2006.pdf) | 2006 | ICML | ![CV](https://img.shields.io/badge/CV-1E90FF?style=flat&logo=opencv&logoColor=white) | ![Speech](https://img.shields.io/badge/SPEECH-FF7F50?style=flat&logo=audacity&logoColor=white) | ![LLM](https://img.shields.io/badge/LLM-9370DB?style=flat&logo=OpenAI&logoColor=white) / STT | [Review](#) | [Code](#) |
