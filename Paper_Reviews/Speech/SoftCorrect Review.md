@@ -108,6 +108,7 @@
   
 ## 3. SoftCorrect
 <img width="792" alt="image" src="https://github.com/user-attachments/assets/deb6f1ca-5406-4bbe-af97-56d6bf6f015d" />
+  
 ### 1) System Overview
 #### 다중 후보 정렬 및 입력 생성
 - ASR beam search로부터 얻은 다중 후보 문장 활용
