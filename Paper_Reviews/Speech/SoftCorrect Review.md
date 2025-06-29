@@ -1,5 +1,7 @@
 # SoftCorrect: Error correction with soft detection for automatic speech recognition
   
+
+<br>  
   
 ## 0. Abstract
 ### 오류 교정의 목표
@@ -28,8 +30,9 @@
   - Aidatatang: CER 9.4% 감소
   - 동시에 병렬 생성(parallel generation) 방식으로 빠른 속도도 유지
 
+
+<br>
   
-   
 ## 1. Introduction
 ### Soft Error Detection의 구현 방법
 - 기존 binary 분류 대신 **언어 모델의 확률(logits) 사용**
@@ -66,10 +69,77 @@
 
   
   
+<br>
+  
 ## 2. Background
+### 오류 교정의 발전
+- 초기에는 **통계적 기계 번역(SMT)** 기반 접근 사용
+- 이후에는 Transformer 기반의 자기회귀(AR) 신경망 모델로 발전
+  - AR : 출력 시퀀스를 앞에서부터 순차적으로 한 토큰씩 생성하며, 각 토큰은 이전 토큰들에 의존해서 생성됨 
+- 최근에는 추론 속도를 개선한 비자기회귀(NAR) 모델이 각광받고 있으며, duration predictor를 사용해 병렬 디코딩이 가능하고 정확도도 우수
+  - **NAR** : **출력 전체를 동시에 예측**하며, 각 토큰은 다른 토큰에 의존하지 않고 **병렬로 생성**
+    - NAR 모델의 경우 출력 길이를 정하거나 토큰 위치를 예측하기 어려움
+  - **duration predictor** : 각 입력 토큰이 몇 개의 출력 토큰으로 확장될지 예측
+    - **출력 길이와 위치가 고정**되면, 디코더는 각 위치의 출력 토큰을 **독립적으로 동시에 예측 가능**   
+- SoftCorrect는 이러한 비자기회귀 기반의 교정 모델로, 빠르고 정확한 수정이 목표
+
+### ASR 다중 후보 활용 (n-best)
+- 대부분의 ASR 시스템은 beam search를 통해 **여러 개의 후보 문장(n-best)** 을 생성
+- **후보 간 동일 위치의 불일치는 오류 가능성이 높은 위치를 시사**
+  - 같은 위치에서 단어가 서로 다르게 나오는 부분이 있다면 오류가 있을 가능성 높음
+- **후보들을 정렬하여 같은 길이로 만든 뒤**, encoder 입력으로 활용
+- 다중 후보의 차이를 통해 오류 위치를 탐지하고, 더 나은 후보 문장을 선택하는 방식으로 정확도 높임
+
+### 오류 탐지 방식: 명시적 vs. 암묵적
+- Explicit - 명시적 정렬
+  - source와 target 문장을 편집 거리 기반으로 정렬하고, 각 토큰의 duration 예측
+  - duration 값에 따라 삭제/삽입/치환 오류 판단
+    - 0:삭제 오류 / 1:유지or치환 / >=2:삽입 오류 
+  - 하지만 duration 예측이 어렵고, 잘못된 판단 시 **새 오류 유발 가능성 존재**
+
+- Implicit - 암묵적 정렬
+  - attention 또는 CTC 기반 구조를 활용해 **오류 위치를 명시하지 않고 간접 학습**
+  - 특히 CTC는 병렬 디코딩이 가능하고 duration 예측 없이 학습 가능
+  - 오류 위치에 대한 명확한 신호가 없다는 한계 존재
 
 
   
+<br>
+  
+## 3. SoftCorrect
+<img width="792" alt="image" src="https://github.com/user-attachments/assets/deb6f1ca-5406-4bbe-af97-56d6bf6f015d" />
+### 1) System Overview
+#### 다중 후보 정렬 및 입력 생성
+- ASR beam search로부터 얻은 다중 후보 문장 활용
+- 각 후보 문장은 길이가 다를 수 있으므로, **동일한 길이로 정렬**
+- 정렬된 결과는 각 위치마다 여러 후보 단어가 나열된 형태
+- 이를 임베딩한 뒤 위치별로 concat하여 선형 계층(linear layer)의 입력으로 사용
+
+#### 오류 탐지기 (Encoder)
+- 표준 Transformer Encoder 구조로 각 토큰에 대한 확률 생성
+- encoder의 hidden state는 임베딩 행렬과 곱해져서 **전체 어휘(vocabulary)**에 대한 확률 분포를 산출
+- 즉, 특정 위치에서 **정답 토큰 E와 잘못된 토큰 E′**에 대한 확률을 동시에 비교 가능
+
+#### 후보 문장 선택
+- **그냥 입력 토큰을 그대로 복사하는 방식(trivial copy)**으로 학습하지 않도록
+  - **anti-copy** 언어 모델 손실 함수를 사용해 encoder 학습
+- 정답만 예측하는 게 아니라, **“다른 후보 중 이 토큰이 더 자연스러운가?”** 를 평가하도록 학습
+- encoder가 출력한 확률 분포를 기반으로, **각 위치마다 가장 확률이 높은 토큰을 선택**
+
+#### 오류 토큰 판단 (확률 결합)
+- 선택된 문장의 각 토큰에 대해, **encoder 확률(LM 기반)과 ASR 음향 확률을 가중합(weighted sum)**
+- 확률이 설정된 임계값(threshold)보다 낮으면, 해당 토큰을 오류로 탐지
+
+#### 오류 교정기 (Decoder)
+- 선택된 후보 문장을 입력으로 받아, 수정된 최종 문장을 출력
+- 오류로 탐지된 토큰만 3번 중복하여 decoder에 입력
+- 정확한 토큰은 anchor로 간주되어 위치 고정, 수정되지 않음
+- constrained CTC loss로 학습
+
+### 2) Anti-Copy Language Modeling for Detection
+
+
+
   
 ## 요약 정리
 ### Problem
