@@ -1,5 +1,6 @@
 # SoftCorrect: Error correction with soft detection for automatic speech recognition
-
+  
+  
 ## 0. Abstract
 ### 오류 교정의 목표
 - ASR 모델이 생성한 문장에서 **잘못된 단어만을 수정하는 것**
@@ -27,7 +28,8 @@
   - Aidatatang: CER 9.4% 감소
   - 동시에 병렬 생성(parallel generation) 방식으로 빠른 속도도 유지
 
- 
+  
+   
 ## 1. Introduction
 ### Soft Error Detection의 구현 방법
 - 기존 binary 분류 대신 **언어 모델의 확률(logits) 사용**
@@ -62,8 +64,13 @@
   - ASR의 음향 확률 : 아 움송아 툭정 단어일 확률
   - 언어 모델 확률 : 앞뒤 문맥을 고려했을 때, 이 단어가 나올 확률
 
+  
+  
+## 2. Background
 
 
+  
+  
 ## 요약 정리
 ### Problem
 - ASR 시스템의 낮은 WER에도 불구하고 남아있는 오류 단어만을 선택적으로 수정해야 함
