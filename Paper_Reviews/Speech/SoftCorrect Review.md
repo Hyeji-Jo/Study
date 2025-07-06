@@ -122,7 +122,7 @@
 - 즉, 특정 위치에서 **정답 토큰 E와 잘못된 토큰 E′**에 대한 확률을 동시에 비교 가능
 
 #### 후보 문장 선택
-- **그냥 입력 토큰을 그대로 복사하는 방식(trivial copy)**으로 학습하지 않도록
+- **그냥 입력 토큰을 그대로 복사하는 방식(trivial copy)** 으로 학습하지 않도록
   - **anti-copy** 언어 모델 손실 함수를 사용해 encoder 학습
 - 정답만 예측하는 게 아니라, **“다른 후보 중 이 토큰이 더 자연스러운가?”** 를 평가하도록 학습
 - encoder가 출력한 확률 분포를 기반으로, **각 위치마다 가장 확률이 높은 토큰을 선택**
@@ -138,6 +138,75 @@
 - constrained CTC loss로 학습
 
 ### 2) Anti-Copy Language Modeling for Detection
+- encoder를 언어 모델처럼 학습시키되, trival copy(입력 그대로 복사) 현상을 방지하기 위한 손실 함수(anti-copy LM loss) 도입
+<img width="650" alt="image" src="https://github.com/user-attachments/assets/b03c3c20-8936-4ae0-8d0a-24ed6cb80779" />
+  
+#### Anti-Copy Language Model Loss 구성
+1. Cross-Entropy Term (기본 LM 학습)
+  - 문맥을 보고 정답 토큰의 확률이 가장 높아지도록 학습
+  - 정답 토큰 $`y_t`$ 이 전체 vocabulary V + GT 중에서 가장 높은 확률을 갖도록 softmax 학습
+2. Regularization Term (복사 억제)
+  - GT (가짜 정답) 토큰을 새로 추가
+  - 정답 토큰을 제외한 나머지 단어들과 GT 중에서 → GT의 확률이 가장 높아지도록 학습
+  - 정답을 모르더라도 GT를 선택하게 유도함으로써 입력 복사에 의존하지 않는 학습 유도
+    
+#### 손실 함수 수식
+<img width="414" alt="image" src="https://github.com/user-attachments/assets/c7f07f50-5bce-4701-8154-17a76e68bb94" />
+
+- $`H_t`$ : 위치 t에서의 encoder 출력
+- $`W_i`$ : softmax weight 행렬
+- $`y_t`$ : 위치 t의 정답 토큰
+- $`V`$ : 원래 vocabulary
+- $`\lambda`$ : 정규화 항의 가중치 (논문에서는 1.0 사용)
+  
+#### 효과
+- 정답은 맞추되, 단순히 입력을 복사하는 경향(trivial copy)을 억제함
+- encoder가 입력 후보 간 문맥상의 차이를 구별할 수 있게 됨
+- 결과적으로 오류 탐지 및 후보 선택에 더 정교한 확률 분포를 제공함
+<img width="445" alt="image" src="https://github.com/user-attachments/assets/76462079-a91f-41de-bbfa-757d83f0e19f" />
+
+
+### 3) Constrained CTC Loss for Correction
+#### 기존 CTC Loss의 문제
+- 입력의 모든 토큰을 복제해서 정렬과 수정 대상으로 사용함
+- 정확한 토큰도 수정 대상이 됨 → **정확한 단어가 오히려 바뀌는 오류 발생 가능**
+- 모든 위치에서 정렬을 하려 하니 **연산량 증가 → 속도 느려짐**
+
+#### Constrained CTC Loss
+<img width="466" alt="image" src="https://github.com/user-attachments/assets/f9d78cb8-a7d4-45f6-be60-f4bc33d6a3a2" />
+
+- **오류로 탐지된 토큰만 3회 중복하여 입력**으로 넣고
+- 정확한 토큰은 수정 없이 anchor처럼 고정시킴
+- 디코더는 이 구조를 기반으로 학습함
+
+#### Why Constrained CTC Loss
+<img width="442" alt="image" src="https://github.com/user-attachments/assets/42786146-37f9-4c7b-b40e-2d7da245b161" />
+
+- 기존 CTC는 전체 입력에서 정렬 경로를 자유롭게 찾음
+- SoftCorrect의 Constrained CTC는 다음처럼 제약함
+  - 정확한 토큰 위치는 고정
+  - 중복된 오류 토큰 부분만 정렬 허용
+- 결과: 어디를 고치고 어디는 그대로 둘지 명확히 구분됨
+
+#### 추론 시 처리 방식
+- 오류 토큰 위치에서만 softmax 수행하여 **수정된 토큰 선택**
+- 그 외 위치(정확한 토큰)는 수정 없이 그대로 출력
+- 중복과 blank는 CTC 방식에 따라 제거함
+
+#### 추가 설계: 오류 탐지 실수에 대한 보완
+- 오류 탐지기가 정확한 토큰을 실수로 오류로 판단하는 상황 대비
+- 학습 중, 정확한 토큰의 5%를 임의로 오류로 간주(pseudo error)
+  - **decoder가 정확한 토큰을 잘못 고치지 않도록 학습**
+- 이로써 decoder가 robust(강인)하게 학습됨
+
+
+  
+<br>
+  
+## 4. Experimental Setup
+### 1) Datasets and ASR Model
+
+
 
 
 
