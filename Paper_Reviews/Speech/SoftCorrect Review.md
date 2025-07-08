@@ -1,5 +1,50 @@
 # SoftCorrect: Error correction with soft detection for automatic speech recognition
-  
+## 요약 정리
+### Problem
+- ASR 시스템이 낮은 WER을 달성했음에도, **여전히 소수의 오류 단어**는 존재함  
+- 이때 중요한 건 **정확한 단어는 유지하고, 오류 단어만 선택적으로 수정하는 것**
+
+- 기존 방식들의 문제점
+  - **암묵적 오류 탐지**: 오류 위치에 대한 명확한 신호 부족 → 모델 학습 어려움
+  - **명시적 오류 탐지**: 오류 탐지가 실패할 경우 **정확한 단어를 잘못 수정하는 오류** 발생 가능
+- 따라서 오류 단어를 정확하고 유연하게 탐지하고, 해당 단어에만 집중하여 수정하는 방식이 필요
+
+### Contributions
+- **Soft Error Detection**  
+  - 언어 모델 확률 기반으로 각 단어의 오류 가능성을 판단  
+  - **GT token**을 추가한 anti-copy LM loss 도입
+- **Constrained CTC Loss**  
+  - **탐지된 오류 단어만 3회 복제**하여 디코더가 해당 위치에만 집중  
+  - 정확한 단어는 anchor처럼 그대로 유지
+- **병렬 생성 지원 (NAR)**: 빠른 속도 유지
+- **다수 후보(n-best)** 기반 후보 선택 및 오류 판단
+- **최고 수준 CER 감소 달성 (AISHELL-1, Aidatatang)**
+
+
+### Method
+- 전체 구조
+  - Encoder (탐지기)
+    - 다수 후보를 정렬하여 입력
+    - 각 위치의 단어가 문맥상 자연스러운지 **확률로 soft하게 판단**
+  - Decoder (수정기)
+    - **탐지된 오류 단어만 복제**
+    - **Constrained CTC Loss** 기반으로 병렬 교정 수행
+- 핵심 모듈
+  | 모듈 | 역할 |
+  |------|------|
+  | **Anti-Copy LM Loss** | GT token 추가 → trivial copy 방지 + 문맥 기반 오류 탐지 학습 |
+  | **Constrained CTC Loss** | 오류 단어만 복제 → 빠르고 정확한 수정 수행 |
+- 추가 기법
+  - **ASR beam search 후보(n-best)** 정렬 후 voting 기반 후보 선택  
+  - **ASR 음향 확률 + LM 확률** 결합 → 오류 판단 신뢰도 향상
+
+### Experiments
+<img width="585" alt="image" src="https://github.com/user-attachments/assets/9f9daca6-2ff4-41bf-bc11-dbcb29d356e8" />
+
+- 기존 명시적 탐지(NAR) 방식보다 **더 높은 정확도**
+- AR 기반 모델보다 **빠르면서도 정확**
+- **Aidatatang**처럼 오류 탐지가 어려운 환경에서도 **안정적으로 효과 발휘**
+
 
 <br>  
   
@@ -205,41 +250,109 @@
   
 ## 4. Experimental Setup
 ### 1) Datasets and ASR Model
+#### 데이터셋
+- 모두 중국어 음성 인식 데이터셋
+- 실험은 ASR → 오류 교정 순서로 진행
+| 데이터셋     | 학습 (train) | 개발 (dev) | 테스트 (test) |
+|--------------|--------------|-------------|----------------|
+| AISHELL-1    | 150시간       | 10시간       | 5시간          |
+| Aidatatang   | 140시간       | 20시간       | 40시간         |
 
+#### ASR 모델 구성
+- 아키텍처: Conformer (SOTA)
+- 성능 개선 기법
+  - SpecAugment (스펙트럼 왜곡)
+  - Speed perturbation (속도 변화)
+  - 언어 모델과 joint decoding
 
-
-
+#### 교정 모델용 학습 데이터
+- ASR 모델로 음성을 텍스트로 변환하여 오류가 포함된 문장 획득 → 교정 모델 학습에 사용
+- 추가로, 4억 개의 비평렬 텍스트를 이용해 **가짜 오류 데이터(pseudo data)** 를 생성하여 사전학습(pretraining) 진행
 
   
-## 요약 정리
-### Problem
-- ASR 시스템의 낮은 WER에도 불구하고 남아있는 오류 단어만을 선택적으로 수정해야 함
-- 기존 방식들의 문제점
-  - 암묵적 오류 탐지: 정확한 오류 위치 신호 부족
-	- 명시적 오류 탐지: 오류 탐지 실패 시 오히려 잘못된 수정 발생 가능
-- 따라서 오류 단어를 정확하고 유연하게 탐지하고, 해당 단어에만 집중하여 수정하는 방식이 필요
+### 2) Baseline Systems
+#### 암묵적 오류 탐지 모델 (Implicit)
+- AR Correct
+  - Transformer 기반 AR encoder-decoder
+- AR N-Best
+  - n-best 후보를 정렬하여 AR 모델에 입력
+- 오류 위치를 명시적으로 예측하지 않고, attention을 통해 암묵적으로 학습
 
-### Contributions
-- Soft Error Detection : 언어 모델 기반 확률로 단어 오류 여부를 판단 (GT token 도입)
-- Constrained CTC Loss : 탐지된 오류 단어만 중복하여 디코딩 대상에 포함시킴
-- 병렬 생성 기반으로 속도 유지
-- 다수 후보(beam search results)를 활용한 투표 기반 후보 선택
-- AISHELL-1/Aidatatang 데이터셋 기준 최고 CER 개선
+#### 명시적 오류 탐지 모델 (Explicit)
+- FastCorrect
+  - duration 예측 기반 병렬 디코딩 NAR 모델
+- FastCorrect 2
+  - FastCorrect + n-best 후보 사용
+- 각 토큰에 대해 duration을 예측하여 오류 유형(삽입/삭제/치환 등)을 명시적으로 파악
 
-### Method
-- 전체 구조
-  - Encoder (탐지기): soft하게 오류 단어 판단 (확률값으로)
-	- Decoder (수정기): 오류 단어만 복제 후 CTC로 수정
-- 핵심 모듈
-  - Anti-Copy Language Model Loss : 복사 학습을 피하기 위해 GT token을 추가한 변형된 cross-entropy loss
-  - Constrained CTC Loss : 오류 단어만 3회 복제 → 나머지는 그대로 디코딩 → 빠르고 정밀한 수정
-- 추가 기법
-  - ASR beam search 후보 다수 사용
-  - ASR 모델의 음향 확률과 encoder 확률을 융합해 오류 판단
+####  기타 결합 방식
+- Rescore
+  - 12-layer Transformer로 n-best 후보 중 가장 자연스러운 문장을 선택
+- FC + Rescore
+  - FastCorrect로 먼저 수정 → Rescore
+- Rescore + FC
+  - Rescore 먼저 수행 → 이후 FastCorrect로 수정
 
-### Experiments
-<img width="585" alt="image" src="https://github.com/user-attachments/assets/9f9daca6-2ff4-41bf-bc11-dbcb29d356e8" />
+  
+<br>
+  
 
-- 명시적 탐지 기반보다 더 높은 정확도
-- AR 모델보다 빠르고 정확
-- Aidatatang처럼 탐지가 어려운 데이터셋에서도 효과적
+## 5. Result
+### 1) Accuracy and Latency
+<img width="696" alt="image" src="https://github.com/user-attachments/assets/f7d5c2d5-df66-4549-9727-4a32e2d297a4" />
+
+- CER (Character Error Rate): 원본 문장과 교정 문장 간 문자 오류율
+- CERR (CER Reduction): ASR 원문 대비 오류율 감소율
+- Latency: 한 문장을 처리하는 데 걸리는 시간 (ms/sentence)
+- 다양한 기존 모델들과 비교하여, SoftCorrect는 **가장 높은 CERR (오류율 감소율)** + 추론 속도(latency)도 매우 빠름
+
+### 2) Ablation Studies
+<img width="709" alt="image" src="https://github.com/user-attachments/assets/67f5200e-3240-46a2-960b-c75e2326531d" />
+
+- SoftCorrect의 구성 요소(soft detection, anti-copy loss, constrained CTC)의 효과를 구성별로 제거해 확인
+- anti-copy LM loss는 단순 복사 대신 문맥 기반 오류 판단 능력을 높여줌
+- constrained CTC는 오류 토큰에만 수정 집중 → 정확도 향상 + 불필요한 수정 방지
+- GPT-style, binary 분류 방식은 문맥 반영이 부족하거나 비효율적임
+
+
+### 3) Method Analyses
+<img width="729" alt="image" src="https://github.com/user-attachments/assets/29064989-39e8-415c-9d01-d536d295b1fe" />
+
+- SoftCorrect가 기존 AR/NAR 모델보다 더 잘 오류를 찾고, 더 잘 고치는지 정량적으로 비교
+- 평가 지표
+  - P_det (Precision of Detection) : 오류로 탐지한 것 중 실제 오류인 비율
+  - R_det (Recall of Detection) : 실제 오류 중 탐지된 비율
+  - F1_det : 탐지 정밀도와 재현율의 조화 평균
+  - P_cor (Precision of Correction) : 수정한 것 중 실제로 정답으로 바뀐 비율
+
+- SoftCorrect는 탐지 정밀도와 재현율 모두 우수 → 높은 F1 score
+- 수정한 토큰 중 정답으로 바뀐 비율(P_cor)도 가장 높음
+- Aidatatang처럼 어려운 데이터셋에서도 성능 안정성 유지
+
+  
+<br>
+  
+
+## 6. Conclusion
+#### 기존 한계 및 제안
+- 기존의 오류 탐지 방식은 다음과 같은 한계 존재
+  - 명시적 탐지: 오류 유형 분류가 어렵고 실패 시 성능 악화
+  - 암묵적 탐지: 명확한 위치 신호가 없어 모델 학습이 비효율적
+- 이를 해결하기 위해, **SoftCorrect는 soft error detection** 방식을 제안함
+
+#### 주요 구성요소
+- Encoder
+  - 후보 문장 중 가장 자연스러운 문장을 선택하고, 각 토큰이 오류인지 확률적으로 판단
+- Anti-Copy LM Loss
+  - trivial copy 방지를 통해 문맥 기반 오류 탐지 능력 강화
+- Decoder
+  - 탐지된 오류 토큰만 수정, 나머지는 그대로 유지
+- Constrained CTC Loss
+  - 수정 대상을 제한해 정확도 상승 + 연산량 감소
+
+#### 실험 결과 요약
+- AISHELL-1: 26.1% CER 감소
+- Aidatatang: 9.4% CER 감소
+- 기존 AR/NAR/Rescore 방식보다 더 높은 정확도 + 더 빠른 속도 달성
+
+  
