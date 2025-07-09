@@ -97,14 +97,73 @@
   - $x_0^{src}$: 소스 mel-spectrogram
   - $s^{tgt}$: 타겟 화자 임베딩
   - $p^{src}$: 소스 음소 임베딩
-- 알고리즘 개요:
+- 알고리즘 개요
+  <img width="433" alt="image" src="https://github.com/user-attachments/assets/af8b92cf-a6b4-4ff2-bce6-668701ed82de" />
 
-```text
-1: x ← x₀_src
-2: for t in {S_K, ..., S_1}:
-3:     z ∼ N(0, I) if t > S_1 else z = 0
-4:     x ← update using ε_θ(x, t, s_tgt, p_src) + σ_t z
-5: return x₀_tgt ← x
+
+
+
+ 
+
+<br>  
+  
+## 3. Proposal: FastVoiceGrad
+### 1) Rethinking initial states in sampling
+#### 배경 및 개념
+- FastVoiceGrad는 단일 스텝(one-step) 역확산으로 음성 변환을 수행해야 하므로, 초기 상태 설정(sampling 시작점)인 **두 요소가 변환 성능에 영향을 미침**
+  - $x$ (입력 스펙트로그램)
+  - $t$ (reverse step 위치)
+- 추론(inference) 시 어떤 초기값을 선택해야 source 정보는 잘 보존하면서도, 학습 분포와의 차이를 줄여 고품질 음성 변환이 가능한가를 실험적으로 분석함
+- VoiceGrad에서는 $x_0^{src}$ (소스 mel-spectrogram) 를 초기값으로 사용함
+  - 하지만 diffusion 모델은 학습 시 정규분포에서 시작된 샘플을 다루므로
+  - 이렇게 깨끗한 데이터로 시작하면 분포 차이(gap) 가 발생
+ 
+#### 기존 방식의 한계
+- $x \sim \mathcal{N}(0, I)$
+  - 순수 노이즈에서 시작
+  - 학습과 추론 분포 일치 (장점)
+  - 소스 정보가 완전히 사라짐 → 내용 왜곡 (단점)
+- $x = x_0^{src}$
+  - 깨끗한 소스 그대로 시작
+  - 소스 내용 완벽 유지 (장점)
+  - 학습 시에는 노이즈에서 시작했으므로 분포 불일치 (단점)
+
+#### 제안 : 중간 노이즈 상태로 시작
+- 소스 정보를 일부 보존하면서도, 학습 분포와 유사한 초기값을 생성
+  - $`x^{src}{S_K} = \sqrt{\bar{\alpha}{S_K}} \cdot x^{src}0 + \sqrt{1 - \bar{\alpha}{S_K}} \cdot \epsilon \tag{9}`$
+  - 이 식은 $x_0^{src}$에 노이즈를 일정 단계($S_K$)만큼 섞은 상태를 의미
+  - 추론 시에는 이 $x^{src}_{S_K}$를 초기값 $x$로 사용
+
+#### 결론
+<img width="426" alt="image" src="https://github.com/user-attachments/assets/c4b98a10-4a36-4de1-9187-8fb64c35df29" />
+
+- 실험결과를 바탕으로 논문에서는 $S_K = 950$ 일 때 음질과 화자 유사도가 가장 균형 잡힘을 확인
+- 따라서 이후 모든 실험 설정값
+  - 초기값 $x = x^{src}_{950}$
+  - 초기 step $t = S_K = 950$
+
+### 2) Adversarial conditional diffusion distillation
+#### 배경 및 개념
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
