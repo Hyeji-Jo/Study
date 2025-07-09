@@ -88,7 +88,7 @@
 - $w_t = 1$ (실험에서 고정), L1 손실 사용 (L2보다 효과적)
 
 ### 5) 음성 변환 알고리즘(Inference)
-- 입력:
+- 입력
   - $x_0^{src}$: 소스 mel-spectrogram
   - $s^{tgt}$: 타겟 화자 임베딩
   - $p^{src}$: 소스 음소 임베딩
@@ -100,5 +100,6 @@
 3:     z ∼ N(0, I) if t > S_1 else z = 0
 4:     x ← update using ε_θ(x, t, s_tgt, p_src) + σ_t z
 5: return x₀_tgt ← x
+
 
 
