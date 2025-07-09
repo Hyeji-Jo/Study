@@ -57,7 +57,48 @@
 <br>  
   
 ## 2. Preliminary : VoiceGrad
-### 1) 연구 배경
+### 1) 모델 개요
+- **VoiceGrad는** diffusion 모델을 기반으로 한 **비병렬 음성 변환(VC) 모델**
+- 두 가지 변형 존재
+  - DSM(Denoising Score Matching) 기반
+  - DDPM(Denoising Diffusion Probabilistic Model) 기반
+- 본 논문에서는 DDPM 기반 VoiceGrad에 집중함
+  - DSM 대비 반복 횟수를 줄이면서도 성능 유지 가능
+ 
+### 2) Forward Diffusion
+- 원 데이터 $`x_0`$ 를 노이즈 $`x_T`$ 로 점진적으로 변환
+- $`q(x_t | x_{t-1}) = \mathcal{N}(x_t; \sqrt{\alpha_t} x_{t-1}, \beta_t I) \tag{1}`$
+- 초기 $x_0$에서 $x_t$까지 직접 계산한 식
+  - $`q(x_t | x_0) = \mathcal{N}(x_t; \sqrt{\bar{\alpha}_t} x_0, (1 - \bar{\alpha}_t) I) \tag{2}`$
+  - $`x_t = \sqrt{\bar{\alpha}_t} x_0 + \sqrt{1 - \bar{\alpha}_t} \epsilon, \quad \epsilon \sim \mathcal{N}(0, I) \tag{3}`$
 
+
+### 3) Reverse Diffusion
+- 노이즈 $`x_T`$ 에서 실제 음성 특징 $`x_0`$ 로 복원
+- $`p_\theta(x_{t-1} | x_t) = \mathcal{N}(x_{t-1}; \mu_\theta(x_t, t, s, p), \sigma_t^2 I) \tag{4}`$
+- $`x_{t-1} = \mu_\theta(x_t, t, s, p) + \sigma_t z, \quad z \sim \mathcal{N}(0, I) \tag{5}`$
+
+- 평균 $\mu_\theta$는 예측된 노이즈 $\epsilon_\theta$로부터 계산
+  - $`\mu_\theta(x_t, t, s, p) = \frac{1}{\sqrt{\alpha_t}} \left(x_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \epsilon_\theta(x_t, t, s, p) \right) \tag{7}`$
+
+
+### 4) 학습 방식
+- 목표 : 모델 $\epsilon_\theta$가 실제 노이즈 $\epsilon$을 예측하도록 학습
+- 손실 함수 : $`\mathcal{L}_{DDPM}(\theta) = \sum_{t=1}^T w_t \, \mathbb{E}_{x_0, \epsilon} \left[ \| \epsilon - \epsilon_\theta(x_t, t, s, p) \|_1 \right] \tag{8}`$
+- $w_t = 1$ (실험에서 고정), L1 손실 사용 (L2보다 효과적)
+
+### 5) 음성 변환 알고리즘(Inference)
+- 입력:
+  - $x_0^{src}$: 소스 mel-spectrogram
+  - $s^{tgt}$: 타겟 화자 임베딩
+  - $p^{src}$: 소스 음소 임베딩
+- 알고리즘 개요:
+
+```text
+1: x ← x₀_src
+2: for t in {S_K, ..., S_1}:
+3:     z ∼ N(0, I) if t > S_1 else z = 0
+4:     x ← update using ε_θ(x, t, s_tgt, p_src) + σ_t z
+5: return x₀_tgt ← x
 
 
