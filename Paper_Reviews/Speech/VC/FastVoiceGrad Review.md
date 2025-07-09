@@ -59,11 +59,16 @@
 ## 2. Preliminary : VoiceGrad
 ### 1) 모델 개요
 - **VoiceGrad는** diffusion 모델을 기반으로 한 **비병렬 음성 변환(VC) 모델**
+  - 학습 시에 소스–타깃 음성 간 일대일 정렬된(parallel) 데이터가 필요 없기 때문
+  - 학습 과정에서 음소 정보(phoneme embedding) 와 화자 정보(speaker embedding) 만을 조건(condition)으로 사용해서 mel spectrogram을 직접 예측 
 - 두 가지 변형 존재
   - DSM(Denoising Score Matching) 기반
   - DDPM(Denoising Diffusion Probabilistic Model) 기반
 - 본 논문에서는 DDPM 기반 VoiceGrad에 집중함
   - DSM 대비 반복 횟수를 줄이면서도 성능 유지 가능
+  - DSM 기반 VoiceGrad는 Reverse 과정에서 약 100~1000 step을 필요로 함
+  - DDPM기반 VocieGrad는 10step 수준으로도 비슷한 성능을 낼 수 있음
+  - 즉, inference 속도 측면에서 효율적
  
 ### 2) Forward Diffusion
 - 원 데이터 $`x_0`$ 를 노이즈 $`x_T`$ 로 점진적으로 변환
