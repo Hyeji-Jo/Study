@@ -183,6 +183,7 @@ B. Student 모델
 
 ### 3) Variance Adaptor
 <img width="291" height="281" alt="image" src="https://github.com/user-attachments/assets/150ea9e3-85a0-44e3-b748-3592a0be0bb7" />
+
 #### Variance Information
 1. Duration
   - 각 음소(phoneme)가 얼마나 길게 발음되는지 (타이밍, 리듬)
