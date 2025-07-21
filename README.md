@@ -26,7 +26,7 @@
 <br>  
 
 # Paper Reviews 
-- [(더보기 ✅)](https://github.com/Hyeji-Jo/Study/blob/a568eed0c8ced2cf1db7158fca1aa26f7e34745c/Paper_Reviews/README.md)  
+- [(더보기 ✅)](https://github.com/Hyeji-Jo/Study/blob/02fbfec45fef89f7beeab4adc81e5c6ed2e0a599/Paper_Reviews/README.md)  
   
 | Title | Year | Venue | Type | Category | Subcategory | Review | Code | ETC. |
 |-------|:------:|:------------:|:------------:|:----------:|:-------------:|:--------:|:------:|:------:|
