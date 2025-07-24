@@ -82,9 +82,9 @@
   - **Fully convolutional 인코더**
     - RNN 없이 전체를 convolution 연산만으로 구성한 인코더
     - 병렬처리가 가능해서 학습이 빠르고 효율적임
-    - But, 일반 1D convolution 연산은 **시간 축(time)**과 **채널 축(depth)**을 한꺼번에 처리하기에 연상량이 크고 비효율적일 수 있음
+    - But, 일반 1D convolution 연산은 **시간 축(time)** 과 **채널 축(depth)** 을 한꺼번에 처리하기에 연상량이 크고 비효율적일 수 있음
   - **TDS (Time-Depth Separable)**
-    - **시간(time)**과 **깊이(depth)**를 분리해서 처리하는 convolution 구조
+    - **시간(time)** 과 **깊이(depth)** 를 분리해서 처리하는 convolution 구조
     - ex) 시간 축 방향으로만 합성곱 수행 -> 각 시간 위치에 대해 채널 간 정보 추출 -> 채널간 feature mixing ...
     - 장기 의존성 부족할 수 있음
 
@@ -96,15 +96,15 @@
   - $`\text{attend}(K, V, Q) = V \cdot \text{softmax}\left( \frac{1}{\sqrt{d}} K^T Q\right)`$
      - 여기서 \(d\)는 키 \(K\), 쿼리 \(Q\), 값 \(V\)의 은닉 차원(hidden dimension)
      - $`\sqrt{d}`$로 나누는 것은 스케일링을 위한 것 
-- $`P(y_u | X, y_{&lt;u}) = h(S_u, Q_u)`$
-  - 최종적으로 요약 벡터 $`S_u`$와 쿼리 벡터 $`Q_u`$를 사용하여 출력 토큰(output tokens)에 대한 확률 분포 $`P(y_u | X, y_{&lt;u})`$를 계산
+- $`P(y_u | X, y_{u}) = h(S_u, Q_u)`$
+  - 최종적으로 요약 벡터 $`S_u`$와 쿼리 벡터 $`Q_u`$를 사용하여 출력 토큰(output tokens)에 대한 확률 분포 $`P(y_u | X, y_{u})`$를 계산
 
 ### Inference - Beam Search를 이용한 추론
 - 모델이 새로운 음성 입력에 대해 적합한 텍스트 전사를 찾아내는 추론 과정
 - **음향 모델(AM)** 과 **외부 언어 모델(LM)** 을 조합하여, **beam search** 알고리즘을 통해 가장 높은 점수를 받는 텍스트 가설 $`\bar{Y}`$ 선택
   - $`\text{P}_{\text{AM}}`$: 음성 특징(\(X\))으로부터 텍스트(\(Y\))의 확률을 계산하는 모델
   - $`\text{P}_{\text{LM}}`$: 텍스트 시퀀스(\(Y\))의 언어적 자연스러움을 평가하는 외부 언어 모델
-- $`\bar{Y} = \operatorname{argmax}_Y \log P_{AM}(Y | X) + \alpha \log P_{LM}(Y) + \beta|Y|`$
+- $`\bar{Y} = \text{argmax}_Y \log P_{AM}(Y | X) + \alpha \log P_{LM}(Y) + \beta|Y|`$
   - $`\bar{Y}`$ : 최종 선택된 전사 결과 (가장 높은 점수를 받은 텍스트 시퀀스)
   - $`\arg\max_Y`$ : 가능한 모든 \(Y\) 중 점수를 최대화하는 것을 선택
   - $`\log P_{\text{AM}}(Y|X)`$
@@ -122,7 +122,7 @@
 
 ### Inference - 조기 종료 문제 방지
 - 특정 확률 조건을 만족할 때만 문장 종료(EOS: End-of-Sentence) 토큰을 제안
-- $`\log P_u(\text{EOS} | y_{&lt;u}) &gt; \gamma \cdot \max_{c \neq \text{EOS}} \log P_u(c | y_{&lt;u})`$
+- $`\log P_u(\text{EOS} | y_{u}) &gt; \gamma \cdot \max_{c \neq \text{EOS}} \log P_u(c | y_{&lt;u})`$
 
 
 
