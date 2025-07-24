@@ -76,8 +76,8 @@
   - 대응되는 텍스트 (예: 문자/word-piece 시퀀스)
 
 ### Encoder
-- $`\[[K\ V]= \text{encode}(X) \quad (1)\]`$
-- 입력 음성 프레임 $`\(X = [X_1, \ldots, X_T]\)`$를 키(keys) $`\(K = [K_1, \ldots, K_T]\)`$ 와 값(values) $`\(V = [V_1, \ldots, V_T]\)`$ 로 구성된 은닉 표현(hidden representation)으로 변환
+- $`[K\ V]= \text{encode}(X) \quad (1)\`$
+- 입력 음성 프레임 $`X = [X_1, \ldots, X_T]`$를 키(keys) $`K = [K_1, \ldots, K_T]`$ 와 값(values) $`V = [V_1, \ldots, V_T]`$ 로 구성된 은닉 표현(hidden representation)으로 변환
 - TDS(Time-Depth Separable) 블록을 사용하는 완전 컨볼루션(fully convolutional) 인코더를 사용
   - **Fully convolutional 인코더**
     - RNN 없이 전체를 convolution 연산만으로 구성한 인코더
@@ -89,41 +89,40 @@
     - 장기 의존성 부족할 수 있음
 
 ### Decoder
-- $`\[Q_u = \text{RNN}(y_{u-1}, Q_{u-1}) \quad (2)\]`$
-  - RNN을 사용하여 이전 토큰 $`\(y_{u-1}\)`$ 과 쿼리 벡터(query vector) $`\(Q_{u-1}\)`$ 를 인코딩해 다음 쿼리 벡터 $`\(Q_u\)`$ 생성
-- $`\[S_u = \text{attend}(Q_u, K, V) \quad (3)\]`$
-  - Q,K,V 어텐션 메커니증을 통해 요약 벡터(summary vector) $`\(S_u\)`$ 생성
-  - $`\[\text{attend}(K, V, Q) = V \cdot \text{softmax}\left( \frac{1}{\sqrt{d}} K^T Q\right) \quad (5)\]`$
+- $`Q_u = \text{RNN}(y_{u-1}, Q_{u-1})`$
+  - RNN을 사용하여 이전 토큰 $`y_{u-1}`$ 과 쿼리 벡터(query vector) $`Q_{u-1}`$ 를 인코딩해 다음 쿼리 벡터 $`Q_u`$ 생성
+- $`S_u = \text{attend}(Q_u, K, V)`$
+  - Q,K,V 어텐션 메커니증을 통해 요약 벡터(summary vector) $`S_u`$ 생성
+  - $`\text{attend}(K, V, Q) = V \cdot \text{softmax}\left( \frac{1}{\sqrt{d}} K^T Q\right)`$
      - 여기서 \(d\)는 키 \(K\), 쿼리 \(Q\), 값 \(V\)의 은닉 차원(hidden dimension)
-     - $`\(\sqrt{d}\)`$로 나누는 것은 스케일링을 위한 것 
-- $`\[P(y_u | X, y_{&lt;u}) = h(S_u, Q_u) \quad (4)\]`$
-  - 최종적으로 요약 벡터 $`\(S_u\)`$와 쿼리 벡터 $`\(Q_u\)`$를 사용하여 출력 토큰(output tokens)에 대한 확률 분포 $`\(P(y_u | X, y_{&lt;u})\)`$를 계산
+     - $`\sqrt{d}`$로 나누는 것은 스케일링을 위한 것 
+- $`P(y_u | X, y_{&lt;u}) = h(S_u, Q_u)`$
+  - 최종적으로 요약 벡터 $`S_u`$와 쿼리 벡터 $`Q_u`$를 사용하여 출력 토큰(output tokens)에 대한 확률 분포 $`P(y_u | X, y_{&lt;u})`$를 계산
 
 ### Inference - Beam Search를 이용한 추론
 - 모델이 새로운 음성 입력에 대해 적합한 텍스트 전사를 찾아내는 추론 과정
-- **음향 모델(AM)** 과 **외부 언어 모델(LM)** 을 조합하여, **beam search** 알고리즘을 통해 가장 높은 점수를 받는 텍스트 가설 $`\( \bar{Y} \)`$ 선택
-  - $`\(\text{P}_{\text{AM}}\)`$: 음성 특징(\(X\))으로부터 텍스트(\(Y\))의 확률을 계산하는 모델
-  - $`\(\text{P}_{\text{LM}}\)`$: 텍스트 시퀀스(\(Y\))의 언어적 자연스러움을 평가하는 외부 언어 모델
-- <img width="737" height="66" alt="image" src="https://github.com/user-attachments/assets/f4d31482-fe6d-4e64-aa3a-cc643a4fdd33" />
-
-  - $`\( \bar{Y} \)`$ : 최종 선택된 전사 결과 (가장 높은 점수를 받은 텍스트 시퀀스)
-  - $`\( \arg\max_Y \)`$ : 가능한 모든 \(Y\) 중 점수를 최대화하는 것을 선택
-  - $`\( \log P_{\text{AM}}(Y|X) \)`$
+- **음향 모델(AM)** 과 **외부 언어 모델(LM)** 을 조합하여, **beam search** 알고리즘을 통해 가장 높은 점수를 받는 텍스트 가설 $`\bar{Y}`$ 선택
+  - $`\text{P}_{\text{AM}}`$: 음성 특징(\(X\))으로부터 텍스트(\(Y\))의 확률을 계산하는 모델
+  - $`\text{P}_{\text{LM}}`$: 텍스트 시퀀스(\(Y\))의 언어적 자연스러움을 평가하는 외부 언어 모델
+- $`\bar{Y} = \operatorname{argmax}_Y \log P_{AM}(Y | X) + \alpha \log P_{LM}(Y) + \beta|Y|`$
+  - $`\bar{Y}`$ : 최종 선택된 전사 결과 (가장 높은 점수를 받은 텍스트 시퀀스)
+  - $`\arg\max_Y`$ : 가능한 모든 \(Y\) 중 점수를 최대화하는 것을 선택
+  - $`\log P_{\text{AM}}(Y|X)`$
     - 음성 특징 \(X\)가 주어졌을 때 텍스트 시퀀스 \(Y\)를 생성할 로그 확률
     - 입력 음성이 텍스트와 얼마나 잘 일치하는지
-  - $`\( \log P_{\text{LM}}(Y) \)`$
+  - $`\log P_{\text{LM}}(Y)`$
     - 외부 언어 모델(PLM)이 예측한 확률
     - 문법적으로, 의미적으로 자연스러운 문장인지
-  - $`\( \alpha \)`$ : 언어 모델 가중치 (LM weight) - 클수록 언어 모델의 영향 증가
-  - $`\( \beta |Y| \)`$ : 토큰 삽입 항
+  - $`\alpha`$ : 언어 모델 가중치 (LM weight) - 클수록 언어 모델의 영향 증가
+  - $`\beta |Y|`$ : 토큰 삽입 항
     - \(|Y|\)는 텍스트 시퀀스 \(Y\)에 포함된 토큰(예: 단어 또는 서브워드)의 개수
-    - $`\( \beta \)`$는 가중치, 조기 종료 문제를 방지하기 위해 사용
+    - $`\beta`$는 가중치, 조기 종료 문제를 방지하기 위해 사용
       - 전사된 시퀀스의 길이에 비례하여 점수를 조정하여, 모델이 너무 짧은 전사를 선호하는 경향을 완화 
 
 
 ### Inference - 조기 종료 문제 방지
 - 특정 확률 조건을 만족할 때만 문장 종료(EOS: End-of-Sentence) 토큰을 제안
-- $`\[ \log P_u(\text{EOS} | y_{&lt;u}) &gt; \gamma \cdot \max_{c \neq \text{EOS}} \log P_u(c | y_{&lt;u}) \quad (7) \]`$
+- $`\log P_u(\text{EOS} | y_{&lt;u}) &gt; \gamma \cdot \max_{c \neq \text{EOS}} \log P_u(c | y_{&lt;u})`$
 
 
 
