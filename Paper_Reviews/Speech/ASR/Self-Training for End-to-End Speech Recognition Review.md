@@ -1,10 +1,8 @@
 # Self-Training for End-to-End Speech Recognition
 ## 요약 정리
 ### Problem
-- End-to-End ASR 시스템은 성능 향상을 위해 대규모의 라벨링된 데이터가 필요
-  - 실제 현장에서는 전사 작업의 비용/시간 부담으로 인해 라벨 데이터 수집이 어려움
-- 기존의 Semi-Supervised Learning 기법들은 hybrid 모델 중심
-  - E2E에서는 복잡한 구조(TTS, cycle-consistency 등)를 요구
+- End-to-End ASR은 대규모 라벨 없는 데이터 사용이 어렵다 (기존 SSL/ST는 주로 hybrid 구조)
+- 레이블링 비용이 크고, pseudo-label 품질 관리가 어려움
 
 ### Contributions
 - 강력한 acoustic + language 모델 기반 pseudo-label 생성
@@ -36,7 +34,7 @@
   - 로그 확률을 시퀀스 길이로 나눈 값 사용
  
 
-### Experiments
+### Experiments & Setup
 #### 데이터 구성
 | 유형 | 세트 이름 | 시간 | 용도 |
 |------|-----------|------|------|
@@ -69,50 +67,28 @@
 
 
 ### Results
-#### Filtering의 효과 (WER ↓)
-| 환경 | 필터링 없음 | Heuristic | Heuristic + Confidence |
-|------|--------------|-----------|------------------------|
-| Dev-clean | 6.18% | 6.01% | **5.84%** |
-| Dev-other | 24.1% | 21.4% | **18.95%** |
-
-#### Ensemble의 효과
-| 앙상블 모델 수 | Dev-clean WER | Dev-other WER |
-|----------------|----------------|----------------|
-| 1 | 5.84% | 21.86% |
-| 4 | **5.41%** | **20.31%** |
-| 6 | 5.36% | **18.95%** (+13.7%) |
-
-#### 기존 연구 대비 WER Recovery Rate (WRR)
-| 방법 | Test-clean WER | WRR |
-|------|----------------|-----|
-| Cycle TTE | 21.5% | 27.6% |
-| ASR+TTS | 17.5% | 38.0% |
-| **본 논문 (Ensemble)** | **9.62%** | **76.2%** |
+- Filtering 효과: Dev-other WER 24.1% → 18.95%  
+- Ensemble 효과: Dev-other 21.86% → 18.95% (6 models)  
+- WRR: 76.2% (기존 Cycle TTE 27.6%, ASR+TTS 38.0% 대비 우위)
 
 
 ### Insights
-1. **Self-Training은 단순하지만 강력한 SSL 전략**
-   - 복잡한 cycle-consistency나 TTS 없이도 높은 성능 확보 가능
-   - End-to-End ASR에 효과적임을 실험적으로 입증
+- ST의 핵심은 “좋은 pseudo-label 만들기”와 “나쁜 라벨 걸러내기”
+- Sample Ensemble로 추론 비용 없이 ensemble 효과
+- Low-resource 상황에서도 실용적 파이프라인 가능
 
-2. **Filtering은 필수 구성 요소**
-   - pseudo-label은 noisy할 수밖에 없음
-   - Filtering 없이는 오히려 성능 저하 가능
-   - 특히 noisy 환경에서 필터링 없이는 학습 안정성도 낮음
 
-3. **Sample Ensemble은 고성능을 추론 비용 없이 달성할 수 있는 전략**
-   - inference ensemble은 느리고 비용이 큼
-   - 학습 시점에서 pseudo-label 다양성 확보 → 더 robust한 모델 생성
+### Limitations
+- LibriSpeech(읽기 음성)만 실험 → 실제 대화/잡음 도메인 일반화 미검증  
+- 필터링 기준(heuristic, threshold)이 **수동 튜닝**; 도메인 바뀌면 다시 조정 필요  
+- Confidence 계산이 길이 정규화 log prob 뿐 → 토큰/프레임 단위 불확실성 반영 부족  
+- Sample Ensemble도 결국 **여러 모델 학습 비용↑**(8 GPUs, 다단계 학습)  
+- AM+LM 기반 생성 → LM 텍스트 도메인 품질/크기에 크게 의존  
+- 한 번 생성된 pseudo-label을 고정 → iterative refinement나 teacher-student 상호학습 미흡
 
-4. **실제 적용 가능성**
-   - 소량의 labeled data + 대량의 unlabeled 음성 + 텍스트만 있으면  
-     → Low-resource 환경에서도 성능 개선 가능
-   - 모델 구조도 간단하고, wav2letter++나 ESPnet 등에서 쉽게 재현 가능
-
-5. **후속 연구 아이디어**
-   - confidence score를 soft label로 활용 (semi-KD 구조)
-   - ensemble된 pseudo-label에 weighting 주기
-   - domain adaptation 적용 (noisy → clean transfer)
+### Idea
+- 도메인 변화(콜센터, 의료) 적용 시 LM 도메인 적합성 고려 필요  
+- Multilingual 확장 시 wordpiece 재설정·LM 병합 전략 검토
 
 ---
 
