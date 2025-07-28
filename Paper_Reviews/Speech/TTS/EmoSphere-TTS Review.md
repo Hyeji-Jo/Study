@@ -251,7 +251,7 @@
   - $$D_t(\cdot, c)$$: 조건 c에 따른 Discriminator 출력
   - 진짜는 1, 가짜는 0 되도록 학습
 - **Generator Loss $$(\mathcal{L}_G)$$**
-   - $$ \mathcal{L}G = \sum{c \in \{\text{spk}, \text{emo}\}} \sum_t \mathbb{E} \left[ (1 - D_t(\hat{y}_t, c))^2 \right]$$
+   - $$\mathcal{L}G = \sum{c \in \{\text{spk}, \text{emo}\}} \sum_t \mathbb{E} \left[ (1 - D_t(\hat{y}_t, c))^2 \right]$$
    - G는 Discriminator가 “가짜를 진짜로 믿게” 만들도록 학습
 
 
@@ -337,6 +337,7 @@
 - **목표**: 감정 강도(weak/medium/strong)가 음성에서 잘 표현되었는지 평가
 - **방법**: 각 강도에 따라 합성된 음성쌍을 제시하고 “어느 쪽이 더 강한 감정인가?”를 사람이 선택
 - **결과**
+  
 | 감정 | 모델 | Weak<Medium | Medium<Strong | Weak<Strong |
 |------|------|--------------|----------------|---------------|
 | Angry | EmoSphere-TTS | **0.72** | **0.75** | **0.79** |
