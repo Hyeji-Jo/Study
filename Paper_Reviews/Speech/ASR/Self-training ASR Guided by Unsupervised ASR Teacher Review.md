@@ -8,22 +8,77 @@
 - 또한 SSL 방식(예: Data2vec2)은 pseudo-target이 어떤 정보를 담고 있는지 해석이 어려움
   
 ### Contributions
-- UASR(Wav2vec-u2)를 teacher로 사용하는 self-training 구조 제안
+- **UASR(Wav2vec-u2)를 teacher로 사용하는 self-training 구조 제안**
+  - 라벨 없이 teacher 생성 가능 → 초기 teacher의 label dependency 제거
+- **phonetic supervision을 student의 중간 Transformer layer에 적용**
+  - 중간 층에서 phoneme-level 정보를 직접 학습하도록 유도
+  - 상위층에서는 더 정교한 ASR-friendly 표현 학습 가능
+- **self-distillation + phonetic distillation**을 결합한 새로운 하이브리드 학습 구조
+- **라벨 없이도 기존 SSL & self-training을 모두 능가하는 성능 달성**
 
 ### Method
-
+- **Teacher 모델 (UASR)**
+  - Wav2vec-u2 기반
+  - GAN 구조로 학습되어 unpaired speech + text 만으로 phoneme-level 표현 생성
+- **Student 모델 (Data2vec2)**
+  - CNN + Transformer 기반
+  - self-distillation 방식으로 context target을 학습
+  - 동시에 중간 층에서 UASR의 phonetic 표현을 따라 학습
+- **Loss 구성**
+  - Final layer: MSE(Self-distillation)
+  - Intermediate layer: MSE(phoneme distillation)
+  - Total Loss: $$\mathcal{L}{total} = \mathcal{L}{SSL} + \kappa \cdot \mathcal{L}_{distill}$$
 
 ### Experiments & Setup
-
+- **Dataset**
+  - Pre-training: LibriSpeech 960h (unlabeled)
+  - Fine-tuning: LibriSpeech 100h (labeled, low-resource)
+  - Evaluation: test-clean / test-other (WER 기준)
+- **Baseline**
+  - Data2vec2, HuBERT, WavLM, PBERT, ASBERT 등
+- **UASR Training**
+  - GAN 기반 wav2vec-u2 구조 사용
+  - 여러 번 학습 후 dev-other PER 기준으로 best model 선택
+- **Intermediate layer**
+  - Transformer의 4번째 레이어 사용
+  - UASR target은 instance normalization 적용 
 
 ### Results
+| 모델                          | test-clean | test-other |
+|-------------------------------|------------|-------------|
+| Wav2vec2 [Baseline SSL]       | 6.1        | 13.5        |
+| HuBERT                        | 6.3        | 13.2        |
+| WavLM                         | 5.7        | 12.0        |
+| Data2vec2                     | 4.5        | 9.3         |
+| MonoBERT                      | 5.5        | 11.7        |
+| PolyBERT                      | 4.9        | 11.1        |
+| CTC-clustering (100h)         | 5.2        | 11.4        |
+| PBERT (100h)                  | 4.2        | 9.5         |
+| ASBERT (100h)                 | 4.4        | 9.9         |
+| **Ours (CTC-finetuned teacher)** | 4.2    | 9.0         |
+| **Ours (Wav2vec-u2 teacher)**    | **4.1** | **8.9**     |
+
+- **Relative WER Reduction (vs. Data2vec2)**
+  - test-clean: **8.9% 감소**  
+  - test-other: **4.3% 감소**
+
+- **기존 supervised self-training 방법(PBERT, ASBERT)보다도 우수**
+- **전체 pre-training 과정에서 라벨이 전혀 필요하지 않음**
+  - **완전 라벨프리 self-training 구조로 SOTA 달성**
 
 
 ### Limitations
-
+- **UASR teacher는 GAN 기반**이므로 학습 안정성이 낮음
+  - 여러 번 학습 후 best checkpoint 선택 필요
+- **어떤 중간 layer를 supervision에 쓸지 선택은 실험적 튜닝 필요**
+- 아직까지는 phoneme-level 표현의 정확도 자체는 supervised ASR보단 떨어짐
 
 ### Insights & Idea
-
+- “라벨 없이 시작하는 self-training”의 실질적 가능성 제시
+- **Transformer의 중간 층이 phonetic 정보에 민감하다는 점을 활용한 새로운 학습 방식**
+- **향후 연구 아이디어**
+  - UASR 성능 자체를 개선하거나, 다양한 layer에 multi-scale supervision 적용
+  - domain adaptation이나 multilingual ASR에도 적용 가능성 있음
 
 <br>  
   
