@@ -10,8 +10,16 @@
 ### Method
 
 
-### Experiments
+### Experiments & Setup
 
+
+### Results
+
+
+### Limitations
+
+
+### Insights & Idea
 
 
 <br>  
@@ -56,3 +64,8 @@
 
 
 
+
+<br>  
+  
+## 1. Introduction
+### 연구 문제 정의
