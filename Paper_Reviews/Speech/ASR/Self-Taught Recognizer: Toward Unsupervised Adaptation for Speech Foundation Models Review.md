@@ -118,11 +118,94 @@
 <br>  
   
 ## 2. Related Work
+### ASR에서의 비지도 도메인 적응 (Unsupervised Domain Adaptation, UDA)
+- 타겟 도메인에서 **라벨링된 음성(transcriptions)** 확보는 시간과 비용이 많이 듬
+- 따라서 기존 연구들은 **소스 도메인(label 포함) 데이터**를 기반으로, **라벨 없는 타겟 도메인 데이터**에 적응하는 방법 고안
+
+- **주요 기법**
+  - 타켓 음성 시뮬레이션: 타겟 도메인 스타일의 데이터를 합성해서 적응
+  - 적대적 학습 (Adversarial Learning): 도메인 불변 표현을 학습하여 domain shift 최소화
+  - Teacher-Student Learning: source 모델이 label 제공 → target 모델 학습
+  - Self-supervised 모델 활용: wav2vec2 등으로 pseudo-label 생성하여 라벨 없이 적응
+- **한계**
+  - 위 접근법들은 대부분 **소스 도메인의 레이블이 필요**하므로 완전한 비지도 학습이 아님 → **semi-supervised에 가까움**
+  - 소스 데이터 접근 자체가 어려운 경우가 많음 → **현실 적용 제약 존재**
+
+### 소스 프리 비지도 도메인 적응 (Source-free Unsupervised Domain Adaptation)
+- **소스 데이터를 완전히 배제**하고, 사전 학습된 모델만을 가지고 **라벨 없는 타겟 도메인에 적응하는 방법론**
+- **필요성**
+  - 소스 데이터에 개인정보나 민감 정보 포함 가능성
+  - 저장/전달/재사용의 법적·윤리적 제약 → 소스 없이 적응하는 방법이 중요
+- **주요 접근법**
+  - Self-supervised Knowledge Distillation: 사전 학습된 모델의 내부 지식만 활용하여 적응
+  - Contrastive Learning: 타겟 도메인 간 유사·비유사 샘플 간 간극을 학습
+  - Hidden Structure Mining: 라벨 없이 데이터 간 구조 관계를 추출하여 학습
+  - Uncertainty-guided Adaptation: 모델의 예측 불확실성을 활용해 신뢰도 높은 샘플 선택 (→ STAR가 속한 범주)
+ 
+- 최근에는 **auto-regressive decoder 기반 불확실성 추정**에 대한 연구가 많아졌으나,
+→ **Source-Free UDA에는 거의 적용되지 않음**
+
+### STAR의 위치 및 차별성
+- **문제 인식**
+  - Whisper 등 speech foundation model은 사전 학습에 수십만 시간의 데이터를 사용
+    - 소스 도메인의 범위가 넓고 복잡
+  - 이 데이터를 보존·공유·재학습하는 것이 현실적으로 불가능
+- **STAR의 핵심 아이디어**
+  - 소스 데이터가 없는 환경에서, **모델이 생성한 pseudo-label의 품질을 평가**
+  - 신뢰할 수 있는 토큰 중심으로 학습을 유도 → **지시적 자기학습 (instructive self-training)**
+- **효과**
+  - source 데이터 불필요
+  - ground-truth vs pseudo-label 적응 성능 차이를 크게 줄임
+  - 현실적인 Source-free UDA 달성
+  - ASR 기반 실제 서비스에 적용 가능성↑ (예: 음성 비서 도메인 적응) 
 
 
 
 
+<br>  
+  
+## 3. Methodology
+### 3.1 Problem Setup
+#### ASR 공식화 (ASR Formulation)
+- ASR 모델 f는 음성 입력 $$x \in \mathbb{R}^T$$를 텍스트 시퀀스 $$y \in \mathbb{R}^L$$로 변환
+- 학습은 **teacher-forcing + cross-entropy loss**로 이루어짐
+  - $$\mathcal{L}{\text{ASR}}(x, y) = \sum{l=1}^{L} - \log P_{\theta} (y_l|y_{1:l-1}, x)$$
+- 핵심: **순차적(auto-regressive) 예측**으로 **이전 토큰에 기반해 다음 토큰 예측**
 
+#### UDA 설정
+- 목적: 라벨 없는 **타겟 도메인 데이터** $$X^{(t)}$$ 만 사용해, **소스 모델 $$f^{(s)}$$** 를 **타겟 도메인 $$D^{(t)}$$** 에 맞게 적응
+- Source-free UDA 시나리오
+  - 소스 도메인 데이터 $$\{X^{(s)}, Y^{(s)}\}$$는 사용할 수 없음
+  - 사전 학습된 모델 $$f^{(s)}$$만 주어진 상황에서 **라벨 없는 음성 $$X^{(t)}$$** 만으로 적응해야 함 
+
+#### Self-Training 전략 (STAR의 핵심 구조)
+- **Pseudo-label 생성**
+  - unlabeled 데이터 $$X^{(t)} = \{x_i^{(t)}\}_{i=1}^{N^{(t)}}$$를 소스 모델 $$f^{(s)}$$에 넣어 pseudo-label $$\hat{Y}^{(t)} = \{\hat{y}i^{(t)}\}{i=1}^{N^{(t)}}$$ 생성
+- **Informed Finetuning (정보 기반 미세 조정)**
+  - $$\{X^{(t)}, \hat{Y}^{(t)}\}$$를 이용해 모델을 타겟 도메인으로 적응시키는 학습 수행
+  - $$\mathcal{L}{\text{ST}}(X^{(t)}, \hat{Y}^{(t)}) = \sum{i=1}^{N^{(t)}} \mathcal{L}_{\text{ASR}}(x_i^{(t)}, \hat{y}_i^{(t)})$$
+
+
+### 3.2 Token-level Assessment and Re-weighting
+#### 배경 및 목표
+- Self-training에서 생성된 pseudo-label의 품질은 다양
+- 따라서 **각 토큰별로 품질을 평가하고, 좋은 토큰은 크게, 나쁜 토큰은 작게 학습에 반영해야 함**
+- 이 유사 레이블의 품질을 평가하고, 이를 바탕으로 모델 업데이트를 안내하는 "지표 (indicator)"를 개발하는 것이 이 섹션의 주요 목표
+- 이는 토큰 레벨 (단어 또는 하위 단어 단위)과 발화 레벨 (전체 문장 단위)에서 모두 이루어짐
+
+#### Confidence Score의 한계
+- $$C_l = \max P(\hat{y}_l|\hat{y}_{1:l-1}, x, \theta^*)$$
+  - $$\hat{y}{1:l-1}$$: 이전에 예측된 토큰들
+  - $$\theta^*$$: 모델의 학습된 파라미터
+- 기존의 모델에서는 각 토큰 예측에 대한 "confidence score" $$\(C_l\)$$ (확신 점수)를 사용
+- 이는 자동 회귀 디코딩 (auto-regressive decoding) 시 이전 예측된 토큰들에 기반하여 현재 토큰 $$\hat{y}_l$$의 후방 확률 (posterior probability) 중 가장 높은 값으로 정의
+- **STAR 기반 재가중 학습 손실**: $$eLASR(x, \hat{y}) = \sum_{l=1}^{L} -\log P_{\theta}(\hat{y}_l|\hat{y}_{l-1:1}, x) \cdot C_l$$
+  - L: 출력 텍스트 시퀀스의 길이
+- **문제점**
+  - 자동 회귀 디코딩에서 확신 점수가 예측 정확도를 정확하게 반영하지 못하는 경향 존재
+  - 오류 누적 (error accumulation) 및 과도한 확신 (over-confident) 문제 때문 
+
+#### Attentive Score
 
 
 
