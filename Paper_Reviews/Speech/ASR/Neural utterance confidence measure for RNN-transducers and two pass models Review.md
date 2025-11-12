@@ -169,18 +169,17 @@
 | **Joint Network (조인트 네트워크)** | 두 출력을 결합해 어휘 전체에 대한 확률 분포 생성 |
 
 - 전체 확률 분포는 다음과 같이 표현됨
-$$
-h_t = \text{Trans}(x_t, h_{t-1}) \\
-g_u = \text{Pred}(y_{u-1}, g_{u-1}) \\
-p_{t,u} = \text{Joint}(h_t, g_u)
-$$
+  - $`h_t = \text{Trans}(x_t, h_{t-1})`$ 
+  - $`g_u = \text{Pred}(y_{u-1}, g_{u-1})`$
+  - $`p_{t,u} = \text{Joint}(h_t, g_u)`$
+
 
 여기서  
-- $`\(x_t\)`$: 입력 오디오 프레임  
-- $`\(h_t\)`$: Transcription Network의 상태  
-- $`\(y_{u-1}\)`$: 이전 단계에서 예측된 레이블  
-- $`\(g_u\)`$: Prediction Network의 상태  
-- $`\(p_{t,u}\)`$: 어휘 전체에 대한 예측 확률 분포
+- $`x_t`$: 입력 오디오 프레임  
+- $`h_t`$: Transcription Network의 상태  
+- $`y_{u-1}`$: 이전 단계에서 예측된 레이블  
+- $`g_u`$: Prediction Network의 상태  
+- $`p_{t,u}`$: 어휘 전체에 대한 예측 확률 분포
 
 - 즉, RNN-T는 음향 정보(Transcription)와 언어 정보(Prediction)를 결합하여, **실시간 스트리밍 인식이 가능한 E2E 구조**를 제공
 
